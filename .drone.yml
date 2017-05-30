@@ -1,0 +1,124 @@
+---
+build:
+  build:
+    image: golang:1.8
+    commands:
+      - go get -u .
+      - go build -o app
+    when:
+      branch: master
+      event: push
+
+publish:
+  gcr:
+    storage_driver: overlay
+
+    registry: us.gcr.io
+    repo: nyt-video-dev/video-captions
+    tag:
+      - latest
+      - $$COMMIT
+    token: >
+      $$GOOGLE_CREDENTIALS_DEV
+
+    when:
+      branch: master
+      event: push
+
+deploy:
+  gke-dev:
+    # Documentation: https://github.com/NYTimes/drone-gke/blob/master/DOCS.md.
+    image: nytimes/drone-gke
+
+    # For debugging
+    dry_run: true
+    verbose: true
+
+    zone: us-central1-b
+    cluster: team-cluster-name
+    namespace: your-app
+    token: >
+      $$GOOGLE_CREDENTIALS_DEV
+
+    # These variables are made available in the .kube.yml template.
+    vars:
+      image: us.gcr.io/THE-PROJECT-NAME-dev/image-name:$$COMMIT
+      app: your-app
+      env: dev-or-stg
+      port: 8000
+      replicas: 3
+      # NOTE: recommend minimum of 2 to ensure uptime during a rolling deploy.
+      replicas_min: 2
+      replicas_max: 5
+      cpu: 80
+      env_var_foo: bar
+      env_var_num: 123
+      ip_name: your-dev-ip
+      cert_name: your-dev-cert
+
+    # These variables are made available in the .kube.sec.yml secret template in base64 encoding.
+    secrets:
+      # NOTE: see https://github.com/nytm/dv-drone-gcp-guide step 6 on where this comes from.
+      secret_var: $$EXAMPLE_SECRET
+
+    when:
+      branch: master
+      event: push
+
+  gke-prd:
+    # TODO: This is a repeat of the previous gke section except:
+    # - Configure your arguments for deploying to the prd cluster
+    # - The when condition is on tags
+    # - The "token:" is $$GOOGLE_CREDENTIALS_PRD
+    # Documentation: https://github.com/NYTimes/drone-gke/blob/master/DOCS.md.
+    image: nytimes/drone-gke
+
+    # For debugging
+    dry_run: true
+    verbose: true
+
+    zone: us-central1-b
+    cluster: team-cluster-name
+    namespace: your-app
+    token: >
+      $$GOOGLE_CREDENTIALS_PRD
+
+    # These variables are made available in the .kube.yml template.
+    vars:
+      image: us.gcr.io/THE-PROJECT-NAME-dev/image-name:$$COMMIT
+      app: your-app
+      env: prd
+      replicas: 5
+      # NOTE: recommend minimum of 2 to ensure uptime during a rolling deploy.
+      replicas_min: 3
+      replicas_max: 10
+      cpu: 80
+      env_var_foo: bar
+      env_var_num: 123
+      ip_name: your-prd-ip
+      cert_name: your-prd-cert
+
+    # These variables are made available in the .kube.sec.yml secret template in base64 encoding.
+    secrets:
+      # NOTE: see https://github.com/nytm/dv-drone-gcp-guide step 6 on where this comes from.
+      secret_var: $$EXAMPLE_SECRET
+
+    when:
+      event: tag
+
+notify:
+  slack:
+    webhook_url: $$SLACK_WEBHOOK_URL # This is set by Drone by default
+    channel: your-slack-channel
+
+    when:
+      branch: master
+
+  slack:
+    webhook_url: $$SLACK_WEBHOOK_URL # This is set by Drone by default
+    channel: your-slack-channel
+
+    when:
+      event:
+        - pull_request
+        - tag

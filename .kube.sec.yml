@@ -1,0 +1,12 @@
+# NOTE: this file is parsed as a golang template.
+---
+apiVersion: v1
+kind: Secret
+
+metadata:
+  name: secrets
+
+type: Opaque
+
+data:
+  name-in-kube-sec: {{.secret_var}}

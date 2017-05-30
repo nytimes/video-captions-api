@@ -1,0 +1,111 @@
+# NOTE: this file is parsed as a golang template.
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+
+metadata:
+  name: {{.app}}-{{.env}}
+
+spec:
+  replicas: {{.replicas}}
+
+  template:
+    metadata:
+      labels:
+        app: {{.app}}
+        env: {{.env}}
+
+    spec:
+      containers:
+        - name: application
+          image: {{.image}}
+          ports:
+            - containerPort: {{.port}}
+          # Quote all environment variable values
+          env:
+            - name: ENV_VAR_FOO
+              value: "{{.env_var_foo}}"
+            - name: ENV_VAR_NUMBER
+              value: "{{.env_var_num}}"
+            - name: ENV_VAR_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: name-in-kube-sec
+          # Please see probe documentation for details:
+          # https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/
+          # Available probe types are httpGet, tcpSocket, and exec
+          #
+          # readinessProbe success tells Kubernetes to send traffic to this container
+          # All containers in a pod must pass the readinessProbe for the pod to receive traffic
+          # Required for Ingress
+          readinessProbe:
+            # Success on 200 response
+            httpGet:
+              path: /healthz
+              port: {{.port}}
+            initialDelaySeconds: 1
+            periodSeconds: 10
+            timeoutSeconds: 1
+            successThreshold: 1
+            failureThreshold: 3
+          # livenessProbe failure alerts Kubernetes to restart this container
+          livenessProbe:
+            # Success on socket connection to port
+            tcpSocket:
+              port: {{.port}}
+            initialDelaySeconds: 1
+            periodSeconds: 10
+            timeoutSeconds: 1
+            successThreshold: 1
+            failureThreshold: 3
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+
+metadata:
+  name: {{.app}}-{{.env}}
+
+spec:
+  scaleTargetRef:
+    kind: Deployment
+    name: {{.app}}-{{.env}}
+  minReplicas: {{.replicas_min}}
+  maxReplicas: {{.replicas_max}}
+  targetCPUUtilizationPercentage: {{.cpu}}
+---
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: {{.app}}-{{.env}}
+
+spec:
+  type: NodePort
+  selector:
+    app: {{.app}}
+    env: {{.env}}
+  ports:
+    - port: 80
+      targetPort: {{.port}}
+      protocol: TCP
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+
+metadata:
+  name: {{.app}}-{{.env}}
+  # Please see https documentation for details:
+  # https://github.com/nytm/dv-gcp-guide/blob/master/topics/https.md
+  annotations:
+    # Disable port 80 access (set at initial creation; otherwise no effect)
+    kubernetes.io/ingress.allow-http: "false"
+    # Name of the static global IP address in GCP
+    kubernetes.io/ingress.global-static-ip-name: "{{.ip_name}}"
+    # Name of the TLS certificate in GCP
+    ingress.gcp.kubernetes.io/pre-shared-cert: "{{.cert_name}}"
+
+spec:
+  backend:
+    serviceName: {{.app}}-{{.env}}
+    servicePort: 80

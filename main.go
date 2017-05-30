@@ -21,5 +21,6 @@ func main() {
 	router.HandleFunc("/{name}", echo).Methods("GET")
 	router.HandleFunc("/", echo).Methods("GET")
 
+	fmt.Println("listening on port 8000")
 	http.ListenAndServe(":8000", router)
 }
