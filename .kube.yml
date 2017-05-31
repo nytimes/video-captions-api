@@ -17,6 +17,36 @@ spec:
 
     spec:
       containers:
+        - name: esp
+          image: gcr.io/nyt-bsre-prd/dv-cloud-endpoints
+          args: [
+            "-p", "{{.ce_esp_port}}",
+            "-a", "127.0.0.1:{{.port}}",
+            "-s", "{{.ce_service_name}}",
+            "-v", "{{.ce_service_version}}",
+          ]
+          env:
+            - name: CE_INGRESS_NAME
+              value: "{{.app}}-{{.env}}"
+            - name: CE_ALLOW_OFFICE
+              value: "true"
+          ports:
+            - containerPort: {{.ce_esp_port}}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: {{.ce_esp_port}}
+            periodSeconds: 10
+            initialDelaySeconds: 10
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: {{.ce_esp_port}}
+            periodSeconds: 10
+            initialDelaySeconds: 10
+            timeoutSeconds: 5
+
         - name: application
           image: {{.image}}
           ports:
@@ -77,8 +107,9 @@ spec:
     app: {{.app}}
     env: {{.env}}
   ports:
-    - port: 8000
-      targetPort: {{.port}}
+    - name: http
+    - port: 80
+      targetPort: {{.ce_esp_port}}
       protocol: TCP
 ---
 apiVersion: extensions/v1beta1
