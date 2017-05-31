@@ -4,7 +4,7 @@ build:
     image: golang:1.8
     commands:
       - go get
-      - go build -o app
+      - go build --ldflags '-extldflags "-static"' -o app
     when:
       branch: master
       event: push
