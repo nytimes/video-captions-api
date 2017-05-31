@@ -1,10 +1,10 @@
 ---
 build:
   test:
-    image: golang:1.8
+    image: golang:1.8-alpine
     commands:
       - go get
-      - go build --ldflags '-extldflags "-static"' -o app
+      - go build -o app
     when:
       branch: master
       event: push
