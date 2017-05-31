@@ -37,7 +37,6 @@ deploy:
 
     zone: us-central1-b
     cluster: dev-cluster
-    namespace: video-captions-api
     token: >
       $$GOOGLE_CREDENTIALS_DEV
 
