@@ -54,8 +54,8 @@ deploy:
       replicas_min: 2
       replicas_max: 5
       cpu: 80
-      ip_name: your-dev-ip
-      cert_name: your-dev-cert
+      ip_name: video-captions-api
+      cert_name: stg-nyt-net-cert
 
     # These variables are made available in the .kube.sec.yml secret template in base64 encoding.
 

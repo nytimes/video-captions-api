@@ -108,7 +108,7 @@ spec:
     env: {{.env}}
   ports:
     - name: http
-    - port: 80
+      port: 80
       targetPort: {{.ce_esp_port}}
       protocol: TCP
 ---
@@ -121,7 +121,7 @@ metadata:
   # https://github.com/nytm/dv-gcp-guide/blob/master/topics/https.md
   annotations:
     # Disable port 80 access (set at initial creation; otherwise no effect)
-    kubernetes.io/ingress.allow-http: "false"
+    kubernetes.io/ingress.allow-http: "true"
     # Name of the static global IP address in GCP
     kubernetes.io/ingress.global-static-ip-name: "{{.ip_name}}"
     # Name of the TLS certificate in GCP
