@@ -8,5 +8,3 @@ metadata:
 
 type: Opaque
 
-data:
-  name-in-kube-sec: {{.secret_var}}

@@ -23,15 +23,6 @@ spec:
             - containerPort: {{.port}}
           # Quote all environment variable values
           env:
-            - name: ENV_VAR_FOO
-              value: "{{.env_var_foo}}"
-            - name: ENV_VAR_NUMBER
-              value: "{{.env_var_num}}"
-            - name: ENV_VAR_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: secrets
-                  key: name-in-kube-sec
           # Please see probe documentation for details:
           # https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/
           # Available probe types are httpGet, tcpSocket, and exec
