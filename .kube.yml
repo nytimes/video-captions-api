@@ -77,7 +77,7 @@ spec:
     app: {{.app}}
     env: {{.env}}
   ports:
-    - port: 80
+    - port: 8000
       targetPort: {{.port}}
       protocol: TCP
 ---

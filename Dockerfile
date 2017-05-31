@@ -1,7 +1,7 @@
 FROM alpine:3.3
 
-ADD app /bin/
+ADD captions-api /bin/
 
-ENTRYPOINT "/bin/app"
+ENTRYPOINT "/bin/captions-api"
 
 EXPOSE 8000

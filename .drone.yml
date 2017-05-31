@@ -3,9 +3,9 @@ build:
   test:
     image: golang:1.8-alpine
     commands:
-      - apk update && apk add git mercurial bzr && rm -rf /var/cache/apk/*
+      - apk update && apk add git mercurial bzr
       - go get
-      - go build -o app
+      - go build -o captions-api
     when:
       branch: master
       event: push
