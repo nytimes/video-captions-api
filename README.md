@@ -13,3 +13,5 @@ Build the dev image:
 Run:
 
 `$ make dev`
+
+Go to http://localhost:8000
