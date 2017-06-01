@@ -1,0 +1,13 @@
+FROM golang:1.8-alpine
+
+WORKDIR /go/src/github.com/nytm/video-captions-api
+
+RUN apk update && apk add --no-cache git mercurial bzr && go get github.com/pilu/fresh
+
+COPY . .
+
+RUN go get .
+
+CMD fresh
+
+EXPOSE 8000
