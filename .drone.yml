@@ -63,3 +63,20 @@ deploy:
       branch: master
       event: push
 
+notify:
+  slack:
+    webhook_url: $$SLACK_WEBHOOK_URL
+    channel: media-factory
+
+    when:
+      branch: master
+
+  slack:
+    webhook_url: $$SLACK_WEBHOOK_URL
+    channel: media-factory
+
+    when:
+      event:
+        - pull_request
+        - push
+        - tag
