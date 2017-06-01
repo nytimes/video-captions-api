@@ -67,7 +67,7 @@ deploy:
     image: nytimes/drone-gke
 
     # For debugging
-    dry_run: true
+    dry_run: false
     verbose: true
 
     zone: us-central1-b
