@@ -20,14 +20,14 @@ publish:
       - latest
       - $$COMMIT
     token: >
-      $$GOOGLE_CREDENTIALS_DEV
+      $$GOOGLE_CREDENTIALS_STG
 
     when:
       branch: master
       event: push
 
 deploy:
-  gke-dev:
+  gke-stg:
     # Documentation: https://github.com/NYTimes/drone-gke/blob/master/DOCS.md.
     image: nytimes/drone-gke
 
@@ -38,13 +38,13 @@ deploy:
     zone: us-central1-b
     cluster: dev-cluster
     token: >
-      $$GOOGLE_CREDENTIALS_DEV
+      $$GOOGLE_CREDENTIALS_STG
 
     # These variables are made available in the .kube.yml template.
     vars:
       image: us.gcr.io/nyt-video-dev/video-captions-api:$$COMMIT
       app: video-captions-api
-      env: dev
+      env: stg
       port: 8000
       ce_esp_port: 8001
       ce_service_name: video-captions-api.endpoints.nyt-video-dev.cloud.goog

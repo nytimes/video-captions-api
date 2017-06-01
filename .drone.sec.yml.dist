@@ -3,10 +3,7 @@
 # Commit this so all developers know what variables are required to run the application if they update .drone.sec.
 ---
 environment:
-  EXAMPLE_SECRET: # set-secret-value-here
-  # Notice the indentation/alignment of each line in GOOGLE_CREDENTIALS.
-  # They are all the same - this is necessary!
-  GOOGLE_CREDENTIALS_DEV: >
+  GOOGLE_CREDENTIALS_STG: >
     {
     "type": "service_account",
     "project_id": "",
@@ -32,4 +29,3 @@ environment:
     "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
     "client_x509_cert_url": ""
     }
-  ANOTHER_SECRET: # set-secret-value-here
