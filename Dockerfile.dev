@@ -1,6 +1,6 @@
 FROM golang:1.8-alpine
 
-WORKDIR /go/src/github.com/nytm/video-captions-api
+WORKDIR /go/src/github.com/NYTimes/video-captions-api
 
 RUN apk update && apk add --no-cache git mercurial bzr && go get github.com/pilu/fresh
 
