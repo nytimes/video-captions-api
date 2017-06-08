@@ -2,7 +2,6 @@ package database
 
 import (
 	"context"
-	"strconv"
 
 	"cloud.google.com/go/datastore"
 )
@@ -37,34 +36,26 @@ func NewDatastoreClient(projectID string) (*DatastoreClient, error) {
 // StoreJob stores a job
 func (c *DatastoreClient) StoreJob(job Job) (string, error) {
 	ctx := context.Background()
-	key := makeKey(c.kind, c.namespace)
-	newKey, err := c.client.Put(ctx, key, &job)
+	key := NewNameKeyWithNamespace(c.kind, job.ID, c.namespace)
+	_, err := c.client.Put(ctx, key, &job)
 	if err != nil {
 		return "", err
 	}
 
-	return strconv.FormatInt(newKey.ID, 10), nil
+	return job.ID, nil
 }
 
 // GetJob retrieves a job from database
-func (c *DatastoreClient) GetJob(idStr string) (Job, error) {
+func (c *DatastoreClient) GetJob(id string) (Job, error) {
 	result := Job{}
 	ctx := context.Background()
-	id, err := strconv.ParseInt(idStr, 10, 64)
-	if err != nil {
-		return result, err
-	}
-
-	key := datastore.IDKey(c.kind, id, nil)
-	key.Namespace = c.namespace
-
+	key := NewNameKeyWithNamespace(c.kind, id, c.namespace)
 	err := c.client.Get(ctx, key, &result)
 	if err != nil {
 		return result, err
 	}
 
 	return result, nil
-
 }
 
 // GetJobs retrieves all jobs in database
@@ -81,37 +72,27 @@ func (c *DatastoreClient) GetJobs() ([]Job, error) {
 }
 
 // UpdateJob updates a job
-func (c *DatastoreClient) UpdateJob(idStr string, job Job) error {
-	_, err := c.GetJob(idStr)
+func (c *DatastoreClient) UpdateJob(id string, job Job) error {
+	_, err := c.GetJob(id)
 	if err != nil {
 		return err
 	}
 
 	ctx := context.Background()
-	key := makeKey(c.kind, c.namespace)
-	key.ID, err = strconv.ParseInt(idStr, 10, 64)
-	if err != nil {
-		return err
-	}
+	key := NewNameKeyWithNamespace(c.kind, id, c.namespace)
 	_, err = c.client.Put(ctx, key, &job)
 	return err
 }
 
 // DeleteJob deletes a job from database
-func (c *DatastoreClient) DeleteJob(idStr string) error {
-	id, err := strconv.ParseInt(idStr, 10, 64)
-	if err != nil {
-		return err
-	}
-
+func (c *DatastoreClient) DeleteJob(id string) error {
 	ctx := context.Background()
-	key := datastore.IDKey(c.kind, id, nil)
-	key.Namespace = c.namespace
+	key := NewNameKeyWithNamespace(c.kind, id, c.namespace)
 	return c.client.Delete(ctx, key)
 }
 
-func makeKey(kind, namespace string) *datastore.Key {
-	key := datastore.IncompleteKey(kind, nil)
+func NewNameKeyWithNamespace(kind, name, namespace string) *datastore.Key {
+	key := datastore.NameKey(kind, name, nil)
 	key.Namespace = namespace
 	return key
 }

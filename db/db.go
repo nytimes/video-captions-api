@@ -11,6 +11,7 @@ type DB interface {
 }
 
 type Job struct {
+	ID        string
 	Media_url string
 	Status    string
 	ScoopID   string
