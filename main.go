@@ -1,26 +1,25 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
-
-	"github.com/gorilla/mux"
+	"github.com/NYTimes/gizmo/config"
+	"github.com/NYTimes/gizmo/server"
+	"github.com/NYTimes/video-captions-api/service"
 )
 
-func echo(w http.ResponseWriter, r *http.Request) {
-	values := mux.Vars(r)
-	name := values["name"]
-	if name == "" {
-		name = "unknown"
-	}
-	w.Write([]byte(fmt.Sprintf("hello %s\n", name)))
-}
-
 func main() {
-	router := mux.NewRouter()
-	router.HandleFunc("/{name}", echo).Methods("GET")
-	router.HandleFunc("/", echo).Methods("GET")
+	var cfg service.Config
+	config.LoadJSONFile("./config.json", &cfg)
 
-	fmt.Println("listening on port 8000")
-	http.ListenAndServe(":8000", router)
+	server.Init("video-captions-api", cfg.Server)
+
+	err := server.Register(service.NewSimpleService(&cfg))
+	if err != nil {
+		server.Log.Fatal("Unable to register service: ", err)
+	}
+
+	err = server.Run()
+	if err != nil {
+		server.Log.Fatal("Server encountered a fatal error: ", err)
+	}
+
 }
