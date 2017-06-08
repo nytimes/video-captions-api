@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"errors"
 
 	"cloud.google.com/go/datastore"
 )
@@ -35,6 +36,10 @@ func NewDatastoreClient(projectID string) (*DatastoreClient, error) {
 
 // StoreJob stores a job
 func (c *DatastoreClient) StoreJob(job Job) (string, error) {
+	if _, err := c.GetJob(job.ID); err == nil {
+		return "", errors.New("Job already exists")
+	}
+
 	ctx := context.Background()
 	key := NewNameKeyWithNamespace(c.kind, job.ID, c.namespace)
 	_, err := c.client.Put(ctx, key, &job)
