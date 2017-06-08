@@ -41,7 +41,7 @@ func (c *DatastoreClient) StoreJob(job Job) (string, error) {
 	}
 
 	ctx := context.Background()
-	key := NewNameKeyWithNamespace(c.kind, job.ID, c.namespace)
+	key := newNameKeyWithNamespace(c.kind, job.ID, c.namespace)
 	_, err := c.client.Put(ctx, key, &job)
 	if err != nil {
 		return "", err
@@ -54,7 +54,7 @@ func (c *DatastoreClient) StoreJob(job Job) (string, error) {
 func (c *DatastoreClient) GetJob(id string) (Job, error) {
 	result := Job{}
 	ctx := context.Background()
-	key := NewNameKeyWithNamespace(c.kind, id, c.namespace)
+	key := newNameKeyWithNamespace(c.kind, id, c.namespace)
 	err := c.client.Get(ctx, key, &result)
 	if err != nil {
 		return result, err
@@ -84,7 +84,7 @@ func (c *DatastoreClient) UpdateJob(id string, job Job) error {
 	}
 
 	ctx := context.Background()
-	key := NewNameKeyWithNamespace(c.kind, id, c.namespace)
+	key := newNameKeyWithNamespace(c.kind, id, c.namespace)
 	_, err = c.client.Put(ctx, key, &job)
 	return err
 }
@@ -92,11 +92,11 @@ func (c *DatastoreClient) UpdateJob(id string, job Job) error {
 // DeleteJob deletes a job from database
 func (c *DatastoreClient) DeleteJob(id string) error {
 	ctx := context.Background()
-	key := NewNameKeyWithNamespace(c.kind, id, c.namespace)
+	key := newNameKeyWithNamespace(c.kind, id, c.namespace)
 	return c.client.Delete(ctx, key)
 }
 
-func NewNameKeyWithNamespace(kind, name, namespace string) *datastore.Key {
+func newNameKeyWithNamespace(kind, name, namespace string) *datastore.Key {
 	key := datastore.NameKey(kind, name, nil)
 	key.Namespace = namespace
 	return key
