@@ -1,4 +1,4 @@
-package threeplay
+package providers
 
 import (
 	"fmt"
@@ -6,26 +6,25 @@ import (
 	"strconv"
 
 	"github.com/NYTimes/threeplay"
-	"github.com/NYTimes/video-captions-api/providers"
 )
 
 const providerName string = "3play"
 
-type Provider struct {
+type ThreePlayProvider struct {
 	*threeplay.Client
 }
 
-func New(APIKey, APISecret string) providers.Provider {
-	return &Provider{
+func NewThreePlay(APIKey, APISecret string) Provider {
+	return &ThreePlayProvider{
 		threeplay.NewClient(APIKey, APISecret),
 	}
 }
 
-func (c *Provider) GetName() string {
+func (c *ThreePlayProvider) GetName() string {
 	return providerName
 }
 
-func (c *Provider) GetJob(id string) (*providers.Job, error) {
+func (c *ThreePlayProvider) GetJob(id string) (*Job, error) {
 	i, err := strconv.Atoi(id)
 	if err != nil {
 		return nil, err
@@ -36,7 +35,7 @@ func (c *Provider) GetJob(id string) (*providers.Job, error) {
 		return nil, err
 	}
 
-	job := &providers.Job{
+	job := &Job{
 		ID:       strconv.FormatUint(uint64(file.ID), 10),
 		Status:   file.State,
 		Provider: providerName,
@@ -44,7 +43,7 @@ func (c *Provider) GetJob(id string) (*providers.Job, error) {
 	return job, nil
 }
 
-func (c *Provider) DispatchJob(job providers.Job) (providers.Job, error) {
+func (c *ThreePlayProvider) DispatchJob(job Job) (Job, error) {
 	fmt.Println("Dispatching job to 3Play", job.ID)
 	// TODO: we need to parse job.ProviderParams to query
 	query, _ := url.ParseQuery("for_asr=1")
@@ -52,7 +51,7 @@ func (c *Provider) DispatchJob(job providers.Job) (providers.Job, error) {
 	fileID, err := c.UploadFileFromURL(job.MediaURL, query)
 
 	if err != nil {
-		return providers.Job{}, err
+		return Job{}, err
 	}
 
 	job.ProviderID = fileID
