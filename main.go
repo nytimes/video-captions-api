@@ -3,16 +3,27 @@ package main
 import (
 	"github.com/NYTimes/gizmo/config"
 	"github.com/NYTimes/gizmo/server"
+	"github.com/NYTimes/video-captions-api/database"
+	"github.com/NYTimes/video-captions-api/providers"
+	"github.com/NYTimes/video-captions-api/providers/threeplay"
 	"github.com/NYTimes/video-captions-api/service"
 )
 
 func main() {
 	var cfg service.Config
+	var providers []providers.Provider
+	db, err := database.NewDatastoreClient("nyt-video-dev")
+	if err != nil {
+		server.Log.Fatal("Unable to create Datastore client", err)
+	}
 	config.LoadJSONFile("./config.json", &cfg)
 
-	server.Init("video-captions-api", cfg.Server)
+	// TODO: remove the list from the service constructor and
+	// add support for service.AddProvider(provider)
+	providers = append(providers, threeplay.New(cfg.APIKey, cfg.APISecret))
 
-	err := server.Register(service.NewSimpleService(&cfg))
+	server.Init("video-captions-api", cfg.Server)
+	err = server.Register(service.NewSimpleService(&cfg, providers, db))
 	if err != nil {
 		server.Log.Fatal("Unable to register service: ", err)
 	}

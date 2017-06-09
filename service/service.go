@@ -6,12 +6,12 @@ import (
 	"github.com/NYTimes/gziphandler"
 
 	"github.com/NYTimes/gizmo/server"
+	"github.com/NYTimes/video-captions-api/database"
 	"github.com/NYTimes/video-captions-api/providers"
-	"github.com/NYTimes/video-captions-api/providers/threeplay"
 )
 
 type SimpleService struct {
-	client providers.Provider
+	client Client
 }
 
 type Config struct {
@@ -20,9 +20,16 @@ type Config struct {
 	APISecret string
 }
 
-func NewSimpleService(cfg *Config) *SimpleService {
+func NewSimpleService(cfg *Config, providersArr []providers.Provider, db database.DB) *SimpleService {
+	providersByName := make(map[string]providers.Provider)
+	for _, provider := range providersArr {
+		providersByName[provider.GetName()] = provider
+	}
 	return &SimpleService{
-		threeplay.New(cfg.APIKey, cfg.APISecret),
+		Client{
+			Providers: providersByName,
+			DB:        db,
+		},
 	}
 }
 

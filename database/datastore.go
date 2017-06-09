@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 
+	"github.com/NYTimes/video-captions-api/providers"
+
 	"cloud.google.com/go/datastore"
 )
 
@@ -35,7 +37,7 @@ func NewDatastoreClient(projectID string) (*DatastoreClient, error) {
 }
 
 // StoreJob stores a job
-func (c *DatastoreClient) StoreJob(job Job) (string, error) {
+func (c *DatastoreClient) StoreJob(job providers.Job) (string, error) {
 	if _, err := c.GetJob(job.ID); err == nil {
 		return "", errors.New("Job already exists")
 	}
@@ -51,8 +53,8 @@ func (c *DatastoreClient) StoreJob(job Job) (string, error) {
 }
 
 // GetJob retrieves a job from database
-func (c *DatastoreClient) GetJob(id string) (Job, error) {
-	result := Job{}
+func (c *DatastoreClient) GetJob(id string) (providers.Job, error) {
+	result := providers.Job{}
 	ctx := context.Background()
 	key := newNameKeyWithNamespace(c.kind, id, c.namespace)
 	err := c.client.Get(ctx, key, &result)
@@ -64,9 +66,9 @@ func (c *DatastoreClient) GetJob(id string) (Job, error) {
 }
 
 // GetJobs retrieves all jobs in database
-func (c *DatastoreClient) GetJobs() ([]Job, error) {
+func (c *DatastoreClient) GetJobs() ([]providers.Job, error) {
 	query := datastore.NewQuery(c.kind).Namespace(c.namespace)
-	var jobs []Job
+	var jobs []providers.Job
 	ctx := context.Background()
 	_, err := c.client.GetAll(ctx, query, &jobs)
 	if err != nil {
@@ -77,7 +79,7 @@ func (c *DatastoreClient) GetJobs() ([]Job, error) {
 }
 
 // UpdateJob updates a job
-func (c *DatastoreClient) UpdateJob(id string, job Job) error {
+func (c *DatastoreClient) UpdateJob(id string, job providers.Job) error {
 	_, err := c.GetJob(id)
 	if err != nil {
 		return err

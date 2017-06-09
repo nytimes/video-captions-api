@@ -1,6 +1,7 @@
 package threeplay
 
 import (
+	"fmt"
 	"net/url"
 	"strconv"
 
@@ -18,6 +19,10 @@ func New(APIKey, APISecret string) providers.Provider {
 	return &Provider{
 		threeplay.NewClient(APIKey, APISecret),
 	}
+}
+
+func (c *Provider) GetName() string {
+	return providerName
 }
 
 func (c *Provider) GetJob(id string) (*providers.Job, error) {
@@ -39,18 +44,18 @@ func (c *Provider) GetJob(id string) (*providers.Job, error) {
 	return job, nil
 }
 
-func (c *Provider) DispatchJob(job *providers.Job) (*providers.Job, error) {
+func (c *Provider) DispatchJob(job providers.Job) (providers.Job, error) {
+	fmt.Println("Dispatching job to 3Play", job.ID)
 	// TODO: we need to parse job.ProviderParams to query
 	query, _ := url.ParseQuery("for_asr=1")
 
 	fileID, err := c.UploadFileFromURL(job.MediaURL, query)
 
 	if err != nil {
-		return nil, err
+		return providers.Job{}, err
 	}
-	job.Provider = "3play"
-	job.ID = fileID
-	job.Status = "processing"
+
+	job.ProviderID = fileID
 
 	return job, nil
 }
