@@ -10,20 +10,24 @@ import (
 
 const providerName string = "3play"
 
+// ThreePlayProvider is a 3play client that implements the Provider interface
 type ThreePlayProvider struct {
 	*threeplay.Client
 }
 
+// NewThreePlay creates a ThreePlayProvider instance
 func NewThreePlay(APIKey, APISecret string) Provider {
 	return &ThreePlayProvider{
 		threeplay.NewClient(APIKey, APISecret),
 	}
 }
 
+// GetName returns provider name
 func (c *ThreePlayProvider) GetName() string {
 	return providerName
 }
 
+// GetJob returns a 3play file
 func (c *ThreePlayProvider) GetJob(id string) (*Job, error) {
 	i, err := strconv.Atoi(id)
 	if err != nil {
@@ -43,6 +47,7 @@ func (c *ThreePlayProvider) GetJob(id string) (*Job, error) {
 	return job, nil
 }
 
+// DispatchJob sends a video file to 3play for transcription and captions generation
 func (c *ThreePlayProvider) DispatchJob(job Job) (Job, error) {
 	fmt.Println("Dispatching job to 3Play", job.ID)
 	// TODO: we need to parse job.ProviderParams to query

@@ -2,6 +2,7 @@ package providers
 
 import "time"
 
+// Job representation of a captions job
 type Job struct {
 	ID       string `json:"id"`
 	MediaURL string `json:"media_url"`

@@ -12,7 +12,8 @@ import (
 	"github.com/satori/go.uuid"
 )
 
-func (s *SimpleService) GetJob(r *http.Request) (int, interface{}, error) {
+// GetJob from Provider given a Job id
+func (s *CaptionsService) GetJob(r *http.Request) (int, interface{}, error) {
 	id := web.Vars(r)["id"]
 	fmt.Println("GetJob", id)
 	// TODO: on the 3play client, we should look at the errors field and check for not_found errors at least
@@ -23,7 +24,8 @@ func (s *SimpleService) GetJob(r *http.Request) (int, interface{}, error) {
 	return http.StatusOK, file, nil
 }
 
-func (s *SimpleService) CreateJob(r *http.Request) (int, interface{}, error) {
+// CreateJob create a Job
+func (s *CaptionsService) CreateJob(r *http.Request) (int, interface{}, error) {
 	fmt.Println("CreateJob")
 	var job providers.Job
 	data, err := ioutil.ReadAll(r.Body)

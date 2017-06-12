@@ -10,22 +10,25 @@ import (
 	"github.com/NYTimes/video-captions-api/providers"
 )
 
-type SimpleService struct {
+// CaptionsService the service responsible to wrapping interactions with Providers
+type CaptionsService struct {
 	client Client
 }
 
+// Config used for configuration/injection of settings for a CaptionService
 type Config struct {
 	Server    *server.Config
 	APIKey    string
 	APISecret string
 }
 
-func NewSimpleService(cfg *Config, providersArr []providers.Provider, db database.DB) *SimpleService {
+// NewCaptionsService creates a CaptionsService
+func NewCaptionsService(cfg *Config, providersArr []providers.Provider, db database.DB) *CaptionsService {
 	providersByName := make(map[string]providers.Provider)
 	for _, provider := range providersArr {
 		providersByName[provider.GetName()] = provider
 	}
-	return &SimpleService{
+	return &CaptionsService{
 		Client{
 			Providers: providersByName,
 			DB:        db,
@@ -33,15 +36,18 @@ func NewSimpleService(cfg *Config, providersArr []providers.Provider, db databas
 	}
 }
 
-func (s *SimpleService) Prefix() string {
+// Prefix CaptionsService API prefix
+func (s *CaptionsService) Prefix() string {
 	return ""
 }
 
-func (s *SimpleService) Middleware(h http.Handler) http.Handler {
+// Middleware gizmo middleware hook
+func (s *CaptionsService) Middleware(h http.Handler) http.Handler {
 	return gziphandler.GzipHandler(h)
 }
 
-func (s *SimpleService) Endpoints() map[string]map[string]http.HandlerFunc {
+// Endpoints returns CaptionsService API endpoints
+func (s *CaptionsService) Endpoints() map[string]map[string]http.HandlerFunc {
 	return map[string]map[string]http.HandlerFunc{
 		"/jobs/{id}": map[string]http.HandlerFunc{
 			"GET": server.JSONToHTTP(s.GetJob).ServeHTTP,

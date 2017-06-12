@@ -7,18 +7,21 @@ import (
 	"github.com/NYTimes/video-captions-api/providers"
 )
 
-type MemoryDatabse struct {
+// MemoryDatabase memory based database implementation for the DB interface
+type MemoryDatabase struct {
 	mtx  sync.Mutex
 	jobs map[string]providers.Job
 }
 
-func NewMemoryDatabase() *MemoryDatabse {
-	return &MemoryDatabse{
+// NewMemoryDatabase creates a MemoryDatabase
+func NewMemoryDatabase() *MemoryDatabase {
+	return &MemoryDatabase{
 		jobs: make(map[string]providers.Job, 0),
 	}
 }
 
-func (db *MemoryDatabse) StoreJob(job providers.Job) (string, error) {
+// StoreJob stores Job in-memory
+func (db *MemoryDatabase) StoreJob(job providers.Job) (string, error) {
 	if _, err := db.GetJob(job.ID); err == nil {
 		return "", errors.New("Job already exists")
 	}
@@ -30,7 +33,8 @@ func (db *MemoryDatabse) StoreJob(job providers.Job) (string, error) {
 	return job.ID, nil
 }
 
-func (db *MemoryDatabse) UpdateJob(id string, job providers.Job) error {
+// UpdateJob updates Job in-memory
+func (db *MemoryDatabase) UpdateJob(id string, job providers.Job) error {
 	if _, err := db.GetJob(id); err != nil {
 		return errors.New("Job doesn't exist")
 	}
@@ -41,7 +45,9 @@ func (db *MemoryDatabse) UpdateJob(id string, job providers.Job) error {
 	db.jobs[id] = job
 	return nil
 }
-func (db *MemoryDatabse) GetJob(id string) (providers.Job, error) {
+
+// GetJob returns a Job given its ID
+func (db *MemoryDatabase) GetJob(id string) (providers.Job, error) {
 	db.mtx.Lock()
 	defer db.mtx.Unlock()
 
@@ -50,14 +56,18 @@ func (db *MemoryDatabse) GetJob(id string) (providers.Job, error) {
 	}
 	return providers.Job{}, errors.New("Job doesn't exist")
 }
-func (db *MemoryDatabse) DeleteJob(id string) error {
+
+// DeleteJob deletes a Job given its ID
+func (db *MemoryDatabase) DeleteJob(id string) error {
 	db.mtx.Lock()
 	defer db.mtx.Unlock()
 
 	delete(db.jobs, id)
 	return nil
 }
-func (db *MemoryDatabse) GetJobs() ([]providers.Job, error) {
+
+// GetJobs Returns all Jobs stored
+func (db *MemoryDatabase) GetJobs() ([]providers.Job, error) {
 	db.mtx.Lock()
 	defer db.mtx.Unlock()
 

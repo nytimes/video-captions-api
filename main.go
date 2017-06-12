@@ -22,7 +22,7 @@ func main() {
 	providersList = append(providersList, providers.NewThreePlay(cfg.APIKey, cfg.APISecret))
 
 	server.Init("video-captions-api", cfg.Server)
-	err = server.Register(service.NewSimpleService(&cfg, providersList, db))
+	err = server.Register(service.NewCaptionsService(&cfg, providersList, db))
 	if err != nil {
 		server.Log.Fatal("Unable to register service: ", err)
 	}

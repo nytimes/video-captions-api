@@ -8,11 +8,13 @@ import (
 	"github.com/NYTimes/video-captions-api/providers"
 )
 
+// Client CaptionsService client
 type Client struct {
 	Providers map[string]providers.Provider
 	DB        database.DB
 }
 
+// GetJob gets a job by ID
 func (c Client) GetJob(id string) (providers.Job, error) {
 	job, err := c.DB.GetJob(id)
 	if err != nil {
@@ -34,6 +36,7 @@ func (c Client) GetJob(id string) (providers.Job, error) {
 	return job, err
 }
 
+// DispatchJob dispatches a Job given an existing Provider
 func (c Client) DispatchJob(job providers.Job) (providers.Job, error) {
 	provider := c.Providers[job.Provider]
 	if provider == nil {
