@@ -15,6 +15,22 @@ type Client struct {
 
 func (c Client) GetJob(id string) (providers.Job, error) {
 	job, err := c.DB.GetJob(id)
+	if err != nil {
+		return job, err
+	}
+
+	fmt.Println("Fetching job status")
+	provider := c.Providers[job.Provider]
+	providerJob, err := provider.GetJob(job.ProviderID)
+	if err != nil {
+		return job, err
+	}
+
+	fmt.Println("updating job status:", job.Status, "->", providerJob.Status)
+	job.Status = providerJob.Status
+
+	fmt.Println("updating job in DB")
+	err = c.DB.UpdateJob(id, job)
 	return job, err
 }
 
