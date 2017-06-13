@@ -1,8 +1,9 @@
 package database
 
 import (
-	"context"
 	"errors"
+
+	"golang.org/x/net/context"
 
 	"github.com/NYTimes/video-captions-api/providers"
 
@@ -14,9 +15,16 @@ const (
 	entityNamespace string = "captions-jobs"
 )
 
+type DatastoreClient interface {
+	Put(context.Context, *datastore.Key, interface{}) (*datastore.Key, error)
+	Get(context.Context, *datastore.Key, interface{}) error
+	Delete(context.Context, *datastore.Key) error
+	GetAll(context.Context, *datastore.Query, interface{}) ([]*datastore.Key, error)
+}
+
 // DatastoreDatabase is a datastore client that implements DB interface
 type DatastoreDatabase struct {
-	client    *datastore.Client
+	client    DatastoreClient
 	kind      string
 	namespace string
 }
