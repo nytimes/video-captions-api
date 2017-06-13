@@ -6,7 +6,7 @@ RUN apk -qq update && apk -qq add --no-cache git mercurial bzr && go get github.
 
 COPY . .
 
-RUN go get .
+RUN go get -t ./...
 
 CMD fresh
 
