@@ -14,21 +14,21 @@ const (
 	entityNamespace string = "captions-jobs"
 )
 
-// DatastoreClient is a datastore client that implements DB interface
-type DatastoreClient struct {
+// DatastoreDatabase is a datastore client that implements DB interface
+type DatastoreDatabase struct {
 	client    *datastore.Client
 	kind      string
 	namespace string
 }
 
-// NewDatastoreClient returns a DatastoreClient
-func NewDatastoreClient(projectID string) (*DatastoreClient, error) {
+// NewDatastoreDatabase returns a DatastoreDatabase
+func NewDatastoreDatabase(projectID string) (*DatastoreDatabase, error) {
 	ctx := context.Background()
 	client, err := datastore.NewClient(ctx, projectID)
 	if err != nil {
 		return nil, err
 	}
-	return &DatastoreClient{
+	return &DatastoreDatabase{
 		client,
 		entityKind,
 		entityNamespace,
@@ -37,14 +37,14 @@ func NewDatastoreClient(projectID string) (*DatastoreClient, error) {
 }
 
 // StoreJob stores a job
-func (c *DatastoreClient) StoreJob(job providers.Job) (string, error) {
-	if _, err := c.GetJob(job.ID); err == nil {
+func (d *DatastoreDatabase) StoreJob(job providers.Job) (string, error) {
+	if _, err := d.GetJob(job.ID); err == nil {
 		return "", errors.New("Job already exists")
 	}
 
 	ctx := context.Background()
-	key := newNameKeyWithNamespace(c.kind, job.ID, c.namespace)
-	_, err := c.client.Put(ctx, key, &job)
+	key := newNameKeyWithNamespace(d.kind, job.ID, d.namespace)
+	_, err := d.client.Put(ctx, key, &job)
 	if err != nil {
 		return "", err
 	}
@@ -53,11 +53,11 @@ func (c *DatastoreClient) StoreJob(job providers.Job) (string, error) {
 }
 
 // GetJob retrieves a job from database
-func (c *DatastoreClient) GetJob(id string) (providers.Job, error) {
+func (d *DatastoreDatabase) GetJob(id string) (providers.Job, error) {
 	result := providers.Job{}
 	ctx := context.Background()
-	key := newNameKeyWithNamespace(c.kind, id, c.namespace)
-	err := c.client.Get(ctx, key, &result)
+	key := newNameKeyWithNamespace(d.kind, id, d.namespace)
+	err := d.client.Get(ctx, key, &result)
 	if err != nil {
 		return result, err
 	}
@@ -66,11 +66,11 @@ func (c *DatastoreClient) GetJob(id string) (providers.Job, error) {
 }
 
 // GetJobs retrieves all jobs in database
-func (c *DatastoreClient) GetJobs() ([]providers.Job, error) {
-	query := datastore.NewQuery(c.kind).Namespace(c.namespace)
+func (d *DatastoreDatabase) GetJobs() ([]providers.Job, error) {
+	query := datastore.NewQuery(d.kind).Namespace(d.namespace)
 	var jobs []providers.Job
 	ctx := context.Background()
-	_, err := c.client.GetAll(ctx, query, &jobs)
+	_, err := d.client.GetAll(ctx, query, &jobs)
 	if err != nil {
 		return nil, err
 	}
@@ -79,23 +79,23 @@ func (c *DatastoreClient) GetJobs() ([]providers.Job, error) {
 }
 
 // UpdateJob updates a job
-func (c *DatastoreClient) UpdateJob(id string, job providers.Job) error {
-	_, err := c.GetJob(id)
+func (d *DatastoreDatabase) UpdateJob(id string, job providers.Job) error {
+	_, err := d.GetJob(id)
 	if err != nil {
 		return err
 	}
 
 	ctx := context.Background()
-	key := newNameKeyWithNamespace(c.kind, id, c.namespace)
-	_, err = c.client.Put(ctx, key, &job)
+	key := newNameKeyWithNamespace(d.kind, id, d.namespace)
+	_, err = d.client.Put(ctx, key, &job)
 	return err
 }
 
 // DeleteJob deletes a job from database
-func (c *DatastoreClient) DeleteJob(id string) error {
+func (d *DatastoreDatabase) DeleteJob(id string) error {
 	ctx := context.Background()
-	key := newNameKeyWithNamespace(c.kind, id, c.namespace)
-	return c.client.Delete(ctx, key)
+	key := newNameKeyWithNamespace(d.kind, id, d.namespace)
+	return d.client.Delete(ctx, key)
 }
 
 func newNameKeyWithNamespace(kind, name, namespace string) *datastore.Key {

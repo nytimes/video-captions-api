@@ -11,7 +11,7 @@ import (
 func main() {
 	var cfg service.Config
 	var providersList []providers.Provider
-	db, err := database.NewDatastoreClient("nyt-video-dev")
+	db, err := database.NewDatastoreDatabase("nyt-video-dev")
 	if err != nil {
 		server.Log.Fatal("Unable to create Datastore client", err)
 	}
