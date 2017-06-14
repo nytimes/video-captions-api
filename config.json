@@ -2,6 +2,7 @@
     "APIkey": "i8x1QuAhKlBaQLLNXMJUo1EFP_82a_z0",
     "APISecret": "pyRv7D0rfJ8kVnhziSdYxLOREp8Wx55e",
     "Server": {
-        "HTTPPort": 8000
+        "HTTPPort": 8000,
+        "HealthCheckPath": "/healthz"
     }
 }
