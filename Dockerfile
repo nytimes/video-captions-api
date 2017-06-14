@@ -1,6 +1,7 @@
 FROM alpine:3.3
 
-ADD captions-api /bin/
+# TODO: use gizmo LoadConfigFromEnv instead of the json file
+ADD config.json captions-api /bin/
 
 ENTRYPOINT "/bin/captions-api"
 
