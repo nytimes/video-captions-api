@@ -3,8 +3,8 @@ build:
   test:
     image: golang:1.8-alpine
     commands:
-      - apk update && apk add git mercurial bzr
-      - go get ./...
+      - apk -qq update && apk -qq --no-cache add git mercurial bzr
+      - go get -u -t ./...
       - go test -v ./...
       - go build -o captions-api
     when:
