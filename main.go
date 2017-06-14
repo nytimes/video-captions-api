@@ -1,6 +1,9 @@
 package main
 
 import (
+	"os"
+	"path"
+
 	"github.com/NYTimes/gizmo/config"
 	"github.com/NYTimes/gizmo/server"
 	"github.com/NYTimes/video-captions-api/database"
@@ -15,7 +18,12 @@ func main() {
 	if err != nil {
 		server.Log.Fatal("Unable to create Datastore client", err)
 	}
-	config.LoadJSONFile("./config.json", &cfg)
+	ex, err := os.Executable()
+	if err != nil {
+		server.Log.Fatal("Unable to get process' current working directory")
+	}
+	server.Log.Info(path.Join(path.Dir(ex), "config.json"))
+	config.LoadJSONFile(path.Join(path.Dir(ex), "config.json"), &cfg)
 
 	// TODO: remove the list from the service constructor and
 	// add support for service.AddProvider(provider)
