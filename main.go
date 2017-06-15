@@ -16,9 +16,6 @@ func main() {
 		server.Log.Fatal("Unable to create Datastore client", err)
 	}
 	config.LoadEnvConfig(&cfg)
-
-	// TODO: remove the list from the service constructor and
-	// add support for service.AddProvider(provider)
 	providerConfig := threeplay.LoadConfigFromEnv()
 	captionsService := service.NewCaptionsService(&cfg, db)
 
