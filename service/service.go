@@ -17,9 +17,9 @@ type CaptionsService struct {
 
 // Config used for configuration/injection of settings for a CaptionService
 type Config struct {
-	Server    *server.Config
-	APIKey    string
-	APISecret string
+	Server             *server.Config
+	ThreePlayAPIKey    string `envconfig:"THREE_PLAY_API_KEY"`
+	ThreePlayAPISecret string `envconfig:"THREE_PLAY_API_SECRET"`
 }
 
 // NewCaptionsService creates a CaptionsService
