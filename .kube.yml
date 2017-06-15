@@ -54,17 +54,19 @@ spec:
           # Quote all environment variable values
           env:
             - name: SERVER_HTTP_PORT
-              value: 8000
+              value: "8000"
             - name: SERVER_GIZMO_HEALTH_CHECK_PATH
               value: "/healthz"
             - name: THREE_PLAY_API_KEY
-              secretKeyRef:
-                name: captions-api-secrets
-                key: three-play-api-key
+              valueFrom:
+                secretKeyRef:
+                  name: captions-api-secrets
+                  key: three-play-api-key
             - name: THREE_PLAY_API_SECRET
-              secretKeyRef:
-                name: captions-api-secrets
-                key: three-play-api-secret
+              valueFrom:
+                secretKeyRef:
+                  name: captions-api-secrets
+                  key: three-play-api-secret
 
           # Please see probe documentation for details:
           # https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/
