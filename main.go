@@ -1,9 +1,6 @@
 package main
 
 import (
-	"os"
-	"path"
-
 	"github.com/NYTimes/gizmo/config"
 	"github.com/NYTimes/gizmo/server"
 	"github.com/NYTimes/video-captions-api/database"
@@ -18,16 +15,11 @@ func main() {
 	if err != nil {
 		server.Log.Fatal("Unable to create Datastore client", err)
 	}
-	ex, err := os.Executable()
-	if err != nil {
-		server.Log.Fatal("Unable to get process' current working directory")
-	}
-	server.Log.Info(path.Join(path.Dir(ex), "config.json"))
-	config.LoadJSONFile(path.Join(path.Dir(ex), "config.json"), &cfg)
+	config.LoadEnvConfig(&cfg)
 
 	// TODO: remove the list from the service constructor and
 	// add support for service.AddProvider(provider)
-	providersList = append(providersList, providers.NewThreePlay(cfg.APIKey, cfg.APISecret))
+	providersList = append(providersList, providers.NewThreePlay(cfg.ThreePlayAPIKey, cfg.ThreePlayAPISecret))
 
 	server.Init("video-captions-api", cfg.Server)
 	err = server.Register(service.NewCaptionsService(&cfg, providersList, db))

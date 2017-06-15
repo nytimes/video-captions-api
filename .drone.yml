@@ -59,6 +59,9 @@ deploy:
       cert_name: stg-nyt-net-cert
 
     # These variables are made available in the .kube.sec.yml secret template in base64 encoding.
+    secrets:
+      three_play_api_key: $$THREE_PLAY_API_KEY
+      three_play_api_secret: $$THREE_PLAY_API_SECRET
 
     when:
       branch: master
