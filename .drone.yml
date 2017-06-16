@@ -96,6 +96,10 @@ deploy:
       ip_name: video-captions-api
       cert_name: star-nyt-net-cert
 
+    secrets:
+      three_play_api_key: $$THREE_PLAY_API_KEY
+      three_play_api_secret: $$THREE_PLAY_API_SECRET
+
     when:
       event: tag
 
