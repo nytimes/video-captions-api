@@ -1,4 +1,4 @@
-package threeplay
+package providers
 
 import (
 	"net/url"
@@ -7,7 +7,6 @@ import (
 	"github.com/NYTimes/gizmo/config"
 	"github.com/NYTimes/threeplay"
 	captionsConfig "github.com/NYTimes/video-captions-api/config"
-	"github.com/NYTimes/video-captions-api/providers"
 	log "github.com/Sirupsen/logrus"
 )
 
@@ -25,8 +24,8 @@ type ThreePlayConfig struct {
 	APISecret string `envconfig:"THREE_PLAY_API_SECRET"`
 }
 
-// NewProvider creates a ThreePlayProvider instance
-func (cfg ThreePlayConfig) NewProvider(svcCfg *captionsConfig.CaptionsServiceConfig) providers.Provider {
+// New3PlayProvider creates a ThreePlayProvider instance
+func New3PlayProvider(cfg *ThreePlayConfig, svcCfg *captionsConfig.CaptionsServiceConfig) Provider {
 	return &ThreePlayProvider{
 		threeplay.NewClient(cfg.APIKey, cfg.APISecret),
 		svcCfg.Logger,
@@ -34,7 +33,7 @@ func (cfg ThreePlayConfig) NewProvider(svcCfg *captionsConfig.CaptionsServiceCon
 }
 
 // Load3PlayConfigFromEnv loads 3play API Key/Secret from environment
-func LoadConfigFromEnv() captionsConfig.ProviderConfig {
+func Load3PlayConfigFromEnv() ThreePlayConfig {
 	var providerConfig ThreePlayConfig
 	config.LoadEnvConfig(&providerConfig)
 	return providerConfig
@@ -46,7 +45,7 @@ func (c *ThreePlayProvider) GetName() string {
 }
 
 // GetJob returns a 3play file
-func (c *ThreePlayProvider) GetJob(id string) (*providers.Job, error) {
+func (c *ThreePlayProvider) GetJob(id string) (*Job, error) {
 	i, err := strconv.Atoi(id)
 	if err != nil {
 		return nil, err
@@ -57,7 +56,7 @@ func (c *ThreePlayProvider) GetJob(id string) (*providers.Job, error) {
 		return nil, err
 	}
 
-	job := &providers.Job{
+	job := &Job{
 		ID:       strconv.FormatUint(uint64(file.ID), 10),
 		Status:   file.State,
 		Provider: providerName,
@@ -66,7 +65,7 @@ func (c *ThreePlayProvider) GetJob(id string) (*providers.Job, error) {
 }
 
 // DispatchJob sends a video file to 3play for transcription and captions generation
-func (c *ThreePlayProvider) DispatchJob(job providers.Job) (providers.Job, error) {
+func (c *ThreePlayProvider) DispatchJob(job Job) (Job, error) {
 	jobLogger := c.logger.WithFields(log.Fields{"JobID": job.ID, "Provider": job.Provider})
 	jobLogger.Info("Dispatching job to 3Play")
 	// TODO: we need to parse job.ProviderParams to query
@@ -76,7 +75,7 @@ func (c *ThreePlayProvider) DispatchJob(job providers.Job) (providers.Job, error
 
 	if err != nil {
 		jobLogger.Error("Failed to dispatch job to 3Play", err)
-		return providers.Job{}, err
+		return Job{}, err
 	}
 
 	job.ProviderID = fileID
