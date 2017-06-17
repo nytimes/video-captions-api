@@ -20,12 +20,12 @@ func init() {
 	if os.Getenv("ENABLE_STACKDRIVER") == "true" {
 		logger.Info("Initializing Stackdriver hook")
 		stackdriver, err := sdhook.New(
-			sdhook.GoogleLoggingAgent(),
+			sdhook.GoogleServiceAccountCredentialsFile(os.Getenv("GOOGLE_APPLICATION_CREDENTIALS")),
 			sdhook.ErrorReportingService("video-captions-api"),
 			sdhook.LogName("video-captions-api"),
 		)
 		if err != nil {
-			logger.Error("Failed to initialize Stackdriver hook")
+			logger.Error("Failed to initialize Stackdriver hook: ", err)
 			return
 		}
 		logger.Hooks.Add(stackdriver)
