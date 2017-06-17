@@ -45,6 +45,7 @@ deploy:
     vars:
       image: us.gcr.io/nyt-video-dev/video-captions-api:$$COMMIT
       app: video-captions-api
+      google_json_credentials: $$GOOGLE_CREDENTIALS_STG
       env: stg
       port: 8000
       ce_esp_port: 8001
@@ -83,6 +84,7 @@ deploy:
     vars:
       image: us.gcr.io/nyt-video-dev/video-captions-api:$$COMMIT
       app: video-captions-api
+      google_json_credentials: $$GOOGLE_CREDENTIALS_PRD
       env: prd
       replicas: 5
       # NOTE: recommend minimum of 2 to ensure uptime during a rolling deploy.
