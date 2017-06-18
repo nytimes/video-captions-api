@@ -55,8 +55,6 @@ spec:
           env:
             - name: ENABLE_STACKDRIVER
               value: "true"
-            - name: GOOGLE_JSON_CREDENTIALS
-              value: "{{.google_json_credentials}}"
             - name: SERVER_HTTP_PORT
               value: "8000"
             - name: SERVER_GIZMO_HEALTH_CHECK_PATH
