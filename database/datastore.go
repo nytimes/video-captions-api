@@ -15,6 +15,7 @@ const (
 	entityNamespace string = "captions-jobs"
 )
 
+// DatastoreClient is a datastore interface with operations used by the captions API
 type DatastoreClient interface {
 	Put(context.Context, *datastore.Key, interface{}) (*datastore.Key, error)
 	Get(context.Context, *datastore.Key, interface{}) error
