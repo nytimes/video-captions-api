@@ -14,7 +14,7 @@ import (
 	"github.com/knq/sdhook"
 )
 
-var logger *log.Logger = log.New()
+var logger = log.New()
 
 func init() {
 	if os.Getenv("ENABLE_STACKDRIVER") == "true" {
@@ -70,10 +70,10 @@ func (s *CaptionsService) Middleware(h http.Handler) http.Handler {
 // Endpoints returns CaptionsService API endpoints
 func (s *CaptionsService) Endpoints() map[string]map[string]http.HandlerFunc {
 	return map[string]map[string]http.HandlerFunc{
-		"/jobs/{id}": map[string]http.HandlerFunc{
+		"/jobs/{id}": {
 			"GET": server.JSONToHTTP(s.GetJob).ServeHTTP,
 		},
-		"/jobs": map[string]http.HandlerFunc{
+		"/jobs": {
 			"POST": server.JSONToHTTP(s.CreateJob).ServeHTTP,
 		},
 	}
