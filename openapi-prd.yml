@@ -1,3 +1,4 @@
+x-google-allow: all
 swagger: "2.0"
 info:
   title: "video-captions-api"
@@ -8,6 +9,12 @@ paths:
   "/**":
     get:
       operationId: "wildcard-get"
+      responses:
+        default:
+          description: "wildcard-response"
+      security: []
+    post:
+      operationId: "wildcard-post"
       responses:
         default:
           description: "wildcard-response"
