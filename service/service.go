@@ -20,7 +20,7 @@ func init() {
 	if os.Getenv("ENABLE_STACKDRIVER") == "true" {
 		logger.Info("Initializing Stackdriver hook")
 		stackdriver, err := sdhook.New(
-			sdhook.GoogleServiceAccountCredentialsFile("/bin/gcloud.json")
+			sdhook.GoogleServiceAccountCredentialsFile("/bin/gcloud.json"),
 			sdhook.ErrorReportingService("video-captions-api"),
 			sdhook.LogName("video-captions-api"),
 		)
