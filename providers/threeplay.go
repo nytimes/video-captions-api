@@ -67,10 +67,11 @@ func (c *ThreePlayProvider) GetJob(id string) (*Job, error) {
 // DispatchJob sends a video file to 3play for transcription and captions generation
 func (c *ThreePlayProvider) DispatchJob(job Job) (Job, error) {
 	jobLogger := c.logger.WithFields(log.Fields{"JobID": job.ID, "Provider": job.Provider})
-	jobLogger.Info("Dispatching job to 3Play")
-	// TODO: we need to parse job.ProviderParams to query
-	query, _ := url.ParseQuery("for_asr=1")
+	query := url.Values{}
 
+	for k, v := range job.ProviderParams {
+		query.Add(k, v)
+	}
 	fileID, err := c.UploadFileFromURL(job.MediaURL, query)
 
 	if err != nil {
