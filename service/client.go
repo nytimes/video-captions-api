@@ -63,7 +63,7 @@ func (c Client) DispatchJob(job providers.Job) (providers.Job, error) {
 	jobLogger.Info("Storing job in DB")
 	_, err = c.DB.StoreJob(job)
 	if err != nil {
-		jobLogger.Error("Error storing job in DB")
+		jobLogger.Error("Error storing job in DB", err)
 		return providers.Job{}, errors.New("Error storing Job")
 	}
 	return job, err

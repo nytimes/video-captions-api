@@ -11,6 +11,6 @@ type Job struct {
 	ProviderID string `json:"provider_id"`
 	Provider   string `json:"provider"`
 	//  Datastore doesnt support  maps by default
-	//	ProviderMetadata map[string]string `json:"provider_params"`
-	CreatedAt time.Time `json:"created_at"`
+	ProviderParams map[string]string `datastore:"-" json:"provider_params"`
+	CreatedAt      time.Time         `json:"created_at"`
 }
