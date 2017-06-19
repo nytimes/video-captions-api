@@ -3,15 +3,16 @@ build:
   test:
     image: golang:1.8-alpine
     commands:
-      - env
-      - apk -qq update && apk -qq --no-cache add git mercurial bzr
+      - apk -qq --no-cache add git
+      - go get github.com/golang/lint/golint
       - go get -t ./...
-      - golint ./...
+      - golint -set_exit_status ./...
       - go test -v ./...
       - go build -o captions-api
     when:
-      branch: master
-      event: push
+      event:
+        - push
+        - pull_request
 
 publish:
   gcr:
