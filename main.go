@@ -11,11 +11,11 @@ import (
 
 func main() {
 	var cfg captionsConfig.CaptionsServiceConfig
-	db, err := database.NewDatastoreDatabase("nyt-video-dev")
+	config.LoadEnvConfig(&cfg)
+	db, err := database.NewDatastoreDatabase(cfg.ProjectID)
 	if err != nil {
 		server.Log.Fatal("Unable to create Datastore client", err)
 	}
-	config.LoadEnvConfig(&cfg)
 	providerConfig := providers.Load3PlayConfigFromEnv()
 	captionsService := service.NewCaptionsService(&cfg, db)
 

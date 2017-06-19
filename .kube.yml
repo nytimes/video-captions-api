@@ -53,6 +53,8 @@ spec:
             - containerPort: {{.port}}
           # Quote all environment variable values
           env:
+            - name: PROJECT_ID
+              value: "{{.project_id}}"
             - name: ENABLE_STACKDRIVER
               value: "true"
             - name: SERVER_HTTP_PORT
