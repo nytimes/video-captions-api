@@ -1,6 +1,10 @@
 package providers
 
-import "time"
+import (
+	"time"
+
+	"cloud.google.com/go/datastore"
+)
 
 // Job representation of a captions job
 type Job struct {
@@ -11,6 +15,29 @@ type Job struct {
 	ProviderID string `json:"provider_id"`
 	Provider   string `json:"provider"`
 	//  Datastore doesnt support  maps by default
-	ProviderParams map[string]string `datastore:"-" json:"provider_params"`
-	CreatedAt      time.Time         `json:"created_at"`
+	ProviderParams ProviderParams `json:"provider_params"`
+	CreatedAt      time.Time      `json:"created_at"`
+}
+
+type ProviderParams map[string]string
+
+func (p *ProviderParams) Load(ps []datastore.Property) error {
+	if *p == nil {
+		*p = make(ProviderParams)
+	}
+	for _, v := range ps {
+		(*p)[v.Name] = v.Value.(string)
+	}
+	return nil
+}
+
+func (p *ProviderParams) Save() ([]datastore.Property, error) {
+	var result []datastore.Property
+	for k, v := range *p {
+		result = append(result, datastore.Property{
+			Name:  k,
+			Value: v,
+		})
+	}
+	return result, nil
 }
