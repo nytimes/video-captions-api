@@ -19,8 +19,10 @@ type Job struct {
 	CreatedAt      time.Time      `json:"created_at"`
 }
 
+// ProviderParams is a set of parameters for providers
 type ProviderParams map[string]string
 
+// Load makes ProviderParams implement datastore.PropertyLoadSaver interface
 func (p *ProviderParams) Load(ps []datastore.Property) error {
 	if *p == nil {
 		*p = make(ProviderParams)
@@ -31,6 +33,7 @@ func (p *ProviderParams) Load(ps []datastore.Property) error {
 	return nil
 }
 
+// Save makes ProviderParams implement datastore.PropertyLoadSaver interface
 func (p *ProviderParams) Save() ([]datastore.Property, error) {
 	var result []datastore.Property
 	for k, v := range *p {
