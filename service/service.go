@@ -70,10 +70,13 @@ func (s *CaptionsService) Middleware(h http.Handler) http.Handler {
 // Endpoints returns CaptionsService API endpoints
 func (s *CaptionsService) Endpoints() map[string]map[string]http.HandlerFunc {
 	return map[string]map[string]http.HandlerFunc{
+		"/captions/{id}": {
+			"GET": server.JSONToHTTP(s.GetJobs).ServeHTTP,
+		},
 		"/jobs/{id}": {
 			"GET": server.JSONToHTTP(s.GetJob).ServeHTTP,
 		},
-		"/jobs": {
+		"/captions": {
 			"POST": server.JSONToHTTP(s.CreateJob).ServeHTTP,
 		},
 	}

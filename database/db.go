@@ -8,5 +8,5 @@ type DB interface {
 	UpdateJob(string, providers.Job) error
 	GetJob(string) (providers.Job, error)
 	DeleteJob(string) error
-	GetJobs() ([]providers.Job, error)
+	GetJobs(string) ([]providers.Job, error)
 }
