@@ -12,7 +12,7 @@ import (
 	"github.com/satori/go.uuid"
 )
 
-// GetJobs from Provider given a Job id
+// GetJobs returns all the Jobs associated with a ParentID
 func (s *CaptionsService) GetJobs(r *http.Request) (int, interface{}, error) {
 	parentID := web.Vars(r)["id"]
 	jobs, err := s.client.GetJobs(parentID)
@@ -22,7 +22,7 @@ func (s *CaptionsService) GetJobs(r *http.Request) (int, interface{}, error) {
 	return http.StatusOK, jobs, nil
 }
 
-// GetJobs from Provider given a Job id
+// GetJob returns a Job given its ID
 func (s *CaptionsService) GetJob(r *http.Request) (int, interface{}, error) {
 	id := web.Vars(r)["id"]
 	// TODO: on the 3play client, we should look at the errors field and check for not_found errors at least
