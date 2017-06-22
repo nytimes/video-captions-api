@@ -15,16 +15,25 @@ type Client struct {
 	logger    *log.Logger
 }
 
-// GetJob gets a job by ID
-func (c Client) GetJob(id string) (providers.Job, error) {
-	jobLogger := c.logger.WithField("JobID", id)
-	job, err := c.DB.GetJob(id)
+// GetJobs gets all jobs associated with a ParentID
+func (c Client) GetJobs(parentID string) ([]providers.Job, error) {
+	jobs, err := c.DB.GetJobs(parentID)
 	if err != nil {
-		jobLogger.Error("Could not find Job in database")
+		c.logger.Error("Error loading jobs from DB", parentID)
+		return nil, err
+	}
+	return jobs, nil
+}
+
+// GetJob gets a job by ID
+func (c Client) GetJob(jobID string) (providers.Job, error) {
+	job, err := c.DB.GetJob(jobID)
+	if err != nil {
+		c.logger.Error("Could not find Job in database")
 		return job, err
 	}
 
-	jobLogger = jobLogger.WithFields(log.Fields{"JobID": id, "Provider": job.Provider})
+	jobLogger := c.logger.WithFields(log.Fields{"JobID": jobID, "Provider": job.Provider})
 	provider := c.Providers[job.Provider]
 	jobLogger.Info("Fetching job from Provider")
 	providerJob, err := provider.GetJob(job.ProviderID)
@@ -36,7 +45,7 @@ func (c Client) GetJob(id string) (providers.Job, error) {
 	if providerJob.Status != job.Status {
 		jobLogger.Info("Updating job status: ", job.Status, "->", providerJob.Status)
 		job.Status = providerJob.Status
-		err = c.DB.UpdateJob(id, job)
+		err = c.DB.UpdateJob(jobID, job)
 	} else {
 		jobLogger.Info("No job status update")
 	}

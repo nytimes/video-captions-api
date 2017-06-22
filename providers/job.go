@@ -9,6 +9,7 @@ import (
 // Job representation of a captions job
 type Job struct {
 	ID       string `json:"id"`
+	ParentID string `json:"parent_id"`
 	MediaURL string `json:"media_url"`
 	Status   string `json:"status"`
 	// this should be in the ProviderParams

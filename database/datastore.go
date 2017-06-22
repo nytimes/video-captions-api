@@ -75,10 +75,10 @@ func (d *DatastoreDatabase) GetJob(id string) (providers.Job, error) {
 }
 
 // GetJobs retrieves all jobs in database
-func (d *DatastoreDatabase) GetJobs() ([]providers.Job, error) {
-	query := datastore.NewQuery(d.kind).Namespace(d.namespace)
+func (d *DatastoreDatabase) GetJobs(parentID string) ([]providers.Job, error) {
 	var jobs []providers.Job
 	ctx := context.Background()
+	query := datastore.NewQuery(d.kind).Namespace(d.namespace).Filter("ParentID =", parentID)
 	_, err := d.client.GetAll(ctx, query, &jobs)
 	if err != nil {
 		return nil, err

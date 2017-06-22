@@ -8,11 +8,21 @@ import (
 
 	"github.com/NYTimes/gizmo/web"
 	"github.com/NYTimes/video-captions-api/providers"
-	"github.com/satori/go.uuid"
 	log "github.com/Sirupsen/logrus"
+	"github.com/satori/go.uuid"
 )
 
-// GetJob from Provider given a Job id
+// GetJobs from Provider given a Job id
+func (s *CaptionsService) GetJobs(r *http.Request) (int, interface{}, error) {
+	parentID := web.Vars(r)["id"]
+	jobs, err := s.client.GetJobs(parentID)
+	if err != nil {
+		return http.StatusNotFound, nil, err
+	}
+	return http.StatusOK, jobs, nil
+}
+
+// GetJobs from Provider given a Job id
 func (s *CaptionsService) GetJob(r *http.Request) (int, interface{}, error) {
 	id := web.Vars(r)["id"]
 	// TODO: on the 3play client, we should look at the errors field and check for not_found errors at least
@@ -27,8 +37,8 @@ func (s *CaptionsService) GetJob(r *http.Request) (int, interface{}, error) {
 func (s *CaptionsService) CreateJob(r *http.Request) (int, interface{}, error) {
 	requestLogger := logger.WithFields(log.Fields{
 		"Handler": "CreateJob",
-		"Method": r.Method,
-		"URI": r.RequestURI,
+		"Method":  r.Method,
+		"URI":     r.RequestURI,
 	})
 	var job providers.Job
 	data, err := ioutil.ReadAll(r.Body)
@@ -50,8 +60,8 @@ func (s *CaptionsService) CreateJob(r *http.Request) (int, interface{}, error) {
 		return http.StatusBadRequest, nil, errors.New("Please provide a media_url")
 	}
 
+	job.ParentID = job.ID
 	job.ID = uuid.NewV4().String()
-
 	job, err = s.client.DispatchJob(job)
 	if err != nil {
 		return http.StatusInternalServerError, err, err
