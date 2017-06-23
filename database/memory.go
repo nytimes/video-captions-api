@@ -66,14 +66,16 @@ func (db *MemoryDatabase) DeleteJob(id string) error {
 	return nil
 }
 
-// GetJobs Returns all Jobs stored
-func (db *MemoryDatabase) GetJobs() ([]providers.Job, error) {
+// GetJobs Returns all Jobs stored for the same ParentID
+func (db *MemoryDatabase) GetJobs(parentID string) ([]providers.Job, error) {
 	db.mtx.Lock()
 	defer db.mtx.Unlock()
 
-	jobList := make([]providers.Job, len(db.jobs))
+	var jobList []providers.Job
 	for _, job := range db.jobs {
-		jobList = append(jobList, job)
+		if parentID == job.ParentID {
+			jobList = append(jobList, job)
+		}
 	}
 
 	return jobList, nil

@@ -12,14 +12,14 @@ import (
 type Client struct {
 	Providers map[string]providers.Provider
 	DB        database.DB
-	logger    *log.Logger
+	Logger    *log.Logger
 }
 
 // GetJobs gets all jobs associated with a ParentID
 func (c Client) GetJobs(parentID string) ([]providers.Job, error) {
 	jobs, err := c.DB.GetJobs(parentID)
 	if err != nil {
-		c.logger.Error("Error loading jobs from DB", parentID)
+		c.Logger.Error("Error loading jobs from DB", parentID)
 		return nil, err
 	}
 	return jobs, nil
@@ -29,16 +29,16 @@ func (c Client) GetJobs(parentID string) ([]providers.Job, error) {
 func (c Client) GetJob(jobID string) (providers.Job, error) {
 	job, err := c.DB.GetJob(jobID)
 	if err != nil {
-		c.logger.Error("Could not find Job in database")
+		c.Logger.Error("Could not find Job in database")
 		return job, err
 	}
 
-	jobLogger := c.logger.WithFields(log.Fields{"JobID": jobID, "Provider": job.Provider})
+	jobLogger := c.Logger.WithFields(log.Fields{"JobID": jobID, "Provider": job.Provider})
 	provider := c.Providers[job.Provider]
 	jobLogger.Info("Fetching job from Provider")
 	providerJob, err := provider.GetJob(job.ProviderID)
 	if err != nil {
-		jobLogger.Error("error gettting job from provider", err)
+		jobLogger.Error("error getting job from provider", err)
 		return job, err
 	}
 
@@ -56,7 +56,7 @@ func (c Client) GetJob(jobID string) (providers.Job, error) {
 // DispatchJob dispatches a Job given an existing Provider
 func (c Client) DispatchJob(job providers.Job) (providers.Job, error) {
 	provider := c.Providers[job.Provider]
-	jobLogger := c.logger.WithFields(log.Fields{"JobID": job.ID, "Provider": job.Provider})
+	jobLogger := c.Logger.WithFields(log.Fields{"JobID": job.ID, "Provider": job.Provider})
 	if provider == nil {
 		jobLogger.Error("Provider not found")
 		return providers.Job{}, errors.New("Provider not found")
