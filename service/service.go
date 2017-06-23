@@ -42,12 +42,11 @@ func NewCaptionsService(cfg *config.CaptionsServiceConfig, db database.DB) *Capt
 	if cfg.Logger == nil {
 		cfg.Logger = logger
 	}
-	logger.Info("healthcheck", cfg.Server.HealthCheckPath)
 	return &CaptionsService{
 		Client{
 			Providers: make(map[string]providers.Provider),
 			DB:        db,
-			logger:    logger,
+			Logger:    logger,
 		},
 	}
 }

@@ -26,11 +26,11 @@ func (s *CaptionsService) GetJobs(r *http.Request) (int, interface{}, error) {
 func (s *CaptionsService) GetJob(r *http.Request) (int, interface{}, error) {
 	id := web.Vars(r)["id"]
 	// TODO: on the 3play client, we should look at the errors field and check for not_found errors at least
-	file, err := s.client.GetJob(id)
+	job, err := s.client.GetJob(id)
 	if err != nil {
 		return http.StatusNotFound, nil, err
 	}
-	return http.StatusOK, file, nil
+	return http.StatusOK, job, nil
 }
 
 // CreateJob create a Job
