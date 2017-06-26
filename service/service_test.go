@@ -43,7 +43,7 @@ func (p BrokenProvider) GetJob(id string) (*providers.Job, error) {
 	return nil, errors.New("failed to get job")
 }
 
-func CreateCaptionsService() (*CaptionsService, Client) {
+func createCaptionsService() (*CaptionsService, Client) {
 	client := Client{
 		Providers: make(map[string]providers.Provider),
 		DB:        database.NewMemoryDatabase(),
@@ -57,7 +57,7 @@ func CreateCaptionsService() (*CaptionsService, Client) {
 
 func TestAddProvider(t *testing.T) {
 	assert := assert.New(t)
-	service, client := CreateCaptionsService()
+	service, client := createCaptionsService()
 
 	service.AddProvider(FakeProvider{})
 	provider := client.Providers["test-provider"]
