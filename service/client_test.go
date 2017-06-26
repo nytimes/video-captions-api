@@ -9,7 +9,7 @@ import (
 )
 
 func TestGetJob(t *testing.T) {
-	service, client := CreateCaptionsService()
+	service, client := createCaptionsService()
 	assert := assert.New(t)
 	service.AddProvider(FakeProvider{logger: log.New()})
 	job := providers.Job{
@@ -24,7 +24,7 @@ func TestGetJob(t *testing.T) {
 }
 
 func TestDispatchJobNoProvider(t *testing.T) {
-	_, client := CreateCaptionsService()
+	_, client := createCaptionsService()
 	_, err := client.DispatchJob(providers.Job{Provider: "wrong-provider"})
 	assert.Equal(t, "Provider not found", err.Error())
 }

@@ -14,7 +14,7 @@ import (
 
 func TestCreateJob(t *testing.T) {
 	assert := assert.New(t)
-	service, client := CreateCaptionsService()
+	service, client := createCaptionsService()
 	service.AddProvider(FakeProvider{logger: client.Logger})
 	job := providers.Job{
 		ID:       "123",
@@ -32,7 +32,7 @@ func TestCreateJob(t *testing.T) {
 
 func TestCreateJobNoMediaURL(t *testing.T) {
 	assert := assert.New(t)
-	service, client := CreateCaptionsService()
+	service, client := createCaptionsService()
 	service.AddProvider(FakeProvider{logger: client.Logger})
 	job := providers.Job{
 		ID:       "123",
@@ -49,7 +49,7 @@ func TestCreateJobNoMediaURL(t *testing.T) {
 
 func TestCreateJobDispatchError(t *testing.T) {
 	assert := assert.New(t)
-	service, client := CreateCaptionsService()
+	service, client := createCaptionsService()
 	service.AddProvider(BrokenProvider{logger: client.Logger})
 	job := providers.Job{
 		ID:       "123",
@@ -66,7 +66,7 @@ func TestCreateJobDispatchError(t *testing.T) {
 
 func TestCreateJobInvalidBody(t *testing.T) {
 	assert := assert.New(t)
-	service, client := CreateCaptionsService()
+	service, client := createCaptionsService()
 	service.AddProvider(FakeProvider{logger: client.Logger})
 	r, _ := http.NewRequest("POST", "/captions", bytes.NewReader([]byte("not json")))
 	status, resultJob, err := service.CreateJob(r)
@@ -78,7 +78,7 @@ func TestCreateJobInvalidBody(t *testing.T) {
 
 func TestGetJob404(t *testing.T) {
 	assert := assert.New(t)
-	service, _ := CreateCaptionsService()
+	service, _ := createCaptionsService()
 	r, _ := http.NewRequest("GET", "/jobs/404", nil)
 	status, _, err := service.GetJob(r)
 	assert.Equal(status, 404)
