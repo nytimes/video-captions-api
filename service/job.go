@@ -2,7 +2,6 @@ package service
 
 import (
 	"encoding/json"
-	"errors"
 	"io/ioutil"
 	"net/http"
 
@@ -12,12 +11,22 @@ import (
 	"github.com/satori/go.uuid"
 )
 
+// CaptionsError wraps error messages and uniforms json response
+type CaptionsError struct {
+	Message string `json:"error"`
+}
+
+// Error implements the error interface
+func (e CaptionsError) Error() string {
+	return e.Message
+}
+
 // GetJobs returns all the Jobs associated with a ParentID
 func (s *CaptionsService) GetJobs(r *http.Request) (int, interface{}, error) {
 	parentID := web.Vars(r)["id"]
 	jobs, err := s.client.GetJobs(parentID)
 	if err != nil {
-		return http.StatusNotFound, nil, err
+		return http.StatusNotFound, nil, CaptionsError{err.Error()}
 	}
 	return http.StatusOK, jobs, nil
 }
@@ -28,7 +37,7 @@ func (s *CaptionsService) GetJob(r *http.Request) (int, interface{}, error) {
 	// TODO: on the 3play client, we should look at the errors field and check for not_found errors at least
 	job, err := s.client.GetJob(id)
 	if err != nil {
-		return http.StatusNotFound, nil, err
+		return http.StatusNotFound, nil, CaptionsError{err.Error()}
 	}
 	return http.StatusOK, job, nil
 }
@@ -43,28 +52,28 @@ func (s *CaptionsService) CreateJob(r *http.Request) (int, interface{}, error) {
 	var job providers.Job
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		requestLogger.Error("Could not read request body", err)
-		return http.StatusBadRequest, nil, err
+		requestLogger.Error("Could not read request body: ", err)
+		return http.StatusBadRequest, nil, CaptionsError{err.Error()}
 	}
 	err = json.Unmarshal(data, &job)
 
 	if err != nil {
 		requestLogger.Error("Could not create job from request body", err)
-		return http.StatusBadRequest, nil, errors.New("Malformed parameters")
+		return http.StatusBadRequest, nil, CaptionsError{"Malformed parameters"}
 	}
 
 	mediaURL := job.MediaURL
 
 	if mediaURL == "" {
 		requestLogger.Error("Tried to create a job without a media url", err)
-		return http.StatusBadRequest, nil, errors.New("Please provide a media_url")
+		return http.StatusBadRequest, nil, CaptionsError{"Please provide a media_url"}
 	}
 
 	job.ParentID = job.ID
 	job.ID = uuid.NewV4().String()
 	job, err = s.client.DispatchJob(job)
 	if err != nil {
-		return http.StatusInternalServerError, err, err
+		return http.StatusInternalServerError, nil, CaptionsError{err.Error()}
 	}
 
 	return http.StatusCreated, job, nil
