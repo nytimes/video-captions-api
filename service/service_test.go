@@ -10,35 +10,35 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type FakeProvider struct {
+type fakeProvider struct {
 	logger *log.Logger
 }
 
-func (p FakeProvider) DispatchJob(job providers.Job) (providers.Job, error) {
+func (p fakeProvider) DispatchJob(job providers.Job) (providers.Job, error) {
 	p.logger.Info("dispatching job")
 	return job, nil
 }
 
-func (p FakeProvider) GetJob(id string) (*providers.Job, error) {
+func (p fakeProvider) GetJob(id string) (*providers.Job, error) {
 	p.logger.Info("fetching job", id)
 	return &providers.Job{}, nil
 }
 
-func (p FakeProvider) GetName() string {
+func (p fakeProvider) GetName() string {
 	return "test-provider"
 }
 
-type BrokenProvider FakeProvider
+type brokenProvider fakeProvider
 
-func (p BrokenProvider) GetName() string {
+func (p brokenProvider) GetName() string {
 	return "broken-provider"
 }
 
-func (p BrokenProvider) DispatchJob(job providers.Job) (providers.Job, error) {
+func (p brokenProvider) DispatchJob(job providers.Job) (providers.Job, error) {
 	return providers.Job{}, errors.New("provider error")
 }
 
-func (p BrokenProvider) GetJob(id string) (*providers.Job, error) {
+func (p brokenProvider) GetJob(id string) (*providers.Job, error) {
 	p.logger.Info("fetching job", id)
 	return nil, errors.New("failed to get job")
 }
@@ -59,7 +59,7 @@ func TestAddProvider(t *testing.T) {
 	assert := assert.New(t)
 	service, client := createCaptionsService()
 
-	service.AddProvider(FakeProvider{})
+	service.AddProvider(fakeProvider{})
 	provider := client.Providers["test-provider"]
 	assert.NotNil(provider)
 	assert.Equal(provider.GetName(), "test-provider")

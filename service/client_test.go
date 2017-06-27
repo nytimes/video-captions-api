@@ -11,7 +11,7 @@ import (
 func TestGetJob(t *testing.T) {
 	service, client := createCaptionsService()
 	assert := assert.New(t)
-	service.AddProvider(FakeProvider{logger: log.New()})
+	service.AddProvider(fakeProvider{logger: log.New()})
 	job := providers.Job{
 		ID:       "123",
 		MediaURL: "http://vp.nyt.com/video.mp4",
