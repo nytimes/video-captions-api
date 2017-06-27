@@ -67,10 +67,12 @@ func (d *DatastoreDatabase) GetJob(id string) (providers.Job, error) {
 	ctx := context.Background()
 	key := newNameKeyWithNamespace(d.kind, id, d.namespace)
 	err := d.client.Get(ctx, key, &result)
-	if err != nil {
-		return result, err
+	if err == datastore.ErrNoSuchEntity {
+		return result, errors.New("Job not found")
 	}
-
+	if err != nil {
+		return result, errors.New("Unkown error from Datastore")
+	}
 	return result, nil
 }
 
@@ -80,10 +82,12 @@ func (d *DatastoreDatabase) GetJobs(parentID string) ([]providers.Job, error) {
 	ctx := context.Background()
 	query := datastore.NewQuery(d.kind).Namespace(d.namespace).Filter("ParentID =", parentID)
 	_, err := d.client.GetAll(ctx, query, &jobs)
-	if err != nil {
-		return nil, err
+	if len(jobs) == 0 {
+		return nil, errors.New("No Jobs found for this ParentID")
 	}
-
+	if err != nil {
+		return nil, errors.New("Unkown error from Datastore")
+	}
 	return jobs, nil
 }
 
