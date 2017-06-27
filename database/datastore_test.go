@@ -1,7 +1,6 @@
 package database
 
 import (
-	"errors"
 	"reflect"
 	"testing"
 
@@ -25,7 +24,7 @@ func (c *datastoreTestClient) Put(_ context.Context, key *datastore.Key, src int
 func (c *datastoreTestClient) Get(_ context.Context, key *datastore.Key, dst interface{}) error {
 	job, ok := c.jobs[key.Name]
 	if !ok {
-		return errors.New("ErrNoSuchEntity")
+		return datastore.ErrNoSuchEntity
 	}
 
 	v := reflect.ValueOf(dst)
@@ -86,7 +85,7 @@ func TestGetJob(t *testing.T) {
 	assert.Nil(err)
 
 	_, err = db.GetJob("456")
-	assert.EqualError(err, "ErrNoSuchEntity")
+	assert.EqualError(err, "Job not found")
 }
 
 func TestUpdateJob(t *testing.T) {
@@ -110,7 +109,7 @@ func TestUpdateJob(t *testing.T) {
 	assert.Equal(newJob, afterChange)
 
 	err = db.UpdateJob("234", newJob)
-	assert.EqualError(err, "ErrNoSuchEntity")
+	assert.EqualError(err, "Job not found")
 }
 
 func TestDeleteJob(t *testing.T) {
