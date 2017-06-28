@@ -82,11 +82,11 @@ func (d *DatastoreDatabase) GetJobs(parentID string) ([]providers.Job, error) {
 	ctx := context.Background()
 	query := datastore.NewQuery(d.kind).Namespace(d.namespace).Filter("ParentID =", parentID)
 	_, err := d.client.GetAll(ctx, query, &jobs)
-	if len(jobs) == 0 {
-		return nil, errors.New("No Jobs found for this ParentID")
-	}
 	if err != nil {
 		return nil, errors.New("Unkown error from Datastore")
+	}
+	if len(jobs) == 0 {
+		return nil, errors.New("No Jobs found for this ParentID")
 	}
 	return jobs, nil
 }
