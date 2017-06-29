@@ -89,7 +89,7 @@ func TestNewCaptionsService(t *testing.T)  {
 	assert.Equal(service.Prefix(), "")
 
 	assert.NotNil(service.client.Logger)
-	if reflect.DeepEqual(service.client.Logger, logger) {
+	if !reflect.DeepEqual(service.client.Logger, logger) {
 		t.Errorf("Wrong logger\nExpected: %#v\nGot:  %#v", logger, service.client.Logger)
 	}
 
