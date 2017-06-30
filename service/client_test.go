@@ -6,6 +6,7 @@ import (
 	"github.com/NYTimes/video-captions-api/providers"
 	log "github.com/Sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+	"reflect"
 )
 
 func TestGetJob(t *testing.T) {
@@ -27,4 +28,38 @@ func TestDispatchJobNoProvider(t *testing.T) {
 	_, client := createCaptionsService()
 	_, err := client.DispatchJob(providers.Job{Provider: "wrong-provider"})
 	assert.Equal(t, "Provider not found", err.Error())
+}
+
+func TestGetJobs(t *testing.T) {
+	parentID := "Mom"
+
+	service, client := createCaptionsService()
+
+	service.AddProvider(fakeProvider{logger: log.New()})
+	job1 := providers.Job{
+		ID:       "123",
+		MediaURL: "http://vp.nyt.com/video1.mp4",
+		Provider: "test-provider1",
+		ParentID: parentID,
+	}
+	client.DB.StoreJob(job1)
+	job2 := providers.Job{
+		ID:       "456",
+		MediaURL: "http://vp.nyt.com/video2.mp4",
+		Provider: "test-provider2",
+		ParentID: parentID,
+	}
+	client.DB.StoreJob(job2)
+
+	resultJob, _ := client.GetJobs(parentID)
+
+	assert := assert.New(t)
+	assert.NotNil(resultJob)
+	assert.Len(resultJob, 2)
+	if !reflect.DeepEqual(job1, resultJob[0]) {
+		t.Errorf("The first job did not match\nExpected: %#v\nGot:  %#v", job1, resultJob[0])
+	}
+	if !reflect.DeepEqual(job2, resultJob[1]) {
+		t.Errorf("The second job did not match\nExpected: %#v\nGot:  %#v", job2, resultJob[1])
+	}
 }

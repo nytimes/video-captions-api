@@ -46,7 +46,7 @@ func NewCaptionsService(cfg *config.CaptionsServiceConfig, db database.DB) *Capt
 		Client{
 			Providers: make(map[string]providers.Provider),
 			DB:        db,
-			Logger:    logger,
+			Logger:    cfg.Logger,
 		},
 	}
 }
