@@ -7,8 +7,8 @@ build:
       - go get github.com/Masterminds/glide
       - go get github.com/golang/lint/golint
       - glide install
-      - golint -set_exit_status ./...
-      - go test -v ./...
+      - golint -set_exit_status $(go list ./... | grep -v vendor)
+      - go test -v $(go list ./... | grep -v vendor)
       - go build -o captions-api
     when:
       event:
