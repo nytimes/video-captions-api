@@ -63,7 +63,7 @@ func (s *CaptionsService) Prefix() string {
 
 // Middleware gizmo middleware hook
 func (s *CaptionsService) Middleware(h http.Handler) http.Handler {
-	return gziphandler.GzipHandler(h)
+	return gziphandler.GzipHandler(server.CORSHandler(h, ""))
 }
 
 // Endpoints returns CaptionsService API endpoints
