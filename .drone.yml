@@ -4,8 +4,9 @@ build:
     image: golang:1.8-alpine
     commands:
       - apk -qq --no-cache add git
+      - go get github.com/Masterminds/glide
       - go get github.com/golang/lint/golint
-      - go get -t ./...
+      - glide install
       - golint -set_exit_status ./...
       - go test -v ./...
       - go build -o captions-api
