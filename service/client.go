@@ -77,3 +77,11 @@ func (c Client) DispatchJob(job providers.Job) (providers.Job, error) {
 	}
 	return job, err
 }
+
+func (c Client) GetProviders() []string {
+	var providers []string
+	for name := range c.Providers {
+		providers = append(providers, name)
+	}
+	return providers
+}
