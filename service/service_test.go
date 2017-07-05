@@ -15,6 +15,7 @@ import (
 
 type fakeProvider struct {
 	logger *log.Logger
+	params map[string]bool
 }
 
 func (p fakeProvider) DispatchJob(job providers.Job) (providers.Job, error) {
@@ -23,6 +24,12 @@ func (p fakeProvider) DispatchJob(job providers.Job) (providers.Job, error) {
 }
 
 func (p fakeProvider) GetJob(id string) (*providers.Job, error) {
+	if p.params["jobError"] {
+		return nil, errors.New("oh no")
+	}
+	if p.params["jobStatus"] {
+		return &providers.Job{Status: "My status"}, nil
+	}
 	p.logger.Info("fetching job", id)
 	return &providers.Job{}, nil
 }

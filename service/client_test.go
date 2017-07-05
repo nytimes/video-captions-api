@@ -63,3 +63,47 @@ func TestGetJobs(t *testing.T) {
 		t.Errorf("The second job did not match\nExpected: %#v\nGot:  %#v", job2, resultJob[1])
 	}
 }
+
+func TestProviderJobError(t *testing.T) {
+	service, client := createCaptionsService()
+	service.AddProvider(fakeProvider{
+		logger: log.New(),
+		params: map[string]bool{
+			"jobError": true,
+			"jobStatus": false,
+		},
+	})
+	job := providers.Job{
+		ID:       "123",
+		MediaURL: "http://vp.nyt.com/video.mp4",
+		Provider: "test-provider",
+	}
+	client.DB.StoreJob(job)
+	_, err := client.GetJob("123")
+
+	assert := assert.New(t)
+	assert.NotNil(err)
+	assert.EqualValues(err.Error(), "oh no")
+
+}
+
+func TestProviderStatusError(t *testing.T) {
+	service, client := createCaptionsService()
+	service.AddProvider(fakeProvider{
+		logger: log.New(),
+		params: map[string]bool{
+			"jobError": false,
+			"jobStatus": true,
+		},
+	})
+	job := providers.Job{
+		ID:       "123",
+		MediaURL: "http://vp.nyt.com/video.mp4",
+		Provider: "test-provider",
+	}
+	client.DB.StoreJob(job)
+	resultJob, _ := client.GetJob("123")
+	assert := assert.New(t)
+	assert.NotNil(resultJob.Status)
+	assert.EqualValues(resultJob.Status, "My status")
+}
