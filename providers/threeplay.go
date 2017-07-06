@@ -83,3 +83,19 @@ func (c *ThreePlayProvider) DispatchJob(job Job) (Job, error) {
 
 	return job, nil
 }
+
+//GetOptions returns available options for 3play
+func (c *ThreePlayProvider) GetOptions() []ProviderOption {
+	return []ProviderOption{
+		{
+			Key:         "for_asr",
+			Value:       []string{"1"},
+			Description: "use computer generated captions",
+		},
+		{
+			Key:         "turnaround_level",
+			Value:       []string{"same_day", "rush", "expedited", "extended", "standard"},
+			Description: "defaults to standard",
+		},
+	}
+}

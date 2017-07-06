@@ -78,10 +78,18 @@ func (c Client) DispatchJob(job providers.Job) (providers.Job, error) {
 	return job, err
 }
 
-func (c Client) GetProviders() []string {
-	var providers []string
-	for name := range c.Providers {
-		providers = append(providers, name)
+//GetProviders list available providers and their options
+func (c Client) GetProviders() interface{} {
+	var result []interface{}
+	for name, provider := range c.Providers {
+		result = append(result, struct {
+			Name    string                     `json:"name"`
+			Options []providers.ProviderOption `json:"options"`
+		}{
+			name,
+			provider.GetOptions(),
+		},
+		)
 	}
-	return providers
+	return result
 }
