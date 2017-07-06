@@ -3,10 +3,11 @@ package service
 import (
 	"testing"
 
+	"reflect"
+
 	"github.com/NYTimes/video-captions-api/providers"
 	log "github.com/Sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	"reflect"
 )
 
 func TestGetJob(t *testing.T) {
@@ -69,7 +70,7 @@ func TestProviderJobError(t *testing.T) {
 	service.AddProvider(fakeProvider{
 		logger: log.New(),
 		params: map[string]bool{
-			"jobError": true,
+			"jobError":  true,
 			"jobStatus": false,
 		},
 	})
@@ -92,7 +93,7 @@ func TestProviderStatusError(t *testing.T) {
 	service.AddProvider(fakeProvider{
 		logger: log.New(),
 		params: map[string]bool{
-			"jobError": false,
+			"jobError":  false,
 			"jobStatus": true,
 		},
 	})
@@ -106,4 +107,14 @@ func TestProviderStatusError(t *testing.T) {
 	assert := assert.New(t)
 	assert.NotNil(resultJob.Status)
 	assert.EqualValues(resultJob.Status, "My status")
+}
+
+func TestGetProviderInfo(t *testing.T) {
+	assert := assert.New(t)
+	service, client := createCaptionsService()
+	service.AddProvider(fakeProvider{
+		logger: log.New(),
+	})
+	result := client.GetProviders()
+	assert.Equal("test-provider", result[0].Name)
 }

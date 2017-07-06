@@ -78,14 +78,17 @@ func (c Client) DispatchJob(job providers.Job) (providers.Job, error) {
 	return job, err
 }
 
+//ProviderInfo has the name and options of a provider
+type ProviderInfo struct {
+	Name    string                     `json:"name"`
+	Options []providers.ProviderOption `json:"options"`
+}
+
 //GetProviders list available providers and their options
-func (c Client) GetProviders() interface{} {
-	var result []interface{}
+func (c Client) GetProviders() []ProviderInfo {
+	var result []ProviderInfo
 	for name, provider := range c.Providers {
-		result = append(result, struct {
-			Name    string                     `json:"name"`
-			Options []providers.ProviderOption `json:"options"`
-		}{
+		result = append(result, ProviderInfo{
 			name,
 			provider.GetOptions(),
 		},
