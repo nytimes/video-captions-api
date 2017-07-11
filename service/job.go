@@ -78,3 +78,9 @@ func (s *CaptionsService) CreateJob(r *http.Request) (int, interface{}, error) {
 
 	return http.StatusCreated, job, nil
 }
+
+// GetProviders returns available providers
+func (s *CaptionsService) GetProviders(r *http.Request) (int, interface{}, error) {
+	providers := s.client.GetProviders()
+	return http.StatusOK, providers, nil
+}

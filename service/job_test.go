@@ -50,7 +50,7 @@ func TestCreateJobNoMediaURL(t *testing.T) {
 func TestCreateJobDispatchError(t *testing.T) {
 	assert := assert.New(t)
 	service, client := createCaptionsService()
-	service.AddProvider(brokenProvider{logger: client.Logger})
+	service.AddProvider(brokenProvider{fakeProvider{logger: client.Logger}})
 	job := providers.Job{
 		ID:       "123",
 		MediaURL: "http://vp.nyt.com/video.mp4",
@@ -83,4 +83,13 @@ func TestGetJob404(t *testing.T) {
 	status, _, err := service.GetJob(r)
 	assert.Equal(status, 404)
 	assert.Equal("Job doesn't exist", err.Error())
+}
+
+func TestGetProviders(t *testing.T) {
+	assert := assert.New(t)
+	service, _ := createCaptionsService()
+	r, _ := http.NewRequest("GET", "/providers", nil)
+	status, _, err := service.GetProviders(r)
+	assert.Equal(200, status)
+	assert.Nil(err)
 }

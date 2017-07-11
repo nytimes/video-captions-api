@@ -4,13 +4,14 @@ import (
 	"errors"
 	"testing"
 
+	"reflect"
+
+	"github.com/NYTimes/gizmo/server"
 	"github.com/NYTimes/video-captions-api/config"
 	"github.com/NYTimes/video-captions-api/database"
 	"github.com/NYTimes/video-captions-api/providers"
 	log "github.com/Sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	"github.com/NYTimes/gizmo/server"
-	"reflect"
 )
 
 type fakeProvider struct {
@@ -38,7 +39,13 @@ func (p fakeProvider) GetName() string {
 	return "test-provider"
 }
 
-type brokenProvider fakeProvider
+func (p fakeProvider) GetOptions() []providers.ProviderOption {
+	return nil
+}
+
+type brokenProvider struct {
+	fakeProvider
+}
 
 func (p brokenProvider) GetName() string {
 	return "broken-provider"
@@ -75,13 +82,13 @@ func TestAddProvider(t *testing.T) {
 	assert.Equal(provider.GetName(), "test-provider")
 }
 
-func TestNewCaptionsService(t *testing.T)  {
+func TestNewCaptionsService(t *testing.T) {
 	logger := log.New()
 	projectID := "My amazing captions project"
 	providers := make(map[string]providers.Provider)
 	cfg := config.CaptionsServiceConfig{
-		Server: &server.Config{},
-		Logger: logger,
+		Server:    &server.Config{},
+		Logger:    logger,
 		ProjectID: projectID,
 	}
 	db := database.NewMemoryDatabase()
@@ -103,8 +110,9 @@ func TestNewCaptionsService(t *testing.T)  {
 	assert.NotNil(service.client.Providers)
 	assert.Equal(service.client.Providers, providers)
 
-	assert.Len(service.Endpoints(), 3)
+	assert.Len(service.Endpoints(), 4)
 	assert.Contains(service.Endpoints(), "/captions/{id}")
 	assert.Contains(service.Endpoints(), "/jobs/{id}")
 	assert.Contains(service.Endpoints(), "/captions")
+	assert.Contains(service.Endpoints(), "/providers")
 }

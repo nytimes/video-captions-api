@@ -78,5 +78,8 @@ func (s *CaptionsService) Endpoints() map[string]map[string]http.HandlerFunc {
 		"/captions": {
 			"POST": server.JSONToHTTP(s.CreateJob).ServeHTTP,
 		},
+		"/providers": {
+			"GET": server.JSONToHTTP(s.GetProviders).ServeHTTP,
+		},
 	}
 }
