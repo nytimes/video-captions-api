@@ -46,14 +46,14 @@ func NewDatastoreDatabase(projectID string) (*DatastoreDatabase, error) {
 }
 
 // StoreJob stores a job
-func (d *DatastoreDatabase) StoreJob(job providers.Job) (string, error) {
+func (d *DatastoreDatabase) StoreJob(job *providers.Job) (string, error) {
 	if _, err := d.GetJob(job.ID); err == nil {
 		return "", errors.New("Job already exists")
 	}
 
 	ctx := context.Background()
 	key := newNameKeyWithNamespace(d.kind, job.ID, d.namespace)
-	_, err := d.client.Put(ctx, key, &job)
+	_, err := d.client.Put(ctx, key, job)
 	if err != nil {
 		return "", err
 	}
@@ -62,16 +62,16 @@ func (d *DatastoreDatabase) StoreJob(job providers.Job) (string, error) {
 }
 
 // GetJob retrieves a job from database
-func (d *DatastoreDatabase) GetJob(id string) (providers.Job, error) {
-	result := providers.Job{}
+func (d *DatastoreDatabase) GetJob(id string) (*providers.Job, error) {
+	result := &providers.Job{}
 	ctx := context.Background()
 	key := newNameKeyWithNamespace(d.kind, id, d.namespace)
-	err := d.client.Get(ctx, key, &result)
+	err := d.client.Get(ctx, key, result)
 	if err == datastore.ErrNoSuchEntity {
-		return result, errors.New("Job not found")
+		return nil, errors.New("Job not found")
 	}
 	if err != nil {
-		return result, errors.New("Unkown error from Datastore")
+		return nil, errors.New("Unkown error from Datastore")
 	}
 	return result, nil
 }
@@ -92,7 +92,7 @@ func (d *DatastoreDatabase) GetJobs(parentID string) ([]providers.Job, error) {
 }
 
 // UpdateJob updates a job
-func (d *DatastoreDatabase) UpdateJob(id string, job providers.Job) error {
+func (d *DatastoreDatabase) UpdateJob(id string, job *providers.Job) error {
 	_, err := d.GetJob(id)
 	if err != nil {
 		return err
@@ -100,7 +100,7 @@ func (d *DatastoreDatabase) UpdateJob(id string, job providers.Job) error {
 
 	ctx := context.Background()
 	key := newNameKeyWithNamespace(d.kind, id, d.namespace)
-	_, err = d.client.Put(ctx, key, &job)
+	_, err = d.client.Put(ctx, key, job)
 	return err
 }
 

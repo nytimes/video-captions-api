@@ -49,13 +49,13 @@ func (s *CaptionsService) CreateJob(r *http.Request) (int, interface{}, error) {
 		"Method":  r.Method,
 		"URI":     r.RequestURI,
 	})
-	var job providers.Job
+	job := &providers.Job{}
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		requestLogger.Error("Could not read request body: ", err)
 		return http.StatusBadRequest, nil, CaptionsError{err.Error()}
 	}
-	err = json.Unmarshal(data, &job)
+	err = json.Unmarshal(data, job)
 
 	if err != nil {
 		requestLogger.Error("Could not create job from request body", err)
@@ -71,7 +71,7 @@ func (s *CaptionsService) CreateJob(r *http.Request) (int, interface{}, error) {
 
 	job.ParentID = job.ID
 	job.ID = uuid.NewV4().String()
-	job, err = s.client.DispatchJob(job)
+	err = s.client.DispatchJob(job)
 	if err != nil {
 		return http.StatusInternalServerError, nil, CaptionsError{err.Error()}
 	}

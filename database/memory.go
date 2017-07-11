@@ -10,18 +10,18 @@ import (
 // MemoryDatabase memory based database implementation for the DB interface
 type MemoryDatabase struct {
 	mtx  sync.Mutex
-	jobs map[string]providers.Job
+	jobs map[string]*providers.Job
 }
 
 // NewMemoryDatabase creates a MemoryDatabase
 func NewMemoryDatabase() *MemoryDatabase {
 	return &MemoryDatabase{
-		jobs: make(map[string]providers.Job, 0),
+		jobs: make(map[string]*providers.Job, 0),
 	}
 }
 
 // StoreJob stores Job in-memory
-func (db *MemoryDatabase) StoreJob(job providers.Job) (string, error) {
+func (db *MemoryDatabase) StoreJob(job *providers.Job) (string, error) {
 	if _, err := db.GetJob(job.ID); err == nil {
 		return "", errors.New("Job already exists")
 	}
@@ -34,7 +34,7 @@ func (db *MemoryDatabase) StoreJob(job providers.Job) (string, error) {
 }
 
 // UpdateJob updates Job in-memory
-func (db *MemoryDatabase) UpdateJob(id string, job providers.Job) error {
+func (db *MemoryDatabase) UpdateJob(id string, job *providers.Job) error {
 	if _, err := db.GetJob(id); err != nil {
 		return errors.New("Job doesn't exist")
 	}
@@ -47,14 +47,14 @@ func (db *MemoryDatabase) UpdateJob(id string, job providers.Job) error {
 }
 
 // GetJob returns a Job given its ID
-func (db *MemoryDatabase) GetJob(id string) (providers.Job, error) {
+func (db *MemoryDatabase) GetJob(id string) (*providers.Job, error) {
 	db.mtx.Lock()
 	defer db.mtx.Unlock()
 
 	if job, ok := db.jobs[id]; ok {
 		return job, nil
 	}
-	return providers.Job{}, errors.New("Job doesn't exist")
+	return nil, errors.New("Job doesn't exist")
 }
 
 // DeleteJob deletes a Job given its ID
@@ -74,7 +74,7 @@ func (db *MemoryDatabase) GetJobs(parentID string) ([]providers.Job, error) {
 	var jobList []providers.Job
 	for _, job := range db.jobs {
 		if parentID == job.ParentID {
-			jobList = append(jobList, job)
+			jobList = append(jobList, *job)
 		}
 	}
 
