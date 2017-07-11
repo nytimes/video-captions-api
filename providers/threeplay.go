@@ -65,7 +65,7 @@ func (c *ThreePlayProvider) GetJob(id string) (*Job, error) {
 }
 
 // DispatchJob sends a video file to 3play for transcription and captions generation
-func (c *ThreePlayProvider) DispatchJob(job Job) (Job, error) {
+func (c *ThreePlayProvider) DispatchJob(job *Job) error {
 	jobLogger := c.logger.WithFields(log.Fields{"JobID": job.ID, "Provider": job.Provider})
 	query := url.Values{}
 
@@ -76,10 +76,10 @@ func (c *ThreePlayProvider) DispatchJob(job Job) (Job, error) {
 
 	if err != nil {
 		jobLogger.Error("Failed to dispatch job to 3Play", err)
-		return Job{}, err
+		return err
 	}
 
 	job.ProviderID = fileID
 
-	return job, nil
+	return nil
 }

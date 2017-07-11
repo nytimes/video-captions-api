@@ -3,17 +3,18 @@ package service
 import (
 	"testing"
 
+	"reflect"
+
 	"github.com/NYTimes/video-captions-api/providers"
 	log "github.com/Sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	"reflect"
 )
 
 func TestGetJob(t *testing.T) {
 	service, client := createCaptionsService()
 	assert := assert.New(t)
 	service.AddProvider(fakeProvider{logger: log.New()})
-	job := providers.Job{
+	job := &providers.Job{
 		ID:       "123",
 		MediaURL: "http://vp.nyt.com/video.mp4",
 		Provider: "test-provider",
@@ -26,7 +27,7 @@ func TestGetJob(t *testing.T) {
 
 func TestDispatchJobNoProvider(t *testing.T) {
 	_, client := createCaptionsService()
-	_, err := client.DispatchJob(providers.Job{Provider: "wrong-provider"})
+	err := client.DispatchJob(&providers.Job{Provider: "wrong-provider"})
 	assert.Equal(t, "Provider not found", err.Error())
 }
 
@@ -36,14 +37,14 @@ func TestGetJobs(t *testing.T) {
 	service, client := createCaptionsService()
 
 	service.AddProvider(fakeProvider{logger: log.New()})
-	job1 := providers.Job{
+	job1 := &providers.Job{
 		ID:       "123",
 		MediaURL: "http://vp.nyt.com/video1.mp4",
 		Provider: "test-provider1",
 		ParentID: parentID,
 	}
 	client.DB.StoreJob(job1)
-	job2 := providers.Job{
+	job2 := &providers.Job{
 		ID:       "456",
 		MediaURL: "http://vp.nyt.com/video2.mp4",
 		Provider: "test-provider2",
@@ -56,10 +57,10 @@ func TestGetJobs(t *testing.T) {
 	assert := assert.New(t)
 	assert.NotNil(resultJob)
 	assert.Len(resultJob, 2)
-	if !reflect.DeepEqual(job1, resultJob[0]) {
+	if !reflect.DeepEqual(job1, &resultJob[0]) {
 		t.Errorf("The first job did not match\nExpected: %#v\nGot:  %#v", job1, resultJob[0])
 	}
-	if !reflect.DeepEqual(job2, resultJob[1]) {
+	if !reflect.DeepEqual(job2, &resultJob[1]) {
 		t.Errorf("The second job did not match\nExpected: %#v\nGot:  %#v", job2, resultJob[1])
 	}
 }
@@ -69,11 +70,11 @@ func TestProviderJobError(t *testing.T) {
 	service.AddProvider(fakeProvider{
 		logger: log.New(),
 		params: map[string]bool{
-			"jobError": true,
+			"jobError":  true,
 			"jobStatus": false,
 		},
 	})
-	job := providers.Job{
+	job := &providers.Job{
 		ID:       "123",
 		MediaURL: "http://vp.nyt.com/video.mp4",
 		Provider: "test-provider",
@@ -92,11 +93,11 @@ func TestProviderStatusError(t *testing.T) {
 	service.AddProvider(fakeProvider{
 		logger: log.New(),
 		params: map[string]bool{
-			"jobError": false,
+			"jobError":  false,
 			"jobStatus": true,
 		},
 	})
-	job := providers.Job{
+	job := &providers.Job{
 		ID:       "123",
 		MediaURL: "http://vp.nyt.com/video.mp4",
 		Provider: "test-provider",

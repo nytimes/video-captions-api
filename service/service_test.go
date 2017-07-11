@@ -4,13 +4,14 @@ import (
 	"errors"
 	"testing"
 
+	"reflect"
+
+	"github.com/NYTimes/gizmo/server"
 	"github.com/NYTimes/video-captions-api/config"
 	"github.com/NYTimes/video-captions-api/database"
 	"github.com/NYTimes/video-captions-api/providers"
 	log "github.com/Sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	"github.com/NYTimes/gizmo/server"
-	"reflect"
 )
 
 type fakeProvider struct {
@@ -18,9 +19,9 @@ type fakeProvider struct {
 	params map[string]bool
 }
 
-func (p fakeProvider) DispatchJob(job providers.Job) (providers.Job, error) {
+func (p fakeProvider) DispatchJob(job *providers.Job) error {
 	p.logger.Info("dispatching job")
-	return job, nil
+	return nil
 }
 
 func (p fakeProvider) GetJob(id string) (*providers.Job, error) {
@@ -44,8 +45,8 @@ func (p brokenProvider) GetName() string {
 	return "broken-provider"
 }
 
-func (p brokenProvider) DispatchJob(job providers.Job) (providers.Job, error) {
-	return providers.Job{}, errors.New("provider error")
+func (p brokenProvider) DispatchJob(job *providers.Job) error {
+	return errors.New("provider error")
 }
 
 func (p brokenProvider) GetJob(id string) (*providers.Job, error) {
@@ -75,13 +76,13 @@ func TestAddProvider(t *testing.T) {
 	assert.Equal(provider.GetName(), "test-provider")
 }
 
-func TestNewCaptionsService(t *testing.T)  {
+func TestNewCaptionsService(t *testing.T) {
 	logger := log.New()
 	projectID := "My amazing captions project"
 	providers := make(map[string]providers.Provider)
 	cfg := config.CaptionsServiceConfig{
-		Server: &server.Config{},
-		Logger: logger,
+		Server:    &server.Config{},
+		Logger:    logger,
 		ProjectID: projectID,
 	}
 	db := database.NewMemoryDatabase()

@@ -16,7 +16,7 @@ func TestCreateJob(t *testing.T) {
 	assert := assert.New(t)
 	service, client := createCaptionsService()
 	service.AddProvider(fakeProvider{logger: client.Logger})
-	job := providers.Job{
+	job := &providers.Job{
 		ID:       "123",
 		MediaURL: "http://vp.nyt.com/video.mp4",
 		Provider: "test-provider",
@@ -24,7 +24,7 @@ func TestCreateJob(t *testing.T) {
 	jobBytes, _ := json.Marshal(job)
 	r, _ := http.NewRequest("POST", "/captions", bytes.NewReader(jobBytes))
 	status, resultJob, err := service.CreateJob(r)
-	job = resultJob.(providers.Job)
+	job = resultJob.(*providers.Job)
 	assert.Nil(err)
 	assert.Equal(201, status)
 	assert.Equal(job.ParentID, "123")
@@ -34,7 +34,7 @@ func TestCreateJobNoMediaURL(t *testing.T) {
 	assert := assert.New(t)
 	service, client := createCaptionsService()
 	service.AddProvider(fakeProvider{logger: client.Logger})
-	job := providers.Job{
+	job := &providers.Job{
 		ID:       "123",
 		Provider: "test-provider",
 	}
@@ -51,7 +51,7 @@ func TestCreateJobDispatchError(t *testing.T) {
 	assert := assert.New(t)
 	service, client := createCaptionsService()
 	service.AddProvider(brokenProvider{logger: client.Logger})
-	job := providers.Job{
+	job := &providers.Job{
 		ID:       "123",
 		MediaURL: "http://vp.nyt.com/video.mp4",
 		Provider: "broken-provider",

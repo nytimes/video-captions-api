@@ -12,11 +12,11 @@ import (
 )
 
 type datastoreTestClient struct {
-	jobs map[string]providers.Job
+	jobs map[string]*providers.Job
 }
 
 func (c *datastoreTestClient) Put(_ context.Context, key *datastore.Key, src interface{}) (*datastore.Key, error) {
-	job := *src.(*providers.Job)
+	job := src.(*providers.Job)
 	c.jobs[key.Name] = job
 	return key, nil
 }
@@ -28,7 +28,7 @@ func (c *datastoreTestClient) Get(_ context.Context, key *datastore.Key, dst int
 	}
 
 	v := reflect.ValueOf(dst)
-	v.Elem().Set(reflect.ValueOf(job))
+	v.Elem().Set(reflect.ValueOf(*job))
 	return nil
 }
 
@@ -44,7 +44,7 @@ func (c *datastoreTestClient) GetAll(_ context.Context, q *datastore.Query, dst 
 func newTestDB() *DatastoreDatabase {
 	return &DatastoreDatabase{
 		&datastoreTestClient{
-			map[string]providers.Job{},
+			make(map[string]*providers.Job),
 		},
 		"kind",
 		"namespace",
@@ -55,7 +55,7 @@ func TestStoreJob(t *testing.T) {
 	assert := assert.New(t)
 	db := newTestDB()
 
-	job := providers.Job{
+	job := &providers.Job{
 		ID:       "123",
 		MediaURL: "https://abc.com/123.mp4",
 	}
@@ -74,7 +74,7 @@ func TestGetJob(t *testing.T) {
 	assert := assert.New(t)
 	db := newTestDB()
 
-	job := providers.Job{
+	job := &providers.Job{
 		ID:       "123",
 		MediaURL: "https://abc.com/123.mp4",
 	}
@@ -92,12 +92,12 @@ func TestUpdateJob(t *testing.T) {
 	assert := assert.New(t)
 	db := newTestDB()
 
-	job := providers.Job{
+	job := &providers.Job{
 		ID:       "123",
 		MediaURL: "https://abc.com/some.mp4",
 	}
 
-	newJob := providers.Job{
+	newJob := &providers.Job{
 		ID:       "123",
 		MediaURL: "https://abc.com/another.mp4",
 	}
@@ -116,7 +116,7 @@ func TestDeleteJob(t *testing.T) {
 	assert := assert.New(t)
 	db := newTestDB()
 
-	job := providers.Job{
+	job := &providers.Job{
 		ID:       "123",
 		MediaURL: "https://abc.com/123.mp4",
 	}
