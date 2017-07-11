@@ -10,4 +10,4 @@ dev:
 		video-captions-api:dev
 
 test:
-	docker run -it -v $(shell pwd):/go/src/github.com/NYTimes/video-captions-api video-captions-api:dev  go test -v ./...
+	docker run -it -v $(shell pwd):/go/src/github.com/NYTimes/video-captions-api video-captions-api:dev  go test -v $$(go list ./... |grep -v vendor)
