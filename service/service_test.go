@@ -62,6 +62,7 @@ func createCaptionsService() (*CaptionsService, Client) {
 	}
 	service := &CaptionsService{
 		client: client,
+		logger: log.New(),
 	}
 	return service, client
 }

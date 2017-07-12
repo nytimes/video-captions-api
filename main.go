@@ -12,6 +12,7 @@ import (
 func main() {
 	var cfg captionsConfig.CaptionsServiceConfig
 	config.LoadEnvConfig(&cfg)
+	cfg.Logger = server.Log
 	db, err := database.NewDatastoreDatabase(cfg.ProjectID)
 	if err != nil {
 		server.Log.Fatal("Unable to create Datastore client", err)
