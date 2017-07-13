@@ -44,7 +44,7 @@ func (s *CaptionsService) GetJob(r *http.Request) (int, interface{}, error) {
 
 // CreateJob create a Job
 func (s *CaptionsService) CreateJob(r *http.Request) (int, interface{}, error) {
-	requestLogger := logger.WithFields(log.Fields{
+	requestLogger := s.logger.WithFields(log.Fields{
 		"Handler": "CreateJob",
 		"Method":  r.Method,
 		"URI":     r.RequestURI,

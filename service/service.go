@@ -2,7 +2,6 @@ package service
 
 import (
 	"net/http"
-	"os"
 
 	"github.com/NYTimes/gziphandler"
 
@@ -11,43 +10,23 @@ import (
 	"github.com/NYTimes/video-captions-api/database"
 	"github.com/NYTimes/video-captions-api/providers"
 	log "github.com/Sirupsen/logrus"
-	"github.com/knq/sdhook"
 )
-
-var logger = log.New()
-
-func init() {
-	if os.Getenv("ENABLE_STACKDRIVER") == "true" {
-		logger.Info("Initializing Stackdriver hook")
-		stackdriver, err := sdhook.New(
-			sdhook.GoogleServiceAccountCredentialsJSON([]byte(os.Getenv("GOOGLE_JSON_CREDENTIALS"))),
-			sdhook.ErrorReportingService("video-captions-api"),
-			sdhook.LogName("video-captions-api"),
-		)
-		if err != nil {
-			logger.Error("Failed to initialize Stackdriver hook: ", err)
-			return
-		}
-		logger.Hooks.Add(stackdriver)
-	}
-}
 
 // CaptionsService the service responsible to wrapping interactions with Providers
 type CaptionsService struct {
 	client Client
+	logger *log.Logger
 }
 
 // NewCaptionsService creates a CaptionsService
 func NewCaptionsService(cfg *config.CaptionsServiceConfig, db database.DB) *CaptionsService {
-	if cfg.Logger == nil {
-		cfg.Logger = logger
-	}
 	return &CaptionsService{
 		Client{
 			Providers: make(map[string]providers.Provider),
 			DB:        db,
 			Logger:    cfg.Logger,
 		},
+		cfg.Logger,
 	}
 }
 
