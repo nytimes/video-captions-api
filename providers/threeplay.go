@@ -79,7 +79,7 @@ func (c *ThreePlayProvider) DispatchJob(job *Job) error {
 		return err
 	}
 
-	job.ProviderID = fileID
+	job.ProviderParams["ProviderID"] = fileID
 
 	return nil
 }

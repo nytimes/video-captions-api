@@ -36,7 +36,7 @@ func (c Client) GetJob(jobID string) (*providers.Job, error) {
 	jobLogger := c.Logger.WithFields(log.Fields{"JobID": jobID, "Provider": job.Provider})
 	provider := c.Providers[job.Provider]
 	jobLogger.Info("Fetching job from Provider")
-	providerJob, err := provider.GetJob(job.ProviderID)
+	providerJob, err := provider.GetJob(job.ProviderParams["ProviderID"])
 	if err != nil {
 		jobLogger.Error("error getting job from provider", err)
 		return nil, err
@@ -61,7 +61,6 @@ func (c Client) DispatchJob(job *providers.Job) error {
 		jobLogger.Error("Provider not found")
 		return errors.New("Provider not found")
 	}
-	job.Status = "processing"
 
 	jobLogger.Info("Dispatching job to provider")
 	err := provider.DispatchJob(job)

@@ -27,7 +27,6 @@ func TestCreateJob(t *testing.T) {
 	job = resultJob.(*providers.Job)
 	assert.Nil(err)
 	assert.Equal(201, status)
-	assert.Equal(job.ParentID, "123")
 }
 
 func TestCreateJobNoMediaURL(t *testing.T) {
