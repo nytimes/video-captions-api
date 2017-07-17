@@ -4,7 +4,7 @@ build:
     image: golang:1.8-alpine
     commands:
       - apk -qq --no-cache add git
-      - go get github.com/golang/dep
+      - go get github.com/golang/dep/cmd/dep
       - go get github.com/golang/lint/golint
       - dep ensure -v
       - golint -set_exit_status $(go list ./... | grep -v vendor)
