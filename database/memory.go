@@ -3,25 +3,23 @@ package database
 import (
 	"errors"
 	"sync"
-
-	"github.com/NYTimes/video-captions-api/providers"
 )
 
 // MemoryDatabase memory based database implementation for the DB interface
 type MemoryDatabase struct {
 	mtx  sync.Mutex
-	jobs map[string]*providers.Job
+	jobs map[string]*Job
 }
 
 // NewMemoryDatabase creates a MemoryDatabase
 func NewMemoryDatabase() *MemoryDatabase {
 	return &MemoryDatabase{
-		jobs: make(map[string]*providers.Job, 0),
+		jobs: make(map[string]*Job, 0),
 	}
 }
 
 // StoreJob stores Job in-memory
-func (db *MemoryDatabase) StoreJob(job *providers.Job) (string, error) {
+func (db *MemoryDatabase) StoreJob(job *Job) (string, error) {
 	if _, err := db.GetJob(job.ID); err == nil {
 		return "", errors.New("Job already exists")
 	}
@@ -34,7 +32,7 @@ func (db *MemoryDatabase) StoreJob(job *providers.Job) (string, error) {
 }
 
 // UpdateJob updates Job in-memory
-func (db *MemoryDatabase) UpdateJob(id string, job *providers.Job) error {
+func (db *MemoryDatabase) UpdateJob(id string, job *Job) error {
 	if _, err := db.GetJob(id); err != nil {
 		return errors.New("Job doesn't exist")
 	}
@@ -47,7 +45,7 @@ func (db *MemoryDatabase) UpdateJob(id string, job *providers.Job) error {
 }
 
 // GetJob returns a Job given its ID
-func (db *MemoryDatabase) GetJob(id string) (*providers.Job, error) {
+func (db *MemoryDatabase) GetJob(id string) (*Job, error) {
 	db.mtx.Lock()
 	defer db.mtx.Unlock()
 
@@ -67,11 +65,11 @@ func (db *MemoryDatabase) DeleteJob(id string) error {
 }
 
 // GetJobs Returns all Jobs stored for the same ParentID
-func (db *MemoryDatabase) GetJobs(parentID string) ([]providers.Job, error) {
+func (db *MemoryDatabase) GetJobs(parentID string) ([]Job, error) {
 	db.mtx.Lock()
 	defer db.mtx.Unlock()
 
-	var jobList []providers.Job
+	var jobList []Job
 	for _, job := range db.jobs {
 		if parentID == job.ParentID {
 			jobList = append(jobList, *job)

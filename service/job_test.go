@@ -7,8 +7,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/NYTimes/video-captions-api/providers"
-
+	"github.com/NYTimes/video-captions-api/database"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -16,7 +15,7 @@ func TestCreateJob(t *testing.T) {
 	assert := assert.New(t)
 	service, client := createCaptionsService()
 	service.AddProvider(fakeProvider{logger: client.Logger})
-	job := &providers.Job{
+	job := &database.Job{
 		ID:       "123",
 		MediaURL: "http://vp.nyt.com/video.mp4",
 		Provider: "test-provider",
@@ -24,7 +23,7 @@ func TestCreateJob(t *testing.T) {
 	jobBytes, _ := json.Marshal(job)
 	r, _ := http.NewRequest("POST", "/captions", bytes.NewReader(jobBytes))
 	status, resultJob, err := service.CreateJob(r)
-	job = resultJob.(*providers.Job)
+	job = resultJob.(*database.Job)
 	assert.Nil(err)
 	assert.Equal(201, status)
 }
@@ -33,7 +32,7 @@ func TestCreateJobNoMediaURL(t *testing.T) {
 	assert := assert.New(t)
 	service, client := createCaptionsService()
 	service.AddProvider(fakeProvider{logger: client.Logger})
-	job := &providers.Job{
+	job := &database.Job{
 		ID:       "123",
 		Provider: "test-provider",
 	}
@@ -50,7 +49,7 @@ func TestCreateJobDispatchError(t *testing.T) {
 	assert := assert.New(t)
 	service, client := createCaptionsService()
 	service.AddProvider(brokenProvider{logger: client.Logger})
-	job := &providers.Job{
+	job := &database.Job{
 		ID:       "123",
 		MediaURL: "http://vp.nyt.com/video.mp4",
 		Provider: "broken-provider",

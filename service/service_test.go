@@ -19,20 +19,20 @@ type fakeProvider struct {
 	params map[string]bool
 }
 
-func (p fakeProvider) DispatchJob(job *providers.Job) error {
+func (p fakeProvider) DispatchJob(job *database.Job) error {
 	p.logger.Info("dispatching job")
 	return nil
 }
 
-func (p fakeProvider) GetJob(id string) (*providers.Job, error) {
+func (p fakeProvider) GetJob(id string) (*database.Job, error) {
 	if p.params["jobError"] {
 		return nil, errors.New("oh no")
 	}
 	if p.params["jobStatus"] {
-		return &providers.Job{Status: "My status"}, nil
+		return &database.Job{Status: "My status"}, nil
 	}
 	p.logger.Info("fetching job", id)
-	return &providers.Job{}, nil
+	return &database.Job{}, nil
 }
 
 func (p fakeProvider) GetName() string {
@@ -45,11 +45,11 @@ func (p brokenProvider) GetName() string {
 	return "broken-provider"
 }
 
-func (p brokenProvider) DispatchJob(job *providers.Job) error {
+func (p brokenProvider) DispatchJob(job *database.Job) error {
 	return errors.New("provider error")
 }
 
-func (p brokenProvider) GetJob(id string) (*providers.Job, error) {
+func (p brokenProvider) GetJob(id string) (*database.Job, error) {
 	p.logger.Info("fetching job", id)
 	return nil, errors.New("failed to get job")
 }

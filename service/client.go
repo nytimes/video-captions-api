@@ -16,7 +16,7 @@ type Client struct {
 }
 
 // GetJobs gets all jobs associated with a ParentID
-func (c Client) GetJobs(parentID string) ([]providers.Job, error) {
+func (c Client) GetJobs(parentID string) ([]database.Job, error) {
 	jobs, err := c.DB.GetJobs(parentID)
 	if err != nil {
 		c.Logger.Error("Error loading jobs from DB", parentID)
@@ -26,7 +26,7 @@ func (c Client) GetJobs(parentID string) ([]providers.Job, error) {
 }
 
 // GetJob gets a job by ID
-func (c Client) GetJob(jobID string) (*providers.Job, error) {
+func (c Client) GetJob(jobID string) (*database.Job, error) {
 	job, err := c.DB.GetJob(jobID)
 	if err != nil {
 		c.Logger.Error("Could not find Job in database")
@@ -54,7 +54,7 @@ func (c Client) GetJob(jobID string) (*providers.Job, error) {
 }
 
 // DispatchJob dispatches a Job given an existing Provider
-func (c Client) DispatchJob(job *providers.Job) error {
+func (c Client) DispatchJob(job *database.Job) error {
 	provider := c.Providers[job.Provider]
 	jobLogger := c.Logger.WithFields(log.Fields{"JobID": job.ID, "Provider": job.Provider})
 	if provider == nil {

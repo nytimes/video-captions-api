@@ -5,7 +5,7 @@ import (
 
 	"reflect"
 
-	"github.com/NYTimes/video-captions-api/providers"
+	"github.com/NYTimes/video-captions-api/database"
 	log "github.com/Sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
@@ -14,7 +14,7 @@ func TestGetJob(t *testing.T) {
 	service, client := createCaptionsService()
 	assert := assert.New(t)
 	service.AddProvider(fakeProvider{logger: log.New()})
-	job := &providers.Job{
+	job := &database.Job{
 		ID:       "123",
 		MediaURL: "http://vp.nyt.com/video.mp4",
 		Provider: "test-provider",
@@ -27,7 +27,7 @@ func TestGetJob(t *testing.T) {
 
 func TestDispatchJobNoProvider(t *testing.T) {
 	_, client := createCaptionsService()
-	err := client.DispatchJob(&providers.Job{Provider: "wrong-provider"})
+	err := client.DispatchJob(&database.Job{Provider: "wrong-provider"})
 	assert.Equal(t, "Provider not found", err.Error())
 }
 
@@ -37,14 +37,14 @@ func TestGetJobs(t *testing.T) {
 	service, client := createCaptionsService()
 
 	service.AddProvider(fakeProvider{logger: log.New()})
-	job1 := &providers.Job{
+	job1 := &database.Job{
 		ID:       "123",
 		MediaURL: "http://vp.nyt.com/video1.mp4",
 		Provider: "test-provider1",
 		ParentID: parentID,
 	}
 	client.DB.StoreJob(job1)
-	job2 := &providers.Job{
+	job2 := &database.Job{
 		ID:       "456",
 		MediaURL: "http://vp.nyt.com/video2.mp4",
 		Provider: "test-provider2",
@@ -74,7 +74,7 @@ func TestProviderJobError(t *testing.T) {
 			"jobStatus": false,
 		},
 	})
-	job := &providers.Job{
+	job := &database.Job{
 		ID:       "123",
 		MediaURL: "http://vp.nyt.com/video.mp4",
 		Provider: "test-provider",
@@ -97,7 +97,7 @@ func TestProviderStatusError(t *testing.T) {
 			"jobStatus": true,
 		},
 	})
-	job := &providers.Job{
+	job := &database.Job{
 		ID:       "123",
 		MediaURL: "http://vp.nyt.com/video.mp4",
 		Provider: "test-provider",
