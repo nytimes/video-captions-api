@@ -13,6 +13,7 @@ type Client struct {
 	Providers map[string]providers.Provider
 	DB        database.DB
 	Logger    *log.Logger
+	Storage   Storage
 }
 
 // GetJobs gets all jobs associated with a ParentID
@@ -33,24 +34,51 @@ func (c Client) GetJob(jobID string) (*database.Job, error) {
 		return nil, err
 	}
 
-	jobLogger := c.Logger.WithFields(log.Fields{"JobID": jobID, "Provider": job.Provider})
+	if job.Done {
+		return job, nil
+	}
+
+	providerID := job.ProviderParams["ProviderID"]
+	fields := log.Fields{"JobID": jobID, "Provider": job.Provider, "ProviderID": providerID}
+	jobLogger := c.Logger.WithFields(fields)
 	provider := c.Providers[job.Provider]
 	jobLogger.Info("Fetching job from Provider")
-	providerJob, err := provider.GetJob(job.ProviderParams["ProviderID"])
+	providerJob, err := provider.GetJob(providerID)
 	if err != nil {
 		jobLogger.Error("error getting job from provider", err)
 		return nil, err
 	}
 
-	if providerJob.Status != job.Status {
-		jobLogger.Info("Updating job status: ", job.Status, "->", providerJob.Status)
-		job.Status = providerJob.Status
+	if job.UpdateStatus(providerJob.Status) {
 		err = c.DB.UpdateJob(jobID, job)
-	} else {
-		jobLogger.Info("No job status update")
 	}
 
-	return job, nil
+	if job.Status == "delivered" && !job.Done {
+		jobLogger.Info("Job is ready on the provider, downloading")
+		// TODO: do this async so we dont block here, once the captions are ready,
+		// we start the download/upload update the status to something like
+		// "storing"/"downloading" and return the response to the user.
+		// once the goroutines are done downloading/storing, mark the job as
+		// done. maybe spawn one goroutine per output?
+		for i, output := range job.Outputs {
+			data, err := provider.Download(providerID, output.Type)
+			if err != nil {
+				jobLogger.WithError(err).Error("Failed to download file")
+				return job, nil
+			}
+			jobLogger.Info("Download done, storing")
+			dest, err := c.Storage.Store(data, output.Name())
+			if err != nil {
+				jobLogger.WithError(err).Error("Failed to store file")
+				return job, nil
+			}
+			job.Outputs[i].URL = dest
+		}
+		job.Done = true
+		err = c.DB.UpdateJob(jobID, job)
+	}
+
+	return job, err
 }
 
 // DispatchJob dispatches a Job given an existing Provider

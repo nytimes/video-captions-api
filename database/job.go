@@ -2,8 +2,10 @@ package database
 
 import (
 	"time"
+	"fmt"
 
 	"cloud.google.com/go/datastore"
+	uuid "github.com/nu7hatch/gouuid"
 )
 
 // Job representation of a captions job
@@ -20,13 +22,29 @@ type Job struct {
 }
 
 type JobOutput struct {
-	Url  string `json:"url"`
+	URL  string `json:"url"`
 	Type string `json:"type"`
-	// add language here?
+}
+
+func (output JobOutput) Name() string {
+  id, _ := uuid.NewV4()
+  name := id.String()[:8]
+  return fmt.Sprintf("%s.%s", name, output.Type)
 }
 
 // ProviderParams is a set of parameters for providers
 type ProviderParams map[string]string
+
+func (j *Job) UpdateStatus(status string) bool {
+  if j.Status == status {
+    return false
+  }
+  if status == "error" && !j.Done {
+    j.Done = true
+  }
+  j.Status = status
+  return true
+}
 
 // Load makes ProviderParams implement datastore.PropertyLoadSaver interface
 func (p *ProviderParams) Load(ps []datastore.Property) error {

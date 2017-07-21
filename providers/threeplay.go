@@ -45,6 +45,15 @@ func (c *ThreePlayProvider) GetName() string {
 	return providerName
 }
 
+// Download downloads captions file from specified type
+func (c *ThreePlayProvider) Download(id string, captionsType string) ([]byte, error) {
+	i, err := strconv.Atoi(id)
+	if err != nil {
+		return nil, err
+	}
+  return c.GetCaptions(uint(i), threeplay.CaptionsFormat(captionsType))
+}
+
 // GetJob returns a 3play file
 func (c *ThreePlayProvider) GetJob(id string) (*database.Job, error) {
 	i, err := strconv.Atoi(id)
