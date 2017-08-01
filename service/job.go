@@ -2,8 +2,11 @@ package service
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/NYTimes/gizmo/web"
@@ -24,11 +27,15 @@ type jobParams struct {
 	OutputTypes    []string                `json:"output_types"`
 }
 
+// NewJobFromParams creates a Job from jobParams
 func NewJobFromParams(newJob jobParams) *database.Job {
 	outputs := make([]database.JobOutput, 0)
+	mediaFile := filepath.Base(newJob.MediaURL)
+	name := strings.TrimSuffix(mediaFile, filepath.Ext(mediaFile))
 	for _, outputType := range newJob.OutputTypes {
-		outputs = append(outputs, database.JobOutput{Type: outputType})
+		outputs = append(outputs, database.JobOutput{Type: outputType, Filename: fmt.Sprintf("%s.%s", name, outputType)})
 	}
+
 	id, _ := uuid.NewV4()
 	return &database.Job{
 		ID:       id.String(),
@@ -79,6 +86,7 @@ func (s *CaptionsService) CreateJob(r *http.Request) (int, interface{}, error) {
 	})
 	params := jobParams{}
 	defer r.Body.Close()
+
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		requestLogger.WithError(err).Error("Could not read request body: ")

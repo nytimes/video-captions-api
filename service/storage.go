@@ -4,54 +4,58 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
-	"path"
 	"strconv"
 	"time"
+
+	log "github.com/Sirupsen/logrus"
 
 	"cloud.google.com/go/storage"
 )
 
+// Storage inferce for captions storage
 type Storage interface {
 	Store(data []byte, filename string) (string, error)
 }
 
 // GCSStorage implements the Storage interface and stores files on GCS
 type GCSStorage struct {
-	*storage.Client
-	bucket *storage.BucketHandle
+	bucketHandle *storage.BucketHandle
+	bucketName   string
+	logger       *log.Logger
 }
 
-func NewGCSStorage(bucketName string) (Storage, error) {
+// NewGCSStorage creates a GCSStorage instance
+func NewGCSStorage(bucketName string, logger *log.Logger) (Storage, error) {
 	ctx := context.Background()
 	client, err := storage.NewClient(ctx)
 	bucket := client.Bucket(bucketName)
 	if err != nil {
 		return nil, err
 	}
-	return &GCSStorage{client, bucket}, nil
+	return &GCSStorage{bucket, bucketName, logger}, nil
 }
 
+// Store implements Storage interface for GCSStorage
 func (gs *GCSStorage) Store(data []byte, filename string) (string, error) {
 	ctx := context.Background()
 	year, month, day := time.Now().Date()
-	obj := gs.bucket.Object(path.Join(strconv.Itoa(year), strconv.Itoa(int(month)), strconv.Itoa(day), filename))
+	objectFullName := fmt.Sprintf("%s/%s/%s/%s", strconv.Itoa(year), strconv.Itoa(int(month)), strconv.Itoa(day), filename)
+	obj := gs.bucketHandle.Object(objectFullName)
 	writer := obj.NewWriter(ctx)
 	writer.ContentType = "text/plain"
-	writer.ACL = []storage.ACLRule{{storage.AllUsers, storage.RoleReader}}
 	if _, err := writer.Write(data); err != nil {
-		fmt.Println("there was some error writing file", err)
-		return "", nil
+		gs.logger.WithError(err).Info("there was some error writing file")
+		return "", err
 	}
 	if err := writer.Close(); err != nil {
-		fmt.Println("error closing writer ", err)
-		return "", nil
+		gs.logger.WithError(err).Info("error closing writer ")
+		return "", err
 	}
-	attrs := writer.Attrs()
-	fmt.Println("done ", attrs)
-	return attrs.MediaLink, nil
+
+	return fmt.Sprintf("gs://%s/%s", gs.bucketName, objectFullName), nil
 }
 
-// FileStore implements the Storage interface and stores files on disk
+// FileStorage implements the Storage interface and stores files on disk
 type FileStorage struct {
 	baseDir string
 }

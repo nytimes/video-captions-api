@@ -67,7 +67,7 @@ func (c Client) GetJob(jobID string) (*database.Job, error) {
 				return job, nil
 			}
 			jobLogger.Info("Download done, storing")
-			dest, err := c.Storage.Store(data, output.Name())
+			dest, err := c.Storage.Store(data, output.Filename)
 			if err != nil {
 				jobLogger.WithError(err).Error("Failed to store file")
 				return job, nil

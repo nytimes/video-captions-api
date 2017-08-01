@@ -55,6 +55,8 @@ spec:
           env:
             - name: PROJECT_ID
               value: "{{.project_id}}"
+            - name: BUCKET_NAME
+              value: "{{.bucket_name}}"
             - name: ENABLE_STACKDRIVER
               value: "false"
             - name: SERVER_HTTP_PORT

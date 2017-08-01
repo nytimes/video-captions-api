@@ -24,6 +24,10 @@ func (p fakeProvider) DispatchJob(job *database.Job) error {
 	return nil
 }
 
+func (p fakeProvider) Download(_ string, _ string) ([]byte, error) {
+	return []byte("captions"), nil
+}
+
 func (p fakeProvider) GetJob(id string) (*database.Job, error) {
 	if p.params["jobError"] {
 		return nil, errors.New("oh no")
@@ -43,6 +47,10 @@ type brokenProvider fakeProvider
 
 func (p brokenProvider) GetName() string {
 	return "broken-provider"
+}
+
+func (p brokenProvider) Download(_ string, _ string) ([]byte, error) {
+	return nil, errors.New("download error")
 }
 
 func (p brokenProvider) DispatchJob(job *database.Job) error {

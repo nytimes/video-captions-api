@@ -20,13 +20,13 @@ type CaptionsService struct {
 
 // NewCaptionsService creates a CaptionsService
 func NewCaptionsService(cfg *config.CaptionsServiceConfig, db database.DB) *CaptionsService {
-	storage, _ := NewGCSStorage("video-captions-api-dev")
+	storage, _ := NewGCSStorage(cfg.BucketName, cfg.Logger)
 	return &CaptionsService{
 		Client{
 			Providers: make(map[string]providers.Provider),
 			DB:        db,
 			Logger:    cfg.Logger,
-			Storage: storage,
+			Storage:   storage,
 		},
 		cfg.Logger,
 	}
