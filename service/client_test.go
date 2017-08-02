@@ -31,6 +31,32 @@ func TestDispatchJobNoProvider(t *testing.T) {
 	assert.Equal(t, "Provider not found", err.Error())
 }
 
+func TestGetJobReady(t *testing.T) {
+	assert := assert.New(t)
+	service, client := createCaptionsService()
+	service.AddProvider(fakeProvider{
+		logger: log.New(),
+		params: map[string]bool{
+			"jobError":  false,
+			"jobStatus": false,
+			"jobDone":   true,
+		},
+	})
+	job := NewJobFromParams(jobParams{
+		MediaURL:    "http://vp.nyt.com/video.mp4",
+		ParentID:    "123",
+		Provider:    "test-provider",
+		OutputTypes: []string{"vtt", "srt"},
+	})
+	job.Status = "delivered"
+	client.DB.StoreJob(job)
+
+	resultJob, _ := client.GetJob(job.ID)
+	assert.True(resultJob.Done)
+	assert.Equal(resultJob.Outputs[0].URL, "somepath/video.vtt")
+	assert.Equal(resultJob.Outputs[1].URL, "somepath/video.srt")
+}
+
 func TestGetJobs(t *testing.T) {
 	parentID := "Mom"
 

@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
 	"reflect"
@@ -35,6 +36,16 @@ func (p fakeProvider) GetJob(id string) (*database.Job, error) {
 	if p.params["jobStatus"] {
 		return &database.Job{Status: "My status"}, nil
 	}
+	if p.params["jobDone"] {
+		job := NewJobFromParams(jobParams{
+			MediaURL:    "http://vp.nyt.com/video.mp4",
+			ParentID:    "123",
+			Provider:    "test-provider",
+			OutputTypes: []string{"vtt", "srt"},
+		})
+		job.Status = "delivered"
+		return job, nil
+	}
 	p.logger.Info("fetching job", id)
 	return &database.Job{}, nil
 }
@@ -67,12 +78,19 @@ func createCaptionsService() (*CaptionsService, Client) {
 		Providers: make(map[string]providers.Provider),
 		DB:        database.NewMemoryDatabase(),
 		Logger:    log.New(),
+		Storage:   ignoreStorage{},
 	}
 	service := &CaptionsService{
 		client: client,
 		logger: log.New(),
 	}
 	return service, client
+}
+
+type ignoreStorage struct{}
+
+func (i ignoreStorage) Store(_ []byte, filename string) (string, error) {
+	return fmt.Sprintf("somepath/%s", filename), nil
 }
 
 func TestAddProvider(t *testing.T) {
