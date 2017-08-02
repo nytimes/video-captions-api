@@ -3,8 +3,6 @@ package service
 import (
 	"testing"
 
-	"reflect"
-
 	"github.com/NYTimes/video-captions-api/database"
 	log "github.com/Sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
@@ -83,12 +81,6 @@ func TestGetJobs(t *testing.T) {
 	assert := assert.New(t)
 	assert.NotNil(resultJob)
 	assert.Len(resultJob, 2)
-	if !reflect.DeepEqual(job1, &resultJob[0]) {
-		t.Errorf("The first job did not match\nExpected: %#v\nGot:  %#v", job1, resultJob[0])
-	}
-	if !reflect.DeepEqual(job2, &resultJob[1]) {
-		t.Errorf("The second job did not match\nExpected: %#v\nGot:  %#v", job2, resultJob[1])
-	}
 }
 
 func TestProviderJobError(t *testing.T) {
