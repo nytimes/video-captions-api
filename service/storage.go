@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"strconv"
 	"time"
 
@@ -53,21 +52,4 @@ func (gs *GCSStorage) Store(data []byte, filename string) (string, error) {
 	}
 
 	return fmt.Sprintf("gs://%s/%s", gs.bucketName, objectFullName), nil
-}
-
-// FileStorage implements the Storage interface and stores files on disk
-type FileStorage struct {
-	baseDir string
-}
-
-// Store stores file on disk
-func (s FileStorage) Store(data []byte, filename string) (string, error) {
-	dest := fmt.Sprintf("%s/%s", s.baseDir, filename)
-	err := ioutil.WriteFile(dest, data, 0644)
-	return dest, err
-}
-
-// NewFileStorage creates a FileStorage with the specifed base directory
-func NewFileStorage(baseDir string) Storage {
-	return &FileStorage{baseDir}
 }
