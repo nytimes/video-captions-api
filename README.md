@@ -10,6 +10,9 @@ Agnostic API to generate captions for media assets across different cloud servic
 
 Install [Docker](https://www.docker.com/).
 
+GCP credentials are required to access Google Datastore.  
+`gcloud auth application-default login`
+
 Build the dev image:
 
 `$ make`
