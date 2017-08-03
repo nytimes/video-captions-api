@@ -22,3 +22,9 @@ Run:
 `$ make dev`
 
 Go to http://localhost:8000
+
+## Documentation
+
+For more info check the [docs](https://github.com/NYTimes/video-captions-api/wiki/Home)
+
+
