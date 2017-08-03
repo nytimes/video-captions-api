@@ -3,7 +3,7 @@
 
 [[projects]]
   name = "cloud.google.com/go"
-  packages = ["compute/metadata","datastore","iam","internal/atomiccache","internal/fields","internal/version","pubsub","pubsub/apiv1"]
+  packages = ["compute/metadata","datastore","iam","internal","internal/atomiccache","internal/fields","internal/optional","internal/version","storage"]
   revision = "7c205da84d8d024a8200be93ab042357c9a70177"
   version = "v0.10.0"
 
@@ -73,7 +73,7 @@
 
 [[projects]]
   name = "github.com/golang/protobuf"
-  packages = ["proto","protoc-gen-go/descriptor","ptypes","ptypes/any","ptypes/duration","ptypes/empty","ptypes/struct","ptypes/timestamp","ptypes/wrappers"]
+  packages = ["proto","protoc-gen-go/descriptor","ptypes/any","ptypes/struct","ptypes/timestamp","ptypes/wrappers"]
   revision = "6a1fa9404c0aebf36c879bc50152edcc953910d2"
 
 [[projects]]
@@ -207,12 +207,6 @@
   revision = "cce311a261e6fcf29de72ca96827bdb0b7d9c9e6"
 
 [[projects]]
-  branch = "master"
-  name = "golang.org/x/sync"
-  packages = ["semaphore"]
-  revision = "f52d1811a62927559de87708c8913c1650ce4f26"
-
-[[projects]]
   name = "golang.org/x/sys"
   packages = ["unix"]
   revision = "90796e5a05ce440b41c768bd9af257005e470461"
@@ -224,7 +218,7 @@
 
 [[projects]]
   name = "google.golang.org/api"
-  packages = ["googleapi/transport","internal","iterator","option","support/bundler","transport"]
+  packages = ["gensupport","googleapi","googleapi/internal/uritemplates","googleapi/transport","internal","iterator","option","storage/v1","transport"]
   revision = "e6586c9293b9d514c7f5d5076731ec977cff1be6"
 
 [[projects]]
@@ -234,7 +228,7 @@
 
 [[projects]]
   name = "google.golang.org/genproto"
-  packages = ["googleapis/api/annotations","googleapis/datastore/v1","googleapis/iam/v1","googleapis/pubsub/v1","googleapis/rpc/status","googleapis/type/latlng","protobuf/field_mask"]
+  packages = ["googleapis/api/annotations","googleapis/datastore/v1","googleapis/iam/v1","googleapis/rpc/status","googleapis/type/latlng"]
   revision = "aa2eb687b4d3e17154372564ad8d6bf11c3cf21f"
 
 [[projects]]
@@ -245,6 +239,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "757a999f19dca34955a1e8b6c53c857008f527f6031e1102e509060eef3ffb8f"
+  inputs-digest = "4f41bd88ceee018381fb9898c7b0980b0dc851b006ecfb3bf66a7cee9fc42e01"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -8,17 +8,26 @@ Agnostic API to generate captions for media assets across different cloud servic
 
 ## Development
 
-Install [Docker](https://www.docker.com/).
+Use `dep` to install dependencies:  
+`go get -u github.com/golang/dep/cmd/dep`  
+`dep ensure`
 
 GCP credentials are required to access Google Datastore.  
 `gcloud auth application-default login`
 
-Build the dev image:
+Environment variables required:
 
-`$ make`
+```
+THREE_PLAY_API_KEY
+THREE_PLAY_API_SECRET
+```
 
 Run:
 
 `$ make dev`
+
+Test:
+
+`$ make test`
 
 Go to http://localhost:8000
