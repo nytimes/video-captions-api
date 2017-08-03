@@ -1,4 +1,4 @@
-package providers
+package database
 
 import (
 	"time"
@@ -8,20 +8,38 @@ import (
 
 // Job representation of a captions job
 type Job struct {
-	ID       string `json:"id"`
-	ParentID string `json:"parent_id"`
-	MediaURL string `json:"media_url"`
-	Status   string `json:"status"`
-	// this should be in the ProviderParams
-	ProviderID string `json:"provider_id"`
-	Provider   string `json:"provider"`
-	//  Datastore doesnt support  maps by default
+	ID             string         `json:"id"`
+	ParentID       string         `json:"parent_id"`
+	MediaURL       string         `json:"media_url"`
+	Status         string         `json:"status"`
+	Provider       string         `json:"provider"`
 	ProviderParams ProviderParams `json:"provider_params"`
 	CreatedAt      time.Time      `json:"created_at"`
+	Outputs        []JobOutput    `json:"outputs"`
+	Done           bool           `json:"done"`
+}
+
+// JobOutput output associated with a Job
+type JobOutput struct {
+	URL      string `json:"url"`
+	Type     string `json:"type"`
+	Filename string `json:"filename"`
 }
 
 // ProviderParams is a set of parameters for providers
 type ProviderParams map[string]string
+
+// UpdateStatus update Job status and mark as done if needed
+func (j *Job) UpdateStatus(status string) bool {
+	if j.Status == status {
+		return false
+	}
+	if status == "error" && !j.Done {
+		j.Done = true
+	}
+	j.Status = status
+	return true
+}
 
 // Load makes ProviderParams implement datastore.PropertyLoadSaver interface
 func (p *ProviderParams) Load(ps []datastore.Property) error {

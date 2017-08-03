@@ -51,6 +51,7 @@ deploy:
       app: video-captions-api
       env: stg
       project_id: 'nyt-video-dev'
+      bucket_name: 'video-captions-api-dev'
       port: 8000
       ce_esp_port: 8001
       ce_service_name: video-captions-api.endpoints.nyt-video-dev.cloud.goog
@@ -90,6 +91,7 @@ deploy:
       app: video-captions-api
       env: prd
       project_id: 'nyt-video-prd'
+      bucket_name: 'video-captions-api-prd'
       replicas: 5
       # NOTE: recommend minimum of 2 to ensure uptime during a rolling deploy.
       replicas_min: 3

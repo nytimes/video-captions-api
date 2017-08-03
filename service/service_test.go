@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
 	"reflect"
@@ -19,20 +20,34 @@ type fakeProvider struct {
 	params map[string]bool
 }
 
-func (p fakeProvider) DispatchJob(job *providers.Job) error {
+func (p fakeProvider) DispatchJob(job *database.Job) error {
 	p.logger.Info("dispatching job")
 	return nil
 }
 
-func (p fakeProvider) GetJob(id string) (*providers.Job, error) {
+func (p fakeProvider) Download(_ string, _ string) ([]byte, error) {
+	return []byte("captions"), nil
+}
+
+func (p fakeProvider) GetJob(id string) (*database.Job, error) {
 	if p.params["jobError"] {
 		return nil, errors.New("oh no")
 	}
 	if p.params["jobStatus"] {
-		return &providers.Job{Status: "My status"}, nil
+		return &database.Job{Status: "My status"}, nil
+	}
+	if p.params["jobDone"] {
+		job := NewJobFromParams(jobParams{
+			MediaURL:    "http://vp.nyt.com/video.mp4",
+			ParentID:    "123",
+			Provider:    "test-provider",
+			OutputTypes: []string{"vtt", "srt"},
+		})
+		job.Status = "delivered"
+		return job, nil
 	}
 	p.logger.Info("fetching job", id)
-	return &providers.Job{}, nil
+	return &database.Job{}, nil
 }
 
 func (p fakeProvider) GetName() string {
@@ -45,11 +60,15 @@ func (p brokenProvider) GetName() string {
 	return "broken-provider"
 }
 
-func (p brokenProvider) DispatchJob(job *providers.Job) error {
+func (p brokenProvider) Download(_ string, _ string) ([]byte, error) {
+	return nil, errors.New("download error")
+}
+
+func (p brokenProvider) DispatchJob(job *database.Job) error {
 	return errors.New("provider error")
 }
 
-func (p brokenProvider) GetJob(id string) (*providers.Job, error) {
+func (p brokenProvider) GetJob(id string) (*database.Job, error) {
 	p.logger.Info("fetching job", id)
 	return nil, errors.New("failed to get job")
 }
@@ -59,12 +78,19 @@ func createCaptionsService() (*CaptionsService, Client) {
 		Providers: make(map[string]providers.Provider),
 		DB:        database.NewMemoryDatabase(),
 		Logger:    log.New(),
+		Storage:   ignoreStorage{},
 	}
 	service := &CaptionsService{
 		client: client,
 		logger: log.New(),
 	}
 	return service, client
+}
+
+type ignoreStorage struct{}
+
+func (i ignoreStorage) Store(_ []byte, filename string) (string, error) {
+	return fmt.Sprintf("somepath/%s", filename), nil
 }
 
 func TestAddProvider(t *testing.T) {

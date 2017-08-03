@@ -2,22 +2,57 @@ package service
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"path/filepath"
+	"strings"
+	"time"
 
 	"github.com/NYTimes/gizmo/web"
-	"github.com/NYTimes/video-captions-api/providers"
+	"github.com/NYTimes/video-captions-api/database"
 	log "github.com/Sirupsen/logrus"
-	"github.com/satori/go.uuid"
+	uuid "github.com/nu7hatch/gouuid"
 )
 
-// CaptionsError wraps error messages and uniforms json response
-type CaptionsError struct {
+type captionsError struct {
 	Message string `json:"error"`
 }
 
+type jobParams struct {
+	ParentID       string                  `json:"parent_id"`
+	MediaURL       string                  `json:"media_url"`
+	Provider       string                  `json:"provider"`
+	ProviderParams database.ProviderParams `json:"provider_params"`
+	OutputTypes    []string                `json:"output_types"`
+}
+
+// NewJobFromParams creates a Job from jobParams
+func NewJobFromParams(newJob jobParams) *database.Job {
+	outputs := make([]database.JobOutput, 0)
+	mediaFile := filepath.Base(newJob.MediaURL)
+	name := strings.TrimSuffix(mediaFile, filepath.Ext(mediaFile))
+	for _, outputType := range newJob.OutputTypes {
+		outputs = append(outputs, database.JobOutput{Type: outputType, Filename: fmt.Sprintf("%s.%s", name, outputType)})
+	}
+
+	id, _ := uuid.NewV4()
+	return &database.Job{
+		ID:       id.String(),
+		ParentID: newJob.ParentID,
+		//TODO: put all possible status under a type/consts so we dont use strings everywhere
+		Status:         "processing",
+		MediaURL:       newJob.MediaURL,
+		Provider:       newJob.Provider,
+		ProviderParams: newJob.ProviderParams,
+		CreatedAt:      time.Now(),
+		Outputs:        outputs,
+		Done:           false,
+	}
+}
+
 // Error implements the error interface
-func (e CaptionsError) Error() string {
+func (e captionsError) Error() string {
 	return e.Message
 }
 
@@ -26,7 +61,7 @@ func (s *CaptionsService) GetJobs(r *http.Request) (int, interface{}, error) {
 	parentID := web.Vars(r)["id"]
 	jobs, err := s.client.GetJobs(parentID)
 	if err != nil {
-		return http.StatusNotFound, nil, CaptionsError{err.Error()}
+		return http.StatusNotFound, nil, captionsError{err.Error()}
 	}
 	return http.StatusOK, jobs, nil
 }
@@ -37,7 +72,7 @@ func (s *CaptionsService) GetJob(r *http.Request) (int, interface{}, error) {
 	// TODO: on the 3play client, we should look at the errors field and check for not_found errors at least
 	job, err := s.client.GetJob(id)
 	if err != nil {
-		return http.StatusNotFound, nil, CaptionsError{err.Error()}
+		return http.StatusNotFound, nil, captionsError{err.Error()}
 	}
 	return http.StatusOK, job, nil
 }
@@ -49,31 +84,30 @@ func (s *CaptionsService) CreateJob(r *http.Request) (int, interface{}, error) {
 		"Method":  r.Method,
 		"URI":     r.RequestURI,
 	})
-	job := &providers.Job{}
+	params := jobParams{}
+	defer r.Body.Close()
+
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		requestLogger.Error("Could not read request body: ", err)
-		return http.StatusBadRequest, nil, CaptionsError{err.Error()}
+		requestLogger.WithError(err).Error("Could not read request body: ")
+		return http.StatusBadRequest, nil, captionsError{err.Error()}
 	}
-	err = json.Unmarshal(data, job)
+	err = json.Unmarshal(data, &params)
 
 	if err != nil {
-		requestLogger.Error("Could not create job from request body", err)
-		return http.StatusBadRequest, nil, CaptionsError{"Malformed parameters"}
+		requestLogger.WithError(err).Error("Could not create job from request body")
+		return http.StatusBadRequest, nil, captionsError{"Malformed parameters"}
 	}
 
-	mediaURL := job.MediaURL
-
-	if mediaURL == "" {
-		requestLogger.Error("Tried to create a job without a media url", err)
-		return http.StatusBadRequest, nil, CaptionsError{"Please provide a media_url"}
+	if params.MediaURL == "" {
+		requestLogger.WithError(err).Error("Tried to create a job without a media url")
+		return http.StatusBadRequest, nil, captionsError{"Please provide a media_url"}
 	}
 
-	job.ParentID = job.ID
-	job.ID = uuid.NewV4().String()
+	job := NewJobFromParams(params)
 	err = s.client.DispatchJob(job)
 	if err != nil {
-		return http.StatusInternalServerError, nil, CaptionsError{err.Error()}
+		return http.StatusInternalServerError, nil, captionsError{err.Error()}
 	}
 
 	return http.StatusCreated, job, nil

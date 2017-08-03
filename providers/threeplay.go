@@ -7,6 +7,7 @@ import (
 	"github.com/NYTimes/gizmo/config"
 	"github.com/NYTimes/threeplay"
 	captionsConfig "github.com/NYTimes/video-captions-api/config"
+	"github.com/NYTimes/video-captions-api/database"
 	log "github.com/Sirupsen/logrus"
 )
 
@@ -44,8 +45,17 @@ func (c *ThreePlayProvider) GetName() string {
 	return providerName
 }
 
+// Download downloads captions file from specified type
+func (c *ThreePlayProvider) Download(id string, captionsType string) ([]byte, error) {
+	i, err := strconv.Atoi(id)
+	if err != nil {
+		return nil, err
+	}
+  return c.GetCaptions(uint(i), threeplay.CaptionsFormat(captionsType))
+}
+
 // GetJob returns a 3play file
-func (c *ThreePlayProvider) GetJob(id string) (*Job, error) {
+func (c *ThreePlayProvider) GetJob(id string) (*database.Job, error) {
 	i, err := strconv.Atoi(id)
 	if err != nil {
 		return nil, err
@@ -56,7 +66,7 @@ func (c *ThreePlayProvider) GetJob(id string) (*Job, error) {
 		return nil, err
 	}
 
-	job := &Job{
+	job := &database.Job{
 		ID:       strconv.FormatUint(uint64(file.ID), 10),
 		Status:   file.State,
 		Provider: providerName,
@@ -65,7 +75,7 @@ func (c *ThreePlayProvider) GetJob(id string) (*Job, error) {
 }
 
 // DispatchJob sends a video file to 3play for transcription and captions generation
-func (c *ThreePlayProvider) DispatchJob(job *Job) error {
+func (c *ThreePlayProvider) DispatchJob(job *database.Job) error {
 	jobLogger := c.logger.WithFields(log.Fields{"JobID": job.ID, "Provider": job.Provider})
 	query := url.Values{}
 
@@ -79,7 +89,7 @@ func (c *ThreePlayProvider) DispatchJob(job *Job) error {
 		return err
 	}
 
-	job.ProviderID = fileID
+	job.ProviderParams["ProviderID"] = fileID
 
 	return nil
 }

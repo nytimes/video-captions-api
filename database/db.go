@@ -1,12 +1,10 @@
 package database
 
-import "github.com/NYTimes/video-captions-api/providers"
-
 // DB interface for database interactions
 type DB interface {
-	StoreJob(*providers.Job) (string, error)
-	UpdateJob(string, *providers.Job) error
-	GetJob(string) (*providers.Job, error)
+	StoreJob(*Job) (string, error)
+	UpdateJob(string, *Job) error
+	GetJob(string) (*Job, error)
 	DeleteJob(string) error
-	GetJobs(string) ([]providers.Job, error)
+	GetJobs(string) ([]Job, error)
 }

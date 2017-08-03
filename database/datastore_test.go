@@ -7,16 +7,15 @@ import (
 	"golang.org/x/net/context"
 
 	"cloud.google.com/go/datastore"
-	"github.com/NYTimes/video-captions-api/providers"
 	"github.com/stretchr/testify/assert"
 )
 
 type datastoreTestClient struct {
-	jobs map[string]*providers.Job
+	jobs map[string]*Job
 }
 
 func (c *datastoreTestClient) Put(_ context.Context, key *datastore.Key, src interface{}) (*datastore.Key, error) {
-	job := src.(*providers.Job)
+	job := src.(*Job)
 	c.jobs[key.Name] = job
 	return key, nil
 }
@@ -44,7 +43,7 @@ func (c *datastoreTestClient) GetAll(_ context.Context, q *datastore.Query, dst 
 func newTestDB() *DatastoreDatabase {
 	return &DatastoreDatabase{
 		&datastoreTestClient{
-			make(map[string]*providers.Job),
+			make(map[string]*Job),
 		},
 		"kind",
 		"namespace",
@@ -55,7 +54,7 @@ func TestStoreJob(t *testing.T) {
 	assert := assert.New(t)
 	db := newTestDB()
 
-	job := &providers.Job{
+	job := &Job{
 		ID:       "123",
 		MediaURL: "https://abc.com/123.mp4",
 	}
@@ -74,7 +73,7 @@ func TestGetJob(t *testing.T) {
 	assert := assert.New(t)
 	db := newTestDB()
 
-	job := &providers.Job{
+	job := &Job{
 		ID:       "123",
 		MediaURL: "https://abc.com/123.mp4",
 	}
@@ -92,12 +91,12 @@ func TestUpdateJob(t *testing.T) {
 	assert := assert.New(t)
 	db := newTestDB()
 
-	job := &providers.Job{
+	job := &Job{
 		ID:       "123",
 		MediaURL: "https://abc.com/some.mp4",
 	}
 
-	newJob := &providers.Job{
+	newJob := &Job{
 		ID:       "123",
 		MediaURL: "https://abc.com/another.mp4",
 	}
@@ -116,7 +115,7 @@ func TestDeleteJob(t *testing.T) {
 	assert := assert.New(t)
 	db := newTestDB()
 
-	job := &providers.Job{
+	job := &Job{
 		ID:       "123",
 		MediaURL: "https://abc.com/123.mp4",
 	}
