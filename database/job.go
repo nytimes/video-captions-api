@@ -17,6 +17,7 @@ type Job struct {
 	CreatedAt      time.Time      `json:"created_at"`
 	Outputs        []JobOutput    `json:"outputs"`
 	Done           bool           `json:"done"`
+	Language       string         `json:"language"`
 }
 
 // JobOutput output associated with a Job
