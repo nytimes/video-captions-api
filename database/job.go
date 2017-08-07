@@ -29,6 +29,15 @@ type JobOutput struct {
 // ProviderParams is a set of parameters for providers
 type ProviderParams map[string]string
 
+// ByCreatedAt implements sort.Interface for []Job by CreatedAt field.
+type ByCreatedAt []Job
+
+func (b ByCreatedAt) Len() int { return len(b) }
+
+func (b ByCreatedAt) Swap(i, j int) { b[i], b[j] = b[j], b[i] }
+
+func (b ByCreatedAt) Less(i, j int) bool { return b[i].CreatedAt.Before(b[j].CreatedAt) }
+
 // UpdateStatus update Job status and mark as done if needed
 func (j *Job) UpdateStatus(status string) bool {
 	if j.Status == status {

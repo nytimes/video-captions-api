@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"sort"
 
 	"github.com/NYTimes/video-captions-api/database"
 	"github.com/NYTimes/video-captions-api/providers"
@@ -23,6 +24,7 @@ func (c Client) GetJobs(parentID string) ([]database.Job, error) {
 		c.Logger.Error("Error loading jobs from DB", parentID)
 		return nil, err
 	}
+	sort.Sort(database.ByCreatedAt(jobs))
 	return jobs, nil
 }
 

@@ -1,7 +1,9 @@
 package service
 
 import (
+	"reflect"
 	"testing"
+	"time"
 
 	"github.com/NYTimes/video-captions-api/database"
 	log "github.com/Sirupsen/logrus"
@@ -61,18 +63,22 @@ func TestGetJobs(t *testing.T) {
 	service, client := createCaptionsService()
 
 	service.AddProvider(fakeProvider{logger: log.New()})
+	today := time.Now()
+	yesterday := today.AddDate(0, 0, -1)
 	job1 := &database.Job{
-		ID:       "123",
-		MediaURL: "http://vp.nyt.com/video1.mp4",
-		Provider: "test-provider1",
-		ParentID: parentID,
+		ID:        "123",
+		MediaURL:  "http://vp.nyt.com/video1.mp4",
+		Provider:  "test-provider1",
+		ParentID:  parentID,
+		CreatedAt: today,
 	}
 	client.DB.StoreJob(job1)
 	job2 := &database.Job{
-		ID:       "456",
-		MediaURL: "http://vp.nyt.com/video2.mp4",
-		Provider: "test-provider2",
-		ParentID: parentID,
+		ID:        "456",
+		MediaURL:  "http://vp.nyt.com/video2.mp4",
+		Provider:  "test-provider2",
+		ParentID:  parentID,
+		CreatedAt: yesterday,
 	}
 	client.DB.StoreJob(job2)
 
@@ -81,6 +87,13 @@ func TestGetJobs(t *testing.T) {
 	assert := assert.New(t)
 	assert.NotNil(resultJob)
 	assert.Len(resultJob, 2)
+
+	if !reflect.DeepEqual(job2, &resultJob[0]) {
+		t.Errorf("The first job did not match\nExpected: %#v\nGot:  %#v", job2, resultJob[0])
+	}
+	if !reflect.DeepEqual(job1, &resultJob[1]) {
+		t.Errorf("The second job did not match\nExpected: %#v\nGot:  %#v", job1, resultJob[1])
+	}
 }
 
 func TestProviderJobError(t *testing.T) {
