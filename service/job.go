@@ -25,6 +25,7 @@ type jobParams struct {
 	Provider       string                  `json:"provider"`
 	ProviderParams database.ProviderParams `json:"provider_params"`
 	OutputTypes    []string                `json:"output_types"`
+	Language       string                  `json:"language"`
 }
 
 // NewJobFromParams creates a Job from jobParams
@@ -48,6 +49,7 @@ func NewJobFromParams(newJob jobParams) *database.Job {
 		CreatedAt:      time.Now(),
 		Outputs:        outputs,
 		Done:           false,
+		Language:       newJob.Language,
 	}
 }
 
