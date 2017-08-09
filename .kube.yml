@@ -28,7 +28,7 @@ spec:
           env:
             - name: CE_INGRESS_NAME
               value: "{{.app}}-{{.env}}"
-            - name: CE_ALLOW_OFFICE
+            - name: CE_ALLOW_ALL
               value: "true"
           ports:
             - containerPort: {{.ce_esp_port}}

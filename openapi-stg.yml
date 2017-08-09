@@ -19,7 +19,3 @@ paths:
         default:
           description: "wildcard-response"
       security: []
-
-security:
-  - api_key: []
-
