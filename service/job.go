@@ -86,7 +86,7 @@ func (s *CaptionsService) CreateJob(r *http.Request) (int, interface{}, error) {
 		"Method":  r.Method,
 		"URI":     r.RequestURI,
 	})
-	params := jobParams{}
+	params := jobParams{Language: "en", OutputTypes: []string{"vtt"}}
 	defer r.Body.Close()
 
 	data, err := ioutil.ReadAll(r.Body)
