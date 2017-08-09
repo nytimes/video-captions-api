@@ -6,6 +6,13 @@ import (
 	"cloud.google.com/go/datastore"
 )
 
+// ProviderJob holds data coming from a Provider
+type ProviderJob struct {
+	ID      string
+	Status  string
+	Details string
+}
+
 // Job representation of a captions job
 type Job struct {
 	ID             string         `json:"id"`
@@ -18,6 +25,7 @@ type Job struct {
 	Outputs        []JobOutput    `json:"outputs"`
 	Done           bool           `json:"done"`
 	Language       string         `json:"language"`
+	Details        string         `json:"details,omitempty"`
 }
 
 // JobOutput output associated with a Job
@@ -46,7 +54,7 @@ func (b ByCreatedAt) Swap(i, j int) { b[i], b[j] = b[j], b[i] }
 func (b ByCreatedAt) Less(i, j int) bool { return b[i].CreatedAt.Before(b[j].CreatedAt) }
 
 // UpdateStatus update Job status and mark as done if needed
-func (j *Job) UpdateStatus(status string) bool {
+func (j *Job) UpdateStatus(status, details string) bool {
 	if j.Status == status {
 		return false
 	}
@@ -54,6 +62,7 @@ func (j *Job) UpdateStatus(status string) bool {
 		j.Done = true
 	}
 	j.Status = status
+	j.Details = details
 	return true
 }
 

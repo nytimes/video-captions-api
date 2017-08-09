@@ -29,25 +29,22 @@ func (p fakeProvider) Download(_ string, _ string) ([]byte, error) {
 	return []byte("captions"), nil
 }
 
-func (p fakeProvider) GetJob(id string) (*database.Job, error) {
+func (p fakeProvider) GetProviderJob(id string) (*database.ProviderJob, error) {
 	if p.params["jobError"] {
 		return nil, errors.New("oh no")
 	}
 	if p.params["jobStatus"] {
-		return &database.Job{Status: "My status"}, nil
+		return &database.ProviderJob{Status: "My status"}, nil
 	}
 	if p.params["jobDone"] {
-		job := NewJobFromParams(jobParams{
-			MediaURL:    "http://vp.nyt.com/video.mp4",
-			ParentID:    "123",
-			Provider:    "test-provider",
-			OutputTypes: []string{"vtt", "srt"},
-		})
-		job.Status = "delivered"
+		job := &database.ProviderJob{
+			ID:     "123",
+			Status: "delivered",
+		}
 		return job, nil
 	}
 	p.logger.Info("fetching job", id)
-	return &database.Job{}, nil
+	return &database.ProviderJob{}, nil
 }
 
 func (p fakeProvider) GetName() string {
@@ -68,7 +65,7 @@ func (p brokenProvider) DispatchJob(job *database.Job) error {
 	return errors.New("provider error")
 }
 
-func (p brokenProvider) GetJob(id string) (*database.Job, error) {
+func (p brokenProvider) GetProviderJob(id string) (*database.ProviderJob, error) {
 	p.logger.Info("fetching job", id)
 	return nil, errors.New("failed to get job")
 }

@@ -6,6 +6,6 @@ import "github.com/NYTimes/video-captions-api/database"
 type Provider interface {
 	DispatchJob(*database.Job) error
 	Download(id string, captionsType string) ([]byte, error)
-	GetJob(id string) (*database.Job, error)
+	GetProviderJob(id string) (*database.ProviderJob, error)
 	GetName() string
 }
