@@ -18,10 +18,13 @@ func TestJobUpdate(t *testing.T) {
 	assert := assert.New(t)
 	job := newJob()
 
-	assert.True(job.UpdateStatus("delivered"))
-	assert.False(job.UpdateStatus("delivered"))
+	assert.True(job.UpdateStatus("delivered", ""))
+	assert.False(job.UpdateStatus("delivered", ""))
+	assert.Equal(job.Details, "")
 
-	assert.True(job.UpdateStatus("error"))
+	assert.True(job.UpdateStatus("error", "error details"))
 	assert.True(job.Done)
-	assert.False(job.UpdateStatus("error"))
+	assert.Equal(job.Details, "error details")
+	assert.False(job.UpdateStatus("error", "more details"))
+	assert.Equal(job.Details, "error details")
 }

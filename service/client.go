@@ -45,23 +45,18 @@ func (c Client) GetJob(jobID string) (*database.Job, error) {
 	jobLogger := c.Logger.WithFields(fields)
 	provider := c.Providers[job.Provider]
 	jobLogger.Info("Fetching job from Provider")
-	providerJob, err := provider.GetJob(providerID)
+	providerJob, err := provider.GetProviderJob(providerID)
 	if err != nil {
 		jobLogger.Error("error getting job from provider", err)
 		return nil, err
 	}
 
-	if job.UpdateStatus(providerJob.Status) {
+	if job.UpdateStatus(providerJob.Status, providerJob.Details) {
 		err = c.DB.UpdateJob(jobID, job)
 	}
 
 	if job.Status == "delivered" && !job.Done {
 		jobLogger.Info("Job is ready on the provider, downloading")
-		// TODO: do this async so we dont block here, once the captions are ready,
-		// we start the download/upload update the status to something like
-		// "storing"/"downloading" and return the response to the user.
-		// once the goroutines are done downloading/storing, mark the job as
-		// done. maybe spawn one goroutine per output?
 		for i, output := range job.Outputs {
 			data, err := provider.Download(providerID, output.Type)
 			if err != nil {
@@ -79,7 +74,6 @@ func (c Client) GetJob(jobID string) (*database.Job, error) {
 		job.Done = true
 		err = c.DB.UpdateJob(jobID, job)
 	}
-
 	return job, err
 }
 

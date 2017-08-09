@@ -51,11 +51,11 @@ func (c *ThreePlayProvider) Download(id string, captionsType string) ([]byte, er
 	if err != nil {
 		return nil, err
 	}
-  return c.GetCaptions(uint(i), threeplay.CaptionsFormat(captionsType))
+	return c.GetCaptions(uint(i), threeplay.CaptionsFormat(captionsType))
 }
 
-// GetJob returns a 3play file
-func (c *ThreePlayProvider) GetJob(id string) (*database.Job, error) {
+// GetProviderJob returns a 3play file
+func (c *ThreePlayProvider) GetProviderJob(id string) (*database.ProviderJob, error) {
 	i, err := strconv.Atoi(id)
 	if err != nil {
 		return nil, err
@@ -66,12 +66,12 @@ func (c *ThreePlayProvider) GetJob(id string) (*database.Job, error) {
 		return nil, err
 	}
 
-	job := &database.Job{
-		ID:       strconv.FormatUint(uint64(file.ID), 10),
-		Status:   file.State,
-		Provider: providerName,
+	providerJob := &database.ProviderJob{
+		ID:      strconv.FormatUint(uint64(file.ID), 10),
+		Status:  file.State,
+		Details: file.ErrorDescription,
 	}
-	return job, nil
+	return providerJob, nil
 }
 
 // DispatchJob sends a video file to 3play for transcription and captions generation
