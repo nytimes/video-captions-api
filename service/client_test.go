@@ -1,7 +1,6 @@
 package service
 
 import (
-	"reflect"
 	"testing"
 	"time"
 
@@ -82,18 +81,14 @@ func TestGetJobs(t *testing.T) {
 	}
 	client.DB.StoreJob(job2)
 
-	resultJob, _ := client.GetJobs(parentID)
+	summaries, _ := client.GetJobs(parentID)
 
 	assert := assert.New(t)
-	assert.NotNil(resultJob)
-	assert.Len(resultJob, 2)
+	assert.NotNil(summaries)
+	assert.Len(summaries, 2)
 
-	if !reflect.DeepEqual(job2, &resultJob[0]) {
-		t.Errorf("The first job did not match\nExpected: %#v\nGot:  %#v", job2, resultJob[0])
-	}
-	if !reflect.DeepEqual(job1, &resultJob[1]) {
-		t.Errorf("The second job did not match\nExpected: %#v\nGot:  %#v", job1, resultJob[1])
-	}
+	assert.Equal(job1.ID, summaries[1].ID)
+	assert.Equal(job2.ID, summaries[0].ID)
 }
 
 func TestProviderJobError(t *testing.T) {

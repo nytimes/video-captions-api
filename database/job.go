@@ -27,6 +27,12 @@ type JobOutput struct {
 	Filename string `json:"filename"`
 }
 
+// JobSummary minimal information about a Job
+type JobSummary struct {
+	ID        string    `json:"id"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
 // ProviderParams is a set of parameters for providers
 type ProviderParams map[string]string
 
