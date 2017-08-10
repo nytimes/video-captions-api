@@ -18,14 +18,18 @@ type Client struct {
 }
 
 // GetJobs gets all jobs associated with a ParentID
-func (c Client) GetJobs(parentID string) ([]database.Job, error) {
+func (c Client) GetJobs(parentID string) ([]*database.JobSummary, error) {
 	jobs, err := c.DB.GetJobs(parentID)
 	if err != nil {
 		c.Logger.Error("Error loading jobs from DB", parentID)
 		return nil, err
 	}
 	sort.Sort(database.ByCreatedAt(jobs))
-	return jobs, nil
+	summaries := make([]*database.JobSummary, len(jobs))
+	for i, job := range jobs {
+		summaries[i] = &database.JobSummary{ID: job.ID, CreatedAt: job.CreatedAt}
+	}
+	return summaries, nil
 }
 
 // GetJob gets a job by ID
