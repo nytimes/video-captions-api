@@ -86,7 +86,11 @@ func (s *CaptionsService) CreateJob(r *http.Request) (int, interface{}, error) {
 		"Method":  r.Method,
 		"URI":     r.RequestURI,
 	})
-	params := jobParams{Language: "en", OutputTypes: []string{"vtt"}}
+	params := jobParams{
+		Language:       "en",
+		OutputTypes:    []string{"vtt"},
+		ProviderParams: make(database.ProviderParams),
+	}
 	defer r.Body.Close()
 
 	data, err := ioutil.ReadAll(r.Body)
@@ -94,8 +98,8 @@ func (s *CaptionsService) CreateJob(r *http.Request) (int, interface{}, error) {
 		requestLogger.WithError(err).Error("Could not read request body: ")
 		return http.StatusBadRequest, nil, captionsError{err.Error()}
 	}
-	err = json.Unmarshal(data, &params)
 
+	err = json.Unmarshal(data, &params)
 	if err != nil {
 		requestLogger.WithError(err).Error("Could not create job from request body")
 		return http.StatusBadRequest, nil, captionsError{"Malformed parameters"}
