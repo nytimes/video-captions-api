@@ -43,13 +43,17 @@ func (gs *GCSStorage) Store(data []byte, filename string) (string, error) {
 	writer := obj.NewWriter(ctx)
 	writer.ContentType = "text/plain"
 	if _, err := writer.Write(data); err != nil {
-		gs.logger.WithError(err).Info("there was some error writing file")
+		gs.logger.WithError(err).Error("there was some error writing file")
 		return "", err
 	}
 	if err := writer.Close(); err != nil {
-		gs.logger.WithError(err).Info("error closing writer ")
+		gs.logger.WithError(err).Error("error closing writer ")
+		return "", err
+	}
+	if err := obj.ACL().Set(ctx, storage.AllUsers, storage.RoleReader); err != nil {
+		gs.logger.WithError(err).Error("could not set ACL")
 		return "", err
 	}
 
-	return fmt.Sprintf("gs://%s/%s", gs.bucketName, objectFullName), nil
+	return fmt.Sprintf("https://storage.cloud.google.com/%s/%s", gs.bucketName, objectFullName), nil
 }
