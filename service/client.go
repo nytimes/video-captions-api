@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"sort"
 
 	"github.com/NYTimes/video-captions-api/database"
@@ -68,7 +69,7 @@ func (c Client) GetJob(jobID string) (*database.Job, error) {
 				return job, nil
 			}
 			jobLogger.Info("Download done, storing")
-			dest, err := c.Storage.Store(data, output.Filename)
+			dest, err := c.Storage.Store(data, fmt.Sprintf("%s/%s", job.Provider, output.Filename))
 			if err != nil {
 				jobLogger.WithError(err).Error("Failed to store file")
 				return job, nil
