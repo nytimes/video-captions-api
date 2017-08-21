@@ -42,6 +42,8 @@ func (gs *GCSStorage) Store(data []byte, filename string) (string, error) {
 	obj := gs.bucketHandle.Object(objectFullName)
 	writer := obj.NewWriter(ctx)
 	writer.ContentType = "text/plain"
+	writer.ObjectAttrs.ACL = []storage.ACLRule{{Entity: storage.AllUsers, Role: storage.RoleReader}}
+
 	if _, err := writer.Write(data); err != nil {
 		gs.logger.WithError(err).Error("there was some error writing file")
 		return "", err
@@ -50,10 +52,5 @@ func (gs *GCSStorage) Store(data []byte, filename string) (string, error) {
 		gs.logger.WithError(err).Error("error closing writer ")
 		return "", err
 	}
-	if err := obj.ACL().Set(ctx, storage.AllUsers, storage.RoleReader); err != nil {
-		gs.logger.WithError(err).Error("could not set ACL")
-		return "", err
-	}
-
 	return fmt.Sprintf("https://storage.cloud.google.com/%s/%s", gs.bucketName, objectFullName), nil
 }
