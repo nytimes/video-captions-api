@@ -100,7 +100,7 @@ func (c *AmaraProvider) DispatchJob(job *database.Job) error {
 		return err
 	}
 
-	lang, err := c.UpdateLanguage(video.ID, job.Language, false)
+	_, err = c.UpdateLanguage(video.ID, job.Language, false)
 	if err != nil {
 		return err
 	}
