@@ -52,5 +52,5 @@ func (gs *GCSStorage) Store(data []byte, filename string) (string, error) {
 		gs.logger.WithError(err).Error("error closing writer ")
 		return "", err
 	}
-	return fmt.Sprintf("https://storage.cloud.google.com/%s/%s", gs.bucketName, objectFullName), nil
+	return fmt.Sprintf("https://storage.googleapis.com/%s/%s", gs.bucketName, objectFullName), nil
 }

@@ -46,7 +46,7 @@ func (c *ThreePlayProvider) GetName() string {
 }
 
 // Download downloads captions file from specified type
-func (c *ThreePlayProvider) Download(id string, captionsType string) ([]byte, error) {
+func (c *ThreePlayProvider) Download(id, captionsType string) ([]byte, error) {
 	i, err := strconv.Atoi(id)
 	if err != nil {
 		return nil, err

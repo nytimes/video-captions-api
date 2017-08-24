@@ -17,10 +17,12 @@ func main() {
 	if err != nil {
 		server.Log.Fatal("Unable to create Datastore client", err)
 	}
-	providerConfig := providers.Load3PlayConfigFromEnv()
+	threeplayConfig := providers.Load3PlayConfigFromEnv()
+	amaraConfig := providers.LoadAmaraConfigFromEnv()
 	captionsService := service.NewCaptionsService(&cfg, db)
 
-	captionsService.AddProvider(providers.New3PlayProvider(&providerConfig, &cfg))
+	captionsService.AddProvider(providers.New3PlayProvider(&threeplayConfig, &cfg))
+	captionsService.AddProvider(providers.NewAmaraProvider(&amaraConfig, &cfg))
 	server.Init("video-captions-api", cfg.Server)
 
 	err = server.Register(captionsService)
