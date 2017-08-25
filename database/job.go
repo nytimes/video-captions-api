@@ -11,6 +11,7 @@ type ProviderJob struct {
 	ID      string
 	Status  string
 	Details string
+	Params  map[string]string
 }
 
 // Job representation of a captions job

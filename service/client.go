@@ -56,7 +56,18 @@ func (c Client) GetJob(jobID string) (*database.Job, error) {
 		return nil, err
 	}
 
-	if job.UpdateStatus(providerJob.Status, providerJob.Details) {
+	params := providerJob.Params
+
+	shouldUpdate := false
+
+	for k, v := range params {
+		if params[k] != job.ProviderParams[k] {
+			job.ProviderParams[k] = v
+			shouldUpdate = true
+		}
+	}
+
+	if job.UpdateStatus(providerJob.Status, providerJob.Details) || shouldUpdate {
 		err = c.DB.UpdateJob(jobID, job)
 	}
 
