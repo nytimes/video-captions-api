@@ -73,6 +73,18 @@ spec:
                 secretKeyRef:
                   name: captions-api-secrets
                   key: three-play-api-secret
+            - name: AMARA_TEAM
+              value: "{{.amara_team}}"
+            - name: AMARA_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: captions-api-secrets
+                  key: amara-token
+            - name: AMARA_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: captions-api-secrets
+                  key: amara-username
 
           # Please see probe documentation for details:
           # https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/

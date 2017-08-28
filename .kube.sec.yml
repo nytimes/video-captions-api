@@ -11,4 +11,5 @@ type: Opaque
 data:
   three-play-api-key: {{.three_play_api_key}}
   three-play-api-secret: {{.three_play_api_secret}}
-
+  amara-token: {{.amara_token}}
+  amara-username: {{.amara_username}}
