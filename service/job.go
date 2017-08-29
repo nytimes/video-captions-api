@@ -29,11 +29,14 @@ type jobParams struct {
 }
 
 // NewJobFromParams creates a Job from jobParams
-func NewJobFromParams(newJob jobParams) *database.Job {
+func NewJobFromParams(newJob jobParams) (*database.Job, error) {
 	outputs := make([]database.JobOutput, 0)
 	mediaFile := filepath.Base(newJob.MediaURL)
 	name := strings.TrimSuffix(mediaFile, filepath.Ext(mediaFile))
-	id, _ := uuid.NewV4()
+	id, err := uuid.NewV4()
+	if err != nil {
+		return nil, fmt.Errorf("could not create job id: %v", err)
+	}
 
 	for _, outputType := range newJob.OutputTypes {
 		fileName := fmt.Sprintf("%s_%s.%s", name, id.String(), outputType)
@@ -52,7 +55,7 @@ func NewJobFromParams(newJob jobParams) *database.Job {
 		Outputs:        outputs,
 		Done:           false,
 		Language:       newJob.Language,
-	}
+	}, nil
 }
 
 // Error implements the error interface
@@ -112,7 +115,12 @@ func (s *CaptionsService) CreateJob(r *http.Request) (int, interface{}, error) {
 		return http.StatusBadRequest, nil, captionsError{"Please provide a media_url"}
 	}
 
-	job := NewJobFromParams(params)
+	job, err := NewJobFromParams(params)
+	if err != nil {
+		requestLogger.WithError(err).Error("could not create job from parameters")
+		return http.StatusInternalServerError, nil, captionsError{err.Error()}
+	}
+
 	err = s.client.DispatchJob(job)
 	if err != nil {
 		return http.StatusInternalServerError, nil, captionsError{err.Error()}
