@@ -33,11 +33,13 @@ func NewJobFromParams(newJob jobParams) *database.Job {
 	outputs := make([]database.JobOutput, 0)
 	mediaFile := filepath.Base(newJob.MediaURL)
 	name := strings.TrimSuffix(mediaFile, filepath.Ext(mediaFile))
+	id, _ := uuid.NewV4()
+
 	for _, outputType := range newJob.OutputTypes {
-		outputs = append(outputs, database.JobOutput{Type: outputType, Filename: fmt.Sprintf("%s.%s", name, outputType)})
+		fileName := fmt.Sprintf("%s_%s.%s", name, id.String(), outputType)
+		outputs = append(outputs, database.JobOutput{Type: outputType, Filename: fileName})
 	}
 
-	id, _ := uuid.NewV4()
 	return &database.Job{
 		ID:       id.String(),
 		ParentID: newJob.ParentID,

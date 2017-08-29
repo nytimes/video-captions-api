@@ -52,8 +52,8 @@ func TestGetJobReady(t *testing.T) {
 
 	resultJob, _ := client.GetJob(job.ID)
 	assert.True(resultJob.Done)
-	assert.Equal(resultJob.Outputs[0].URL, "somepath/test-provider/video.vtt")
-	assert.Equal(resultJob.Outputs[1].URL, "somepath/test-provider/video.srt")
+	assert.Equal("somepath/test-provider/"+resultJob.Outputs[0].Filename, resultJob.Outputs[0].URL)
+	assert.Equal("somepath/test-provider/"+resultJob.Outputs[1].Filename, resultJob.Outputs[1].URL)
 }
 
 func TestGetJobs(t *testing.T) {
