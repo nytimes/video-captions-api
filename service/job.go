@@ -28,8 +28,7 @@ type jobParams struct {
 	Language       string                  `json:"language"`
 }
 
-// NewJobFromParams creates a Job from jobParams
-func NewJobFromParams(newJob jobParams) (*database.Job, error) {
+func newJobFromParams(newJob jobParams) (*database.Job, error) {
 	outputs := make([]database.JobOutput, 0)
 	mediaFile := filepath.Base(newJob.MediaURL)
 	name := strings.TrimSuffix(mediaFile, filepath.Ext(mediaFile))
@@ -115,7 +114,7 @@ func (s *CaptionsService) CreateJob(r *http.Request) (int, interface{}, error) {
 		return http.StatusBadRequest, nil, captionsError{"Please provide a media_url"}
 	}
 
-	job, err := NewJobFromParams(params)
+	job, err := newJobFromParams(params)
 	if err != nil {
 		requestLogger.WithError(err).Error("could not create job from parameters")
 		return http.StatusInternalServerError, nil, captionsError{err.Error()}
