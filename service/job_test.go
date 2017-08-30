@@ -58,7 +58,7 @@ func TestCreateJobDispatchError(t *testing.T) {
 	r, _ := http.NewRequest("POST", "/captions", bytes.NewReader(jobBytes))
 	status, _, err := service.CreateJob(r)
 	assert.NotNil(err)
-	assert.Equal("Error dispatching Job", err.Error())
+	assert.Equal("Error dispatching Job: provider error", err.Error())
 	assert.Equal(500, status)
 }
 

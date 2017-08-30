@@ -122,6 +122,7 @@ func (s *CaptionsService) CreateJob(r *http.Request) (int, interface{}, error) {
 
 	err = s.client.DispatchJob(job)
 	if err != nil {
+		requestLogger.WithError(err).Error("could not dispatch job")
 		return http.StatusInternalServerError, nil, captionsError{err.Error()}
 	}
 

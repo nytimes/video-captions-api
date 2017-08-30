@@ -1,7 +1,7 @@
 package providers
 
 import (
-	"errors"
+	"fmt"
 	"net/url"
 	"strconv"
 
@@ -92,17 +92,20 @@ func (c *AmaraProvider) DispatchJob(job *database.Job) error {
 	params.Add("video_url", job.MediaURL)
 
 	video, err := c.CreateVideo(params)
-	if err != nil || video.ID == "" {
-		return errors.New("failed to create video in amara")
+	if err != nil {
+		return fmt.Errorf("could not create video: %v", err)
+	}
+	if video.ID == "" {
+		return fmt.Errorf("received invalid video: %v", video)
 	}
 	subs, err := c.CreateSubtitles(video.ID, job.Language, "vtt", params)
 	if err != nil {
-		return err
+		return fmt.Errorf("could not create subtitles: %v", err)
 	}
 
 	_, err = c.UpdateLanguage(video.ID, job.Language, false)
 	if err != nil {
-		return err
+		return fmt.Errorf("could not update language: %v", err)
 	}
 
 	job.ProviderParams["ProviderID"] = video.ID
