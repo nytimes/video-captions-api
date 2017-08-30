@@ -22,7 +22,7 @@ type Client struct {
 func (c Client) GetJobs(parentID string) ([]*database.JobSummary, error) {
 	jobs, err := c.DB.GetJobs(parentID)
 	if err != nil {
-		c.Logger.Error("Error loading jobs from DB", parentID)
+		c.Logger.Errorf("Error loading jobs from DB for parent ID: %s", parentID)
 		return nil, err
 	}
 	sort.Sort(database.ByCreatedAt(jobs))
@@ -105,13 +105,13 @@ func (c Client) DispatchJob(job *database.Job) error {
 	jobLogger.Info("Dispatching job to provider")
 	err := provider.DispatchJob(job)
 	if err != nil {
-		jobLogger.Error("Error dispatching job to provider", err)
+		jobLogger.Errorf("Error dispatching job to provider: %v", err)
 		return errors.New("Error dispatching Job")
 	}
 	jobLogger.Info("Storing job in DB")
 	_, err = c.DB.StoreJob(job)
 	if err != nil {
-		jobLogger.Error("Error storing job in DB", err)
+		jobLogger.Errorf("Error storing job in DB: %v", err)
 		return errors.New("Error storing Job")
 	}
 	return nil
