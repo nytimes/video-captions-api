@@ -41,7 +41,7 @@ func TestGetJobReady(t *testing.T) {
 			"jobDone":   true,
 		},
 	})
-	job, _ := NewJobFromParams(jobParams{
+	job, _ := newJobFromParams(jobParams{
 		MediaURL:    "http://vp.nyt.com/video.mp4",
 		ParentID:    "123",
 		Provider:    "test-provider",

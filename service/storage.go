@@ -27,10 +27,10 @@ type GCSStorage struct {
 func NewGCSStorage(bucketName string, logger *log.Logger) (Storage, error) {
 	ctx := context.Background()
 	client, err := storage.NewClient(ctx)
-	bucket := client.Bucket(bucketName)
 	if err != nil {
 		return nil, err
 	}
+	bucket := client.Bucket(bucketName)
 	return &GCSStorage{bucket, bucketName, logger}, nil
 }
 
