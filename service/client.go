@@ -106,13 +106,13 @@ func (c Client) DispatchJob(job *database.Job) error {
 	err := provider.DispatchJob(job)
 	if err != nil {
 		jobLogger.Errorf("Error dispatching job to provider: %v", err)
-		return errors.New("Error dispatching Job")
+		return fmt.Errorf("Error dispatching Job: %v", err)
 	}
 	jobLogger.Info("Storing job in DB")
 	_, err = c.DB.StoreJob(job)
 	if err != nil {
 		jobLogger.Errorf("Error storing job in DB: %v", err)
-		return errors.New("Error storing Job")
+		return fmt.Errorf("Error storing Job: %v", err)
 	}
 	return nil
 }
