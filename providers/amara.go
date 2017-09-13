@@ -15,7 +15,9 @@ import (
 // AmaraProvider amara client wrapper that implements the Provider interface
 type AmaraProvider struct {
 	*amara.Client
-	logger *log.Logger
+	logger   *log.Logger
+	username string
+	team     string
 }
 
 // AmaraConfig holds Amara related config
@@ -30,6 +32,8 @@ func NewAmaraProvider(cfg *AmaraConfig, svcCfg *captionsConfig.CaptionsServiceCo
 	return &AmaraProvider{
 		amara.NewClient(cfg.Username, cfg.Token, cfg.Team),
 		svcCfg.Logger,
+		cfg.Username,
+		cfg.Team,
 	}
 }
 
@@ -88,7 +92,7 @@ func (c *AmaraProvider) DispatchJob(job *database.Job) error {
 		params.Add(k, v)
 	}
 
-	params.Add("team", c.Team)
+	params.Add("team", c.team)
 	params.Add("video_url", job.MediaURL)
 
 	video, err := c.CreateVideo(params)
