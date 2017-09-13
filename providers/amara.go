@@ -112,7 +112,13 @@ func (c *AmaraProvider) DispatchJob(job *database.Job) error {
 		return fmt.Errorf("could not update language: %v", err)
 	}
 
+	editorSession, err := c.EditorLogin(video.ID, job.Language, c.username)
+	if err != nil {
+		return fmt.Errorf("could not create editor login: %v", err)
+	}
+
 	job.ProviderParams["ProviderID"] = video.ID
 	job.ProviderParams["SubVersion"] = strconv.Itoa(subs.VersionNumber)
+	job.ProviderParams["ReviewURL"] = editorSession.URL
 	return nil
 }
