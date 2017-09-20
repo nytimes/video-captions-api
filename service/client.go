@@ -116,3 +116,24 @@ func (c Client) DispatchJob(job *database.Job) error {
 	}
 	return nil
 }
+
+// CancelJob cancels a job by ID
+func (c Client) CancelJob(jobID string) (bool, error) {
+	job, err := c.DB.GetJob(jobID)
+	if err != nil {
+		c.Logger.Error("Could not find Job in database")
+		return false, err
+	}
+
+	if job.Done {
+		c.Logger.Error("Cannot cancel a job that is already done")
+		return false, nil
+	}
+
+	job.Status = "canceled"
+	job.Done = true
+
+	err = c.DB.UpdateJob(jobID, job)
+
+	return true, err
+}

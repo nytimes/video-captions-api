@@ -83,6 +83,19 @@ func (s *CaptionsService) GetJob(r *http.Request) (int, interface{}, error) {
 	return http.StatusOK, job, nil
 }
 
+// CancelJob cancels a given Job by its ID
+func (s *CaptionsService) CancelJob(r *http.Request) (int, interface{}, error) {
+	id := web.Vars(r)["id"]
+	canceled, err := s.client.CancelJob(id)
+	if err != nil {
+		return http.StatusNotFound, nil, captionsError{err.Error()}
+	}
+	if !canceled {
+		return http.StatusConflict, nil, captionsError{"Cannot cancel a job that is already done"}
+	}
+	return http.StatusOK, nil, nil
+}
+
 // CreateJob create a Job
 func (s *CaptionsService) CreateJob(r *http.Request) (int, interface{}, error) {
 	requestLogger := s.logger.WithFields(log.Fields{

@@ -9,6 +9,10 @@ import (
 
 	"github.com/NYTimes/video-captions-api/database"
 	"github.com/stretchr/testify/assert"
+	"fmt"
+	"github.com/NYTimes/gizmo/server"
+
+	"net/http/httptest"
 )
 
 func TestCreateJob(t *testing.T) {
@@ -76,9 +80,76 @@ func TestCreateJobInvalidBody(t *testing.T) {
 
 func TestGetJob404(t *testing.T) {
 	assert := assert.New(t)
+	server := server.NewSimpleServer(&server.Config{})
 	service, _ := createCaptionsService()
+	server.Register(service)
 	r, _ := http.NewRequest("GET", "/jobs/404", nil)
-	status, _, err := service.GetJob(r)
-	assert.Equal(status, 404)
-	assert.Equal("Job doesn't exist", err.Error())
+	w := httptest.NewRecorder()
+	server.ServeHTTP(w, r)
+	var jobBody map[string]interface{}
+	err := json.NewDecoder(w.Body).Decode(&jobBody)
+	if err != nil {
+		t.Errorf("%s: unable to JSON decode response body: %s", w.Body, err)
+	}
+	assert.Equal(w.Code, 404)
+	assert.Equal("Job doesn't exist", jobBody["error"])
+}
+
+func TestCancelJob(t *testing.T) {
+	assert := assert.New(t)
+	server := server.NewSimpleServer(&server.Config{})
+	service, client := createCaptionsService()
+	service.AddProvider(fakeProvider{logger: client.Logger})
+	job := &database.Job{
+		ParentID: "123",
+		MediaURL: "http://vp.nyt.com/video.mp4",
+		Provider: "test-provider",
+		Done: false,
+		Status: "in_progress",
+	}
+	server.Register(service)
+
+	jobBytes, _ := json.Marshal(job)
+	r, _ := http.NewRequest("POST", "/captions", bytes.NewReader(jobBytes))
+	r.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+	server.ServeHTTP(w, r)
+	assert.Equal(201, w.Code)
+	var captionsBody map[string]interface{}
+	err := json.NewDecoder(w.Body).Decode(&captionsBody)
+	if err != nil {
+		t.Errorf("%s: unable to JSON decode response body: %s", w.Body, err)
+	}
+
+	urlStr := fmt.Sprintf("/jobs/%v/cancel", captionsBody["id"])
+	r2, _ := http.NewRequest("GET", urlStr, nil)
+	w2 := httptest.NewRecorder()
+	server.ServeHTTP(w2, r2)
+	assert.Equal(200, w2.Code)
+	var cancelBody map[string]interface{}
+	err = json.NewDecoder(w2.Body).Decode(&cancelBody)
+	if err != nil {
+		t.Errorf("%s: unable to JSON decode response body: %s", w2.Body, err)
+	}
+	assert.Nil(cancelBody)
+}
+
+func TestCancelJob404(t *testing.T) {
+	assert := assert.New(t)
+	server := server.NewSimpleServer(&server.Config{})
+	service, client := createCaptionsService()
+	service.AddProvider(fakeProvider{logger: client.Logger})
+	server.Register(service)
+	r, _ := http.NewRequest("GET", "/jobs/404/cancel", nil)
+	w := httptest.NewRecorder()
+	server.ServeHTTP(w, r)
+
+	var cancelBody map[string]interface{}
+	err := json.NewDecoder(w.Body).Decode(&cancelBody)
+	if err != nil {
+		t.Errorf("%s: unable to JSON decode response body: %s", w.Body, err)
+	}
+
+	assert.Equal(w.Code, 404)
+	assert.Equal("Job doesn't exist", cancelBody["error"])
 }

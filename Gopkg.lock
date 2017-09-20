@@ -8,6 +8,12 @@
   version = "v0.10.0"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/NYTimes/amara"
+  packages = ["."]
+  revision = "49138d0781b74053d8a09db9f62a44db170dfe94"
+
+[[projects]]
   name = "github.com/NYTimes/gizmo"
   packages = ["config","config/metrics","server","web"]
   revision = "bd99546be9d5aff4517f603f9f68abcd56522c66"
@@ -239,6 +245,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "4f41bd88ceee018381fb9898c7b0980b0dc851b006ecfb3bf66a7cee9fc42e01"
+  inputs-digest = "a094cbf76f46f34db41d436b205dbf7f9345762416c75c8a797a07c34868bab6"
   solver-name = "gps-cdcl"
   solver-version = 1
