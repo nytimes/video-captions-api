@@ -135,7 +135,7 @@ func TestProviderStatusError(t *testing.T) {
 	assert.EqualValues(resultJob.Status, "My status")
 }
 
-func TestCencelJob(t *testing.T) {
+func TestCancelClientJob(t *testing.T) {
 	service, client := createCaptionsService()
 	assert := assert.New(t)
 	service.AddProvider(fakeProvider{logger: log.New()})
@@ -152,7 +152,7 @@ func TestCencelJob(t *testing.T) {
 	assert.True(canceled)
 }
 
-func TestCencelJobDone(t *testing.T) {
+func TestCancelClientJobDone(t *testing.T) {
 	service, client := createCaptionsService()
 	assert := assert.New(t)
 	service.AddProvider(fakeProvider{logger: log.New()})
@@ -170,7 +170,7 @@ func TestCencelJobDone(t *testing.T) {
 	assert.False(canceled)
 }
 
-func TestCencelJobDoesntExist(t *testing.T) {
+func TestCancelClientJob404(t *testing.T) {
 	service, client := createCaptionsService()
 	assert := assert.New(t)
 	service.AddProvider(fakeProvider{logger: log.New()})
