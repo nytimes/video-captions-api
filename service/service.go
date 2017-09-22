@@ -60,7 +60,7 @@ func (s *CaptionsService) Endpoints() map[string]map[string]http.HandlerFunc {
 			"POST": server.JSONToHTTP(s.CreateJob).ServeHTTP,
 		},
 		"/jobs/{id}/cancel": {
-			"GET": server.JSONToHTTP(s.CancelJob).ServeHTTP,
+			"POST": server.JSONToHTTP(s.CancelJob).ServeHTTP,
 		},
 	}
 }

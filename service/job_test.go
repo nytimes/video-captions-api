@@ -7,10 +7,11 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"fmt"
+
+	"github.com/NYTimes/gizmo/server"
 	"github.com/NYTimes/video-captions-api/database"
 	"github.com/stretchr/testify/assert"
-	"fmt"
-	"github.com/NYTimes/gizmo/server"
 
 	"net/http/httptest"
 )
@@ -104,8 +105,8 @@ func TestCancelJob(t *testing.T) {
 		ParentID: "123",
 		MediaURL: "http://vp.nyt.com/video.mp4",
 		Provider: "test-provider",
-		Done: false,
-		Status: "in_progress",
+		Done:     false,
+		Status:   "in_progress",
 	}
 	server.Register(service)
 
@@ -122,7 +123,7 @@ func TestCancelJob(t *testing.T) {
 	}
 
 	urlStr := fmt.Sprintf("/jobs/%v/cancel", captionsBody["id"])
-	r2, _ := http.NewRequest("GET", urlStr, nil)
+	r2, _ := http.NewRequest("POST", urlStr, nil)
 	w2 := httptest.NewRecorder()
 	server.ServeHTTP(w2, r2)
 	assert.Equal(200, w2.Code)
@@ -140,7 +141,7 @@ func TestCancelJob404(t *testing.T) {
 	service, client := createCaptionsService()
 	service.AddProvider(fakeProvider{logger: client.Logger})
 	server.Register(service)
-	r, _ := http.NewRequest("GET", "/jobs/404/cancel", nil)
+	r, _ := http.NewRequest("POST", "/jobs/404/cancel", nil)
 	w := httptest.NewRecorder()
 	server.ServeHTTP(w, r)
 
@@ -163,11 +164,11 @@ func TestCancelJobDone(t *testing.T) {
 		ID:       "123",
 		MediaURL: "http://vp.nyt.com/video.mp4",
 		Provider: "test-provider",
-		Done: true,
+		Done:     true,
 	}
 	client.DB.StoreJob(job)
 	server.Register(service)
-	r, _ := http.NewRequest("GET", "/jobs/123/cancel", nil)
+	r, _ := http.NewRequest("POST", "/jobs/123/cancel", nil)
 	w := httptest.NewRecorder()
 	server.ServeHTTP(w, r)
 	assert.Equal(409, w.Code)
