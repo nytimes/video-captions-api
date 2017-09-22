@@ -153,3 +153,28 @@ func TestCancelJob404(t *testing.T) {
 	assert.Equal(w.Code, 404)
 	assert.Equal("Job doesn't exist", cancelBody["error"])
 }
+
+func TestCancelJobDone(t *testing.T) {
+	service, client := createCaptionsService()
+	server := server.NewSimpleServer(&server.Config{})
+	assert := assert.New(t)
+	service.AddProvider(fakeProvider{logger: client.Logger})
+	job := &database.Job{
+		ID:       "123",
+		MediaURL: "http://vp.nyt.com/video.mp4",
+		Provider: "test-provider",
+		Done: true,
+	}
+	client.DB.StoreJob(job)
+	server.Register(service)
+	r, _ := http.NewRequest("GET", "/jobs/123/cancel", nil)
+	w := httptest.NewRecorder()
+	server.ServeHTTP(w, r)
+	assert.Equal(409, w.Code)
+	var cancelBody map[string]interface{}
+	err := json.NewDecoder(w.Body).Decode(&cancelBody)
+	if err != nil {
+		t.Errorf("%s: unable to JSON decode response body: %s", w.Body, err)
+	}
+	assert.Equal("Cannot cancel a job that is already done", cancelBody["error"])
+}
