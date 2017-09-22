@@ -134,3 +134,49 @@ func TestProviderStatusError(t *testing.T) {
 	assert.NotNil(resultJob.Status)
 	assert.EqualValues(resultJob.Status, "My status")
 }
+
+func TestCancelClientJob(t *testing.T) {
+	service, client := createCaptionsService()
+	assert := assert.New(t)
+	service.AddProvider(fakeProvider{logger: log.New()})
+	job := &database.Job{
+		ID:       "123",
+		MediaURL: "http://vp.nyt.com/video.mp4",
+		Provider: "test-provider",
+	}
+	client.DB.StoreJob(job)
+	resultJob, _ := client.GetJob(job.ID)
+
+	canceled, err := client.CancelJob(resultJob.ID)
+	assert.Nil(err)
+	assert.True(canceled)
+}
+
+func TestCancelClientJobDone(t *testing.T) {
+	service, client := createCaptionsService()
+	assert := assert.New(t)
+	service.AddProvider(fakeProvider{logger: log.New()})
+	job := &database.Job{
+		ID:       "123",
+		MediaURL: "http://vp.nyt.com/video.mp4",
+		Provider: "test-provider",
+		Done: true,
+	}
+	client.DB.StoreJob(job)
+	resultJob, _ := client.GetJob(job.ID)
+
+	canceled, err := client.CancelJob(resultJob.ID)
+	assert.Nil(err)
+	assert.False(canceled)
+}
+
+func TestCancelClientJob404(t *testing.T) {
+	service, client := createCaptionsService()
+	assert := assert.New(t)
+	service.AddProvider(fakeProvider{logger: log.New()})
+
+	canceled, err := client.CancelJob("404")
+	assert.NotNil(err)
+	assert.EqualValues(err.Error(), "Job doesn't exist")
+	assert.False(canceled)
+}
