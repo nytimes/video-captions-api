@@ -41,7 +41,7 @@ func (gs *GCSStorage) Store(data []byte, filename string) (string, error) {
 	objectFullName := fmt.Sprintf("%s/%s/%s/%s", strconv.Itoa(year), strconv.Itoa(int(month)), strconv.Itoa(day), filename)
 	obj := gs.bucketHandle.Object(objectFullName)
 	writer := obj.NewWriter(ctx)
-	writer.ContentType = "text/plain"
+	writer.ContentType = "text/plain; charset=utf-8"
 	writer.ObjectAttrs.ACL = []storage.ACLRule{{Entity: storage.AllUsers, Role: storage.RoleReader}}
 
 	if _, err := writer.Write(data); err != nil {
