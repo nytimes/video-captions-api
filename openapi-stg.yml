@@ -24,3 +24,12 @@ paths:
       responses:
         default:
           description: "wildcard-response"
+
+security:
+  - api_key: []
+
+securityDefinitions:
+  api_key:
+    type: "apiKey"
+    name: "key"
+    in: "query"

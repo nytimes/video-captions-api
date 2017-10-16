@@ -55,8 +55,8 @@ deploy:
       port: 8000
       ce_esp_port: 8001
       ce_service_name: video-captions-api.endpoints.nyt-video-dev.cloud.goog
-      ce_service_version: 2017-10-16r0
-      replicas: 3
+      ce_service_version: 2017-10-16r1
+      replicas: 2
       # NOTE: recommend minimum of 2 to ensure uptime during a rolling deploy.
       replicas_min: 2
       replicas_max: 5
