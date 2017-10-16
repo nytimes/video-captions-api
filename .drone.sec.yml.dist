@@ -29,7 +29,9 @@ environment:
     "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
     "client_x509_cert_url": ""
     }
-  THREE_PLAY_API_KEY: ""
-  THREE_PLAY_API_SECRET: ""
+  THREE_PLAY_API_KEY_STG: ""
+  THREE_PLAY_API_SECRET_STG: ""
+  THREE_PLAY_API_KEY_PRD: ""
+  THREE_PLAY_API_SECRET_PRD": ""
   AMARA_USERNAME: ""
   AMARA_TOKEN: ""

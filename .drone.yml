@@ -67,8 +67,8 @@ deploy:
 
     # These variables are made available in the .kube.sec.yml secret template in base64 encoding.
     secrets:
-      three_play_api_key: $$THREE_PLAY_API_KEY
-      three_play_api_secret: $$THREE_PLAY_API_SECRET
+      three_play_api_key: $$THREE_PLAY_API_KEY_STG
+      three_play_api_secret: $$THREE_PLAY_API_SECRET_STG
       amara_token: $$AMARA_TOKEN
       amara_username: $$AMARA_USERNAME
 
@@ -109,8 +109,8 @@ deploy:
       amara_team: nyt-cms
 
     secrets:
-      three_play_api_key: $$THREE_PLAY_API_KEY
-      three_play_api_secret: $$THREE_PLAY_API_SECRET
+      three_play_api_key: $$THREE_PLAY_API_KEY_PRD
+      three_play_api_secret: $$THREE_PLAY_API_SECRET_PRD
       amara_token: $$AMARA_TOKEN
       amara_username: $$AMARA_USERNAME
 
