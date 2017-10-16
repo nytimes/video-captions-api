@@ -106,10 +106,13 @@ deploy:
       ce_service_version: 2017-10-16r0
       ip_name: video-captions-api
       cert_name: star-nyt-net-cert
+      amara_team: nyt-cms
 
     secrets:
       three_play_api_key: $$THREE_PLAY_API_KEY
       three_play_api_secret: $$THREE_PLAY_API_SECRET
+      amara_token: $$AMARA_TOKEN
+      amara_username: $$AMARA_USERNAME
 
     when:
       event: tag
