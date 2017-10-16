@@ -6,16 +6,21 @@ info:
 host: "video-captions-api.endpoints.nyt-video-dev.cloud.goog"
 
 paths:
+  "/healthz":
+    get:
+      operationId: "healthcheck-get"
+      responses:
+        default:
+          description: "healthcheck-response"
+      security: []
   "/**":
     get:
       operationId: "wildcard-get"
       responses:
         default:
           description: "wildcard-response"
-      security: []
     post:
       operationId: "wildcard-post"
       responses:
         default:
           description: "wildcard-response"
-      security: []
