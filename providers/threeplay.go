@@ -51,7 +51,10 @@ func (c *ThreePlayProvider) Download(id, captionsType string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return c.GetCaptions(uint(i), threeplay.CaptionsFormat(captionsType))
+	return c.GetCaptions(threeplay.GetCaptionsOptions{
+		FileID: uint(i),
+		Format: threeplay.CaptionsFormat(captionsType),
+	})
 }
 
 // GetProviderJob returns a 3play file

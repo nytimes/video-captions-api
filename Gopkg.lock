@@ -34,7 +34,7 @@
   branch = "master"
   name = "github.com/NYTimes/threeplay"
   packages = ["."]
-  revision = "aa73bed8dfd4096aff49e5ba70696ed051e090a5"
+  revision = "96ed28726058b44007e91d4ee7d76db310479a63"
 
 [[projects]]
   name = "github.com/Sirupsen/logrus"
