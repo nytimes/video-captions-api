@@ -63,6 +63,8 @@ spec:
               value: "8000"
             - name: SERVER_GIZMO_HEALTH_CHECK_PATH
               value: "/healthz"
+            - name: THREE_PLAY_FORMAT_MAPPING
+              value: "{{.three_play_format_mapping}}"
             - name: THREE_PLAY_API_KEY
               valueFrom:
                 secretKeyRef:

@@ -17,12 +17,14 @@ const providerName string = "3play"
 type ThreePlayProvider struct {
 	*threeplay.Client
 	logger *log.Logger
+	config ThreePlayConfig
 }
 
 // ThreePlayConfig holds config necessary to create a ThreePlayProvider
 type ThreePlayConfig struct {
-	APIKey    string `envconfig:"THREE_PLAY_API_KEY"`
-	APISecret string `envconfig:"THREE_PLAY_API_SECRET"`
+	APIKey        string            `envconfig:"THREE_PLAY_API_KEY"`
+	APISecret     string            `envconfig:"THREE_PLAY_API_SECRET"`
+	FormatMapping map[string]string `envconfig:"THREE_PLAY_FORMAT_MAPPING"`
 }
 
 // New3PlayProvider creates a ThreePlayProvider instance
@@ -30,6 +32,7 @@ func New3PlayProvider(cfg *ThreePlayConfig, svcCfg *captionsConfig.CaptionsServi
 	return &ThreePlayProvider{
 		threeplay.NewClient(cfg.APIKey, cfg.APISecret),
 		svcCfg.Logger,
+		*cfg,
 	}
 }
 
@@ -47,11 +50,19 @@ func (c *ThreePlayProvider) GetName() string {
 
 // Download downloads captions file from specified type
 func (c *ThreePlayProvider) Download(id, captionsType string) ([]byte, error) {
-	i, err := strconv.Atoi(id)
+	fileID, err := strconv.Atoi(id)
 	if err != nil {
 		return nil, err
 	}
-	return c.GetCaptions(uint(i), threeplay.CaptionsFormat(captionsType))
+	opts := threeplay.GetCaptionsOptions{
+		FileID: uint(fileID),
+		Format: threeplay.CaptionsFormat(captionsType),
+	}
+	if customFormat := c.config.FormatMapping[captionsType]; customFormat != "" {
+		opts.OutputFormat = customFormat
+		opts.Format = ""
+	}
+	return c.GetCaptions(opts)
 }
 
 // GetProviderJob returns a 3play file
