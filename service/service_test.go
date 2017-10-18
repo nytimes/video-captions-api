@@ -128,9 +128,10 @@ func TestNewCaptionsService(t *testing.T) {
 	assert.NotNil(service.client.Providers)
 	assert.Equal(service.client.Providers, providers)
 
-	assert.Len(service.Endpoints(), 4)
+	assert.Len(service.Endpoints(), 5)
 	assert.Contains(service.Endpoints(), "/captions/{id}")
 	assert.Contains(service.Endpoints(), "/jobs/{id}")
 	assert.Contains(service.Endpoints(), "/captions")
 	assert.Contains(service.Endpoints(), "/jobs/{id}/cancel")
+	assert.Contains(service.Endpoints(), "/jobs/{id}/download")
 }
