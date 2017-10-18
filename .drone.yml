@@ -64,6 +64,7 @@ deploy:
       ip_name: video-captions-api
       cert_name: stg-nyt-net-cert
       amara_team: nyt-cms
+      three_play_format_mapping: "$$THREE_PLAY_FORMAT_MAPPING"
 
     # These variables are made available in the .kube.sec.yml secret template in base64 encoding.
     secrets:
@@ -107,6 +108,7 @@ deploy:
       ip_name: video-captions-api
       cert_name: star-nyt-net-cert
       amara_team: nyt-cms
+      three_play_format_mapping: "$$THREE_PLAY_FORMAT_MAPPING"
 
     secrets:
       three_play_api_key: $$THREE_PLAY_API_KEY_PRD
