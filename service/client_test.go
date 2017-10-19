@@ -180,3 +180,48 @@ func TestCancelClientJob404(t *testing.T) {
 	assert.EqualValues(err.Error(), "Job doesn't exist")
 	assert.False(canceled)
 }
+
+func TestDownloadCaption(t *testing.T) {
+	service, client := createCaptionsService()
+	assert := assert.New(t)
+	service.AddProvider(fakeProvider{logger: log.New()})
+	job := &database.Job{
+		ID:       "123",
+		MediaURL: "http://vp.nyt.com/video.mp4",
+		Provider: "test-provider",
+	}
+	client.DB.StoreJob(job)
+	caption, err := client.DownloadCaption("123", "vtt")
+	assert.Nil(err)
+	assert.Equal(string(caption[:]), "captions")
+}
+
+func TestDownloadNonexistentCaption(t *testing.T) {
+	service, client := createCaptionsService()
+	assert := assert.New(t)
+	service.AddProvider(fakeProvider{logger: log.New()})
+	job := &database.Job{
+		ID:       "123",
+		MediaURL: "http://vp.nyt.com/video.mp4",
+		Provider: "test-provider",
+	}
+	client.DB.StoreJob(job)
+	_, err := client.DownloadCaption("404", "vtt")
+	assert.NotNil(err)
+	assert.EqualValues(err.Error(), "Job doesn't exist")
+}
+
+func TestDownloadCaptionProviderError(t *testing.T) {
+	service, client := createCaptionsService()
+	assert := assert.New(t)
+	service.AddProvider(brokenProvider{logger: client.Logger})
+	job := &database.Job{
+		ID:       "123",
+		MediaURL: "http://vp.nyt.com/video.mp4",
+		Provider: "broken-provider",
+	}
+	client.DB.StoreJob(job)
+	_, err := client.DownloadCaption("123", "vtt")
+	assert.NotNil(err)
+	assert.EqualValues(err.Error(), "download error")
+}

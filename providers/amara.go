@@ -50,8 +50,8 @@ func (c *AmaraProvider) GetName() string {
 }
 
 // Download download latest subtitle version from Amara
-func (c *AmaraProvider) Download(id, _ string) ([]byte, error) {
-	sub, err := c.GetSubtitles(id, "en")
+func (c *AmaraProvider) Download(id, captionFormat string) ([]byte, error) {
+	sub, err := c.GetSubtitles(id, "en", captionFormat)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func (c *AmaraProvider) Download(id, _ string) ([]byte, error) {
 
 // GetProviderJob returns current job status from Amara
 func (c *AmaraProvider) GetProviderJob(id string) (*database.ProviderJob, error) {
-	subs, err := c.GetSubtitles(id, "en")
+	subs, err := c.GetSubtitles(id, "en", "vtt")
 	status := "in review"
 	if err != nil {
 		return nil, err

@@ -137,3 +137,24 @@ func (c Client) CancelJob(jobID string) (bool, error) {
 
 	return true, err
 }
+
+// DownloadCaption downloads a caption of a given job in the specified format
+func (c Client) DownloadCaption(jobID string, captionType string) ([]byte, error) {
+	job, err := c.DB.GetJob(jobID)
+	if err != nil {
+		c.Logger.Error("Could not find Job in database")
+		return nil, err
+	}
+
+	providerID := job.ProviderParams["ProviderID"]
+	fields := log.Fields{"JobID": jobID, "Provider": job.Provider, "ProviderID": providerID}
+	jobLogger := c.Logger.WithFields(fields)
+	provider := c.Providers[job.Provider]
+	jobLogger.Info("Downloading captions from provider")
+	captions, err := provider.Download(providerID, captionType)
+	if err != nil {
+		jobLogger.Error("error downloading captions from provider", err)
+		return nil, err
+	}
+	return captions, nil
+}
