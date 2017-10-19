@@ -11,7 +11,7 @@
   branch = "master"
   name = "github.com/NYTimes/amara"
   packages = ["."]
-  revision = "49138d0781b74053d8a09db9f62a44db170dfe94"
+  revision = "98b6c9b2c318fe0317b949abca02ce582b977685"
 
 [[projects]]
   name = "github.com/NYTimes/gizmo"
