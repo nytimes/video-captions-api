@@ -147,7 +147,7 @@ func (s *CaptionsService) CreateJob(r *http.Request) (int, interface{}, error) {
 }
 
 // DownloadCaption downloads a caption in the specified format
-func (s *CaptionsService) DownloadCaption(r *http.Request) (int, interface{}, error) {
+func (s *CaptionsService) DownloadCaption(w http.ResponseWriter, r *http.Request) {
 	id := web.Vars(r)["id"]
 
 	requestLogger := s.logger.WithFields(log.Fields{
@@ -162,19 +162,21 @@ func (s *CaptionsService) DownloadCaption(r *http.Request) (int, interface{}, er
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		requestLogger.WithError(err).Error("Could not read download request body: ")
-		return http.StatusBadRequest, nil, captionsError{err.Error()}
+		w.WriteHeader(http.StatusBadRequest)
 	}
 
 	err = json.Unmarshal(data, &param)
 	if err != nil {
 		requestLogger.WithError(err).Error("Could not unmarshal download request body")
-		return http.StatusBadRequest, nil, captionsError{"Malformed parameters"}
+		w.WriteHeader(http.StatusBadRequest)
 	}
 
 	captionFile, err := s.client.DownloadCaption(id, param.CaptionFormat)
 	if err != nil {
-		return http.StatusNotFound, nil, captionsError{err.Error()}
+		w.WriteHeader(http.StatusNotFound)
 	}
 
-	return http.StatusOK, string(captionFile[:]), nil
+	w.Header().Set("Content-Type", fmt.Sprintf("text/%s", param.CaptionFormat))
+	w.WriteHeader(http.StatusOK)
+	w.Write(captionFile)
 }
