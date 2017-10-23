@@ -1,14 +1,14 @@
 ---
 build:
   test:
-    image: golang:1.8-alpine
+    image: golang:1.9-alpine
     commands:
       - apk -qq --no-cache add git
       - go get github.com/golang/dep/cmd/dep
       - go get github.com/golang/lint/golint
       - dep ensure -v
-      - golint -set_exit_status $(go list ./... | grep -v vendor)
-      - go test -v $(go list ./... | grep -v vendor)
+      - golint -set_exit_status $(go list ./...)
+      - go test -v $(go list ./...)
       - go build -o captions-api
     when:
       event:
