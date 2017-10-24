@@ -62,7 +62,7 @@ deploy:
       replicas_max: 5
       cpu: 80
       ip_name: video-captions-api
-      cert_name: stg-nyt-net-cert
+      cert_name: stg-nyt-net-with-chain-cert
       amara_team: nyt-cms
       three_play_format_mapping: "$$THREE_PLAY_FORMAT_MAPPING"
 
@@ -106,7 +106,7 @@ deploy:
       ce_service_name: video-captions-api.endpoints.nyt-video-prd.cloud.goog
       ce_service_version: 2017-10-16r1
       ip_name: video-captions-api
-      cert_name: star-nyt-net-cert
+      cert_name: prd-nyt-net-with-chain-cert
       amara_team: nyt-cms
       three_play_format_mapping: "$$THREE_PLAY_FORMAT_MAPPING"
 
