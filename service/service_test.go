@@ -132,5 +132,5 @@ func TestNewCaptionsService(t *testing.T) {
 	assert.Contains(service.Endpoints(), "/jobs/{id}")
 	assert.Contains(service.Endpoints(), "/captions")
 	assert.Contains(service.Endpoints(), "/jobs/{id}/cancel")
-	assert.Contains(service.Endpoints(), "/jobs/{id}/download")
+	assert.Contains(service.Endpoints(), "/jobs/{id}/download/{captionFormat}")
 }
