@@ -100,7 +100,7 @@ func (c *ThreePlayProvider) DispatchJob(job *database.Job) error {
 		return err
 	}
 
-	job.ProviderParams["ProviderID"] = fileID
+	job.ProviderParams["ProviderID"] = strconv.FormatUint(uint64(fileID), 10)
 
 	return nil
 }
