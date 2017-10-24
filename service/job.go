@@ -176,7 +176,7 @@ func (s *CaptionsService) DownloadCaption(w http.ResponseWriter, r *http.Request
 		w.WriteHeader(http.StatusNotFound)
 	}
 
-	w.Header().Set("Content-Type; charset=utf-8", fmt.Sprintf("text/%s", param.CaptionFormat))
+	w.Header().Set("Content-Type", fmt.Sprintf("text/%s; charset=utf-8", param.CaptionFormat))
 	w.WriteHeader(http.StatusOK)
 	w.Write(captionFile)
 }
