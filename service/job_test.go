@@ -13,13 +13,9 @@ import (
 	"github.com/NYTimes/video-captions-api/database"
 	"github.com/stretchr/testify/assert"
 
-	"net/http/httptest"
 	"io/ioutil"
+	"net/http/httptest"
 )
-
-type CaptionFormat struct {
-	captionFormat string
-}
 
 func TestCreateJob(t *testing.T) {
 	assert := assert.New(t)
@@ -197,8 +193,7 @@ func TestDownload(t *testing.T) {
 	}
 	client.DB.StoreJob(job)
 	server.Register(service)
-	params, _ := json.Marshal(CaptionFormat{captionFormat : "vtt"})
-	r, _ := http.NewRequest("POST", "/jobs/123/download", bytes.NewReader(params))
+	r, _ := http.NewRequest("GET", "/jobs/123/download/srt", bytes.NewReader(nil))
 	w := httptest.NewRecorder()
 	server.ServeHTTP(w, r)
 	assert.Equal(200, w.Code)
@@ -218,8 +213,7 @@ func TestDownloadMissingCaption(t *testing.T) {
 	}
 	client.DB.StoreJob(job)
 	server.Register(service)
-	params, _ := json.Marshal(CaptionFormat{captionFormat : "vtt"})
-	r, _ := http.NewRequest("POST", "/jobs/456/download", bytes.NewReader(params))
+	r, _ := http.NewRequest("GET", "/jobs/456/download/srt", bytes.NewReader(nil))
 	w := httptest.NewRecorder()
 	server.ServeHTTP(w, r)
 	assert.Equal(404, w.Code)
@@ -239,10 +233,10 @@ func TestDownloadBadRequest(t *testing.T) {
 	}
 	client.DB.StoreJob(job)
 	server.Register(service)
-	r, _ := http.NewRequest("POST", "/jobs/123/download", nil)
+	r, _ := http.NewRequest("GET", "/jobs/123/download", bytes.NewReader(nil))
 	w := httptest.NewRecorder()
 	server.ServeHTTP(w, r)
-	assert.Equal(500, w.Code)
+	assert.Equal(404, w.Code)
 	body, _ := ioutil.ReadAll(w.Body)
-	assert.Equal("unexpected server error", string(body))
+	assert.Equal("404 page not found\n", string(body))
 }

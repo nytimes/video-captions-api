@@ -28,10 +28,6 @@ type jobParams struct {
 	Language       string                  `json:"language"`
 }
 
-type downloadParam struct {
-	CaptionFormat string `json:"caption_format"`
-}
-
 func newJobFromParams(newJob jobParams) (*database.Job, error) {
 	outputs := make([]database.JobOutput, 0)
 	mediaFile := filepath.Base(newJob.MediaURL)
@@ -149,34 +145,16 @@ func (s *CaptionsService) CreateJob(r *http.Request) (int, interface{}, error) {
 // DownloadCaption downloads a caption in the specified format
 func (s *CaptionsService) DownloadCaption(w http.ResponseWriter, r *http.Request) {
 	id := web.Vars(r)["id"]
-
-	requestLogger := s.logger.WithFields(log.Fields{
-		"Handler": "DownloadCaption",
-		"Method":  r.Method,
-		"URI":     r.RequestURI,
-	})
-	param := downloadParam{}
+	captionFormat := web.Vars(r)["captionFormat"]
 
 	defer r.Body.Close()
 
-	data, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		requestLogger.WithError(err).Error("Could not read download request body: ")
-		w.WriteHeader(http.StatusBadRequest)
-	}
-
-	err = json.Unmarshal(data, &param)
-	if err != nil {
-		requestLogger.WithError(err).Error("Could not unmarshal download request body")
-		w.WriteHeader(http.StatusBadRequest)
-	}
-
-	captionFile, err := s.client.DownloadCaption(id, param.CaptionFormat)
+	captionFile, err := s.client.DownloadCaption(id, captionFormat)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 	}
 
-	w.Header().Set("Content-Type; charset=utf-8", fmt.Sprintf("text/%s", param.CaptionFormat))
+	w.Header().Set("Content-Type", fmt.Sprintf("text/%s; charset=utf-8", captionFormat))
 	w.WriteHeader(http.StatusOK)
 	w.Write(captionFile)
 }
