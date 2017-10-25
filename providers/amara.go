@@ -107,6 +107,9 @@ func (c *AmaraProvider) DispatchJob(job *database.Job) error {
 		return fmt.Errorf("could not create subtitles: %v", err)
 	}
 
+	// when we create a video, complete is already true,
+	// making it harder for us to know when it's actually complete.
+	// calling UpdateLanguage just to set complete to false.
 	_, err = c.UpdateLanguage(video.ID, job.Language, false)
 	if err != nil {
 		return fmt.Errorf("could not update language: %v", err)
