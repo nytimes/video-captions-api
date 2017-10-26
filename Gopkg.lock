@@ -11,7 +11,7 @@
   branch = "master"
   name = "github.com/NYTimes/amara"
   packages = ["."]
-  revision = "98b6c9b2c318fe0317b949abca02ce582b977685"
+  revision = "387ea10e924d8d2e865226c8e51d4534a50866cc"
 
 [[projects]]
   name = "github.com/NYTimes/gizmo"
@@ -193,6 +193,12 @@
   name = "github.com/prometheus/procfs"
   packages = [".","xfs"]
   revision = "822d4a1f8edcbcbc71e8d1fd6527b12331a6d0ad"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/sethgrid/pester"
+  packages = ["."]
+  revision = "0af5bab1e1ea2860c5aef8e77427bab011d774d8"
 
 [[projects]]
   name = "github.com/stretchr/testify"
