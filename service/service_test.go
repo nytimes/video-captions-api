@@ -26,7 +26,7 @@ func (p fakeProvider) DispatchJob(job *database.Job) error {
 }
 
 func (p fakeProvider) Download(_ string, _ string) ([]byte, error) {
-	return []byte("captions"), nil
+	return []byte("WEBVTT\n\nNOTE Paragraph\n\n00:00:09.240 --> 00:00:11.010\nWe're all talking\nabout the Iowa caucuses"), nil
 }
 
 func (p fakeProvider) GetProviderJob(id string) (*database.ProviderJob, error) {
@@ -133,4 +133,5 @@ func TestNewCaptionsService(t *testing.T) {
 	assert.Contains(service.Endpoints(), "/captions")
 	assert.Contains(service.Endpoints(), "/jobs/{id}/cancel")
 	assert.Contains(service.Endpoints(), "/jobs/{id}/download/{captionFormat}")
+	assert.Contains(service.Endpoints(), "/jobs/{id}/transcript/{captionFormat}")
 }

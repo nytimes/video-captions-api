@@ -65,5 +65,8 @@ func (s *CaptionsService) Endpoints() map[string]map[string]http.HandlerFunc {
 		"/jobs/{id}/download/{captionFormat}": {
 			"GET": s.DownloadCaption,
 		},
+		"/jobs/{id}/transcript/{captionFormat}": {
+			"GET": s.GetTranscript,
+		},
 	}
 }

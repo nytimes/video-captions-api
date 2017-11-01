@@ -198,7 +198,7 @@ func TestDownload(t *testing.T) {
 	server.ServeHTTP(w, r)
 	assert.Equal(200, w.Code)
 	body, _ := ioutil.ReadAll(w.Body)
-	assert.Equal("captions", string(body))
+	assert.Equal("WEBVTT\n\nNOTE Paragraph\n\n00:00:09.240 --> 00:00:11.010\nWe're all talking\nabout the Iowa caucuses", string(body))
 }
 
 func TestDownloadMissingCaption(t *testing.T) {
@@ -239,4 +239,62 @@ func TestDownloadBadRequest(t *testing.T) {
 	assert.Equal(404, w.Code)
 	body, _ := ioutil.ReadAll(w.Body)
 	assert.Equal("404 page not found\n", string(body))
+}
+
+func TestTranscript(t *testing.T) {
+	service, client := createCaptionsService()
+	server := server.NewSimpleServer(&server.Config{})
+	assert := assert.New(t)
+	service.AddProvider(fakeProvider{logger: client.Logger})
+	job := &database.Job{
+		ID:       "123",
+		MediaURL: "http://vp.nyt.com/video.mp4",
+		Provider: "test-provider",
+	}
+	client.DB.StoreJob(job)
+	server.Register(service)
+	r, _ := http.NewRequest("GET", "/jobs/123/transcript/vtt", bytes.NewReader(nil))
+	w := httptest.NewRecorder()
+	server.ServeHTTP(w, r)
+	assert.Equal(200, w.Code)
+	body, _ := ioutil.ReadAll(w.Body)
+	assert.Equal("We're all talking about the Iowa caucuses", string(body))
+}
+
+func TestTranscriptMissingCaption(t *testing.T) {
+	service, client := createCaptionsService()
+	server := server.NewSimpleServer(&server.Config{})
+	assert := assert.New(t)
+	service.AddProvider(fakeProvider{logger: client.Logger})
+	job := &database.Job{
+		ID:       "123",
+		MediaURL: "http://vp.nyt.com/video.mp4",
+		Provider: "test-provider",
+	}
+	client.DB.StoreJob(job)
+	server.Register(service)
+	r, _ := http.NewRequest("GET", "/jobs/456/transcript/vtt", bytes.NewReader(nil))
+	w := httptest.NewRecorder()
+	server.ServeHTTP(w, r)
+	assert.Equal(404, w.Code)
+	body, _ := ioutil.ReadAll(w.Body)
+	assert.Equal("", string(body))
+}
+
+func TestTranscriptBadRequest(t *testing.T) {
+	service, client := createCaptionsService()
+	server := server.NewSimpleServer(&server.Config{})
+	assert := assert.New(t)
+	service.AddProvider(fakeProvider{logger: client.Logger})
+	job := &database.Job{
+		ID:       "123",
+		MediaURL: "http://vp.nyt.com/video.mp4",
+		Provider: "test-provider",
+	}
+	client.DB.StoreJob(job)
+	server.Register(service)
+	r, _ := http.NewRequest("GET", "/jobs/123/transcript/wrong", bytes.NewReader(nil))
+	w := httptest.NewRecorder()
+	server.ServeHTTP(w, r)
+	assert.Equal(400, w.Code)
 }
