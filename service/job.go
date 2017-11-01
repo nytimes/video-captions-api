@@ -159,7 +159,7 @@ func (s *CaptionsService) DownloadCaption(w http.ResponseWriter, r *http.Request
 	w.Write(captionFile)
 }
 
-// DownloadCaption downloads a caption in the specified format
+// GetTranscript returns a transcript of a given caption job
 func (s *CaptionsService) GetTranscript(w http.ResponseWriter, r *http.Request) {
 	id := web.Vars(r)["id"]
 	captionFormat := web.Vars(r)["captionFormat"]

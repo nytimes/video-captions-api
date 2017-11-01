@@ -233,7 +233,6 @@ func (c Client) GenerateTranscript(captionFile []byte, captionFormat string) (st
 			}
 		}
 		return strings.Join(transcript, " "), nil
-	} else {
-		return "", fmt.Errorf("Unable to generate a transcript for caption format: %v", captionFormat)
 	}
+	return "", fmt.Errorf("Unable to generate a transcript for caption format: %v", captionFormat)
 }
