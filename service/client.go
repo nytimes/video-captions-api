@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/NYTimes/video-captions-api/database"
 	"github.com/NYTimes/video-captions-api/providers"
@@ -157,4 +158,81 @@ func (c Client) DownloadCaption(jobID string, captionType string) ([]byte, error
 		return nil, err
 	}
 	return captions, nil
+}
+
+// GenerateTranscript generates a transcript from the provided caption file and format
+func (c Client) GenerateTranscript(captionFile []byte, captionFormat string) (string, error) {
+	type SubtitleParsePreset struct {
+		delimiter     string
+		linesToIgnore int
+		remove        string
+		startingIndex int
+		splitN        int
+	}
+
+	vttPreset := SubtitleParsePreset{
+		delimiter:     "\n\n",
+		linesToIgnore: 1,
+		remove:        "",
+		startingIndex: 0,
+		splitN:        0,
+	}
+
+	srtPreset := SubtitleParsePreset{
+		delimiter:     "\r\n\r\n",
+		linesToIgnore: 2,
+		remove:        "",
+		startingIndex: 0,
+		splitN:        0,
+	}
+
+	sbvPreset := SubtitleParsePreset{
+		delimiter:     "\r\n\r\n",
+		linesToIgnore: 1,
+		remove:        "[br]",
+		startingIndex: 0,
+		splitN:        0,
+	}
+
+	ssaPreset := SubtitleParsePreset{
+		delimiter:     "\n",
+		linesToIgnore: 0,
+		remove:        "",
+		startingIndex: 4,
+		splitN:        10,
+	}
+
+	var parsingPresets = make(map[string]SubtitleParsePreset)
+	parsingPresets["vtt"] = vttPreset
+	parsingPresets["srt"] = srtPreset
+	parsingPresets["sbv"] = sbvPreset
+	parsingPresets["ssa"] = ssaPreset
+
+	if _, ok := parsingPresets[captionFormat]; ok {
+		subtitleFile := string(captionFile)
+		subtitleBlobs := strings.Split(subtitleFile, parsingPresets[captionFormat].delimiter)
+		transcript := []string{}
+
+		for i := parsingPresets[captionFormat].startingIndex; i < len(subtitleBlobs); i++ {
+			currentBlob := subtitleBlobs[i]
+			if parsingPresets[captionFormat].splitN != 0 {
+				blobLines := strings.SplitN(currentBlob, ",", 10)
+				transcript = append(transcript, strings.TrimSpace(blobLines[len(blobLines)-1]))
+			} else {
+				blobLines := strings.Split(currentBlob, "\n")
+				for j := parsingPresets[captionFormat].linesToIgnore; j < len(blobLines); j++ {
+					if len(blobLines[j]) > 0 {
+						if parsingPresets[captionFormat].remove != "" {
+							cleanString := strings.Replace(blobLines[j], parsingPresets[captionFormat].remove, " ", -1)
+							transcript = append(transcript, strings.TrimSpace(cleanString))
+						} else {
+							transcript = append(transcript, strings.TrimSpace(blobLines[j]))
+						}
+					}
+				}
+			}
+		}
+		return strings.Join(transcript, " "), nil
+	}
+	return "", fmt.Errorf("Unable to generate a transcript for caption format: %v", captionFormat)
 }

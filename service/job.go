@@ -158,3 +158,24 @@ func (s *CaptionsService) DownloadCaption(w http.ResponseWriter, r *http.Request
 	w.WriteHeader(http.StatusOK)
 	w.Write(captionFile)
 }
+
+// GetTranscript returns a transcript of a given caption job
+func (s *CaptionsService) GetTranscript(w http.ResponseWriter, r *http.Request) {
+	id := web.Vars(r)["id"]
+	captionFormat := web.Vars(r)["captionFormat"]
+
+	defer r.Body.Close()
+
+	captionFile, err := s.client.DownloadCaption(id, captionFormat)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+	}
+	transcript, err := s.client.GenerateTranscript(captionFile, captionFormat)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+	}
+
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(transcript))
+}

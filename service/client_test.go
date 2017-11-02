@@ -160,7 +160,7 @@ func TestCancelClientJobDone(t *testing.T) {
 		ID:       "123",
 		MediaURL: "http://vp.nyt.com/video.mp4",
 		Provider: "test-provider",
-		Done: true,
+		Done:     true,
 	}
 	client.DB.StoreJob(job)
 	resultJob, _ := client.GetJob(job.ID)
@@ -177,7 +177,7 @@ func TestCancelClientJob404(t *testing.T) {
 
 	canceled, err := client.CancelJob("404")
 	assert.NotNil(err)
-	assert.EqualValues(err.Error(), "Job doesn't exist")
+	assert.EqualValues("Job doesn't exist", err.Error())
 	assert.False(canceled)
 }
 
@@ -193,7 +193,7 @@ func TestDownloadCaption(t *testing.T) {
 	client.DB.StoreJob(job)
 	caption, err := client.DownloadCaption("123", "vtt")
 	assert.Nil(err)
-	assert.Equal(string(caption[:]), "captions")
+	assert.Equal("WEBVTT\n\nNOTE Paragraph\n\n00:00:09.240 --> 00:00:11.010\nWe're all talking\nabout the Iowa caucuses", string(caption[:]))
 }
 
 func TestDownloadNonexistentCaption(t *testing.T) {
@@ -208,7 +208,7 @@ func TestDownloadNonexistentCaption(t *testing.T) {
 	client.DB.StoreJob(job)
 	_, err := client.DownloadCaption("404", "vtt")
 	assert.NotNil(err)
-	assert.EqualValues(err.Error(), "Job doesn't exist")
+	assert.EqualValues("Job doesn't exist", err.Error())
 }
 
 func TestDownloadCaptionProviderError(t *testing.T) {
@@ -223,5 +223,85 @@ func TestDownloadCaptionProviderError(t *testing.T) {
 	client.DB.StoreJob(job)
 	_, err := client.DownloadCaption("123", "vtt")
 	assert.NotNil(err)
-	assert.EqualValues(err.Error(), "download error")
+	assert.EqualValues("download error", err.Error())
+}
+
+func TestGenerateTranscriptSsa(t *testing.T) {
+	service, client := createCaptionsService()
+	assert := assert.New(t)
+	service.AddProvider(fakeProvider{logger: log.New()})
+	job := &database.Job{
+		ID:       "123",
+		MediaURL: "http://vp.nyt.com/video.mp4",
+		Provider: "test-provider",
+	}
+	client.DB.StoreJob(job)
+	caption, err := client.DownloadCaption("123", "ssa")
+	transcript, err := client.GenerateTranscript(caption, "ssa")
+	assert.Nil(err)
+	assert.Equal("Some more of the speech", string(transcript))
+}
+
+func TestGenerateTranscriptVtt(t *testing.T) {
+	service, client := createCaptionsService()
+	assert := assert.New(t)
+	service.AddProvider(fakeProvider{logger: log.New()})
+	job := &database.Job{
+		ID:       "123",
+		MediaURL: "http://vp.nyt.com/video.mp4",
+		Provider: "test-provider",
+	}
+	client.DB.StoreJob(job)
+	caption, err := client.DownloadCaption("123", "vtt")
+	transcript, err := client.GenerateTranscript(caption, "vtt")
+	assert.Nil(err)
+	assert.Equal("We're all talking about the Iowa caucuses", string(transcript))
+}
+
+func TestGenerateTranscriptSrt(t *testing.T) {
+	service, client := createCaptionsService()
+	assert := assert.New(t)
+	service.AddProvider(fakeProvider{logger: log.New()})
+	job := &database.Job{
+		ID:       "123",
+		MediaURL: "http://vp.nyt.com/video.mp4",
+		Provider: "test-provider",
+	}
+	client.DB.StoreJob(job)
+	caption, err := client.DownloadCaption("123", "srt")
+	transcript, err := client.GenerateTranscript(caption, "srt")
+	assert.Nil(err)
+	assert.Equal("We’re all talking about the Iowa caucuses right now, less than two weeks till the Iowa caucuses.", string(transcript))
+}
+
+func TestGenerateTranscriptSbv(t *testing.T) {
+	service, client := createCaptionsService()
+	assert := assert.New(t)
+	service.AddProvider(fakeProvider{logger: log.New()})
+	job := &database.Job{
+		ID:       "123",
+		MediaURL: "http://vp.nyt.com/video.mp4",
+		Provider: "test-provider",
+	}
+	client.DB.StoreJob(job)
+	caption, err := client.DownloadCaption("123", "sbv")
+	transcript, err := client.GenerateTranscript(caption, "sbv")
+	assert.Nil(err)
+	assert.Equal("We're all talking about the Iowa caucuses right now, less than two weeks till the Iowa caucuses.", string(transcript))
+}
+
+func TestGenerateTranscriptWrongFormat(t *testing.T) {
+	service, client := createCaptionsService()
+	assert := assert.New(t)
+	service.AddProvider(fakeProvider{logger: log.New()})
+	job := &database.Job{
+		ID:       "123",
+		MediaURL: "http://vp.nyt.com/video.mp4",
+		Provider: "test-provider",
+	}
+	client.DB.StoreJob(job)
+	caption, err := client.DownloadCaption("123", "vtt")
+	_, err = client.GenerateTranscript(caption, "wrong")
+	assert.NotNil(err)
+	assert.EqualValues("Unable to generate a transcript for caption format: wrong", err.Error())
 }
