@@ -4,11 +4,11 @@ import (
 	"errors"
 	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/NYTimes/video-captions-api/database"
 	"github.com/NYTimes/video-captions-api/providers"
 	log "github.com/Sirupsen/logrus"
-	"strings"
 )
 
 // Client CaptionsService client
@@ -210,7 +210,7 @@ func (c Client) GenerateTranscript(captionFile []byte, captionFormat string) (st
 
 	if _, ok := parsingPresets[captionFormat]; ok {
 		subtitleFile := string(captionFile)
-		subtitleBlobs := strings.Split(string(subtitleFile), parsingPresets[captionFormat].delimiter)
+		subtitleBlobs := strings.Split(subtitleFile, parsingPresets[captionFormat].delimiter)
 		transcript := []string{}
 
 		for i := parsingPresets[captionFormat].startingIndex; i < len(subtitleBlobs); i++ {
@@ -223,7 +223,7 @@ func (c Client) GenerateTranscript(captionFile []byte, captionFormat string) (st
 				for j := parsingPresets[captionFormat].linesToIgnore; j < len(blobLines); j++ {
 					if len(blobLines[j]) > 0 {
 						if parsingPresets[captionFormat].remove != "" {
-							cleanString := strings.Replace(blobLines[j], "[br]", " ", -1)
+							cleanString := strings.Replace(blobLines[j], parsingPresets[captionFormat].remove, " ", -1)
 							transcript = append(transcript, strings.TrimSpace(cleanString))
 						} else {
 							transcript = append(transcript, strings.TrimSpace(blobLines[j]))
