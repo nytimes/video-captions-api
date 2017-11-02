@@ -226,7 +226,23 @@ func TestDownloadCaptionProviderError(t *testing.T) {
 	assert.EqualValues("download error", err.Error())
 }
 
-func TestGenerateTranscript(t *testing.T) {
+func TestGenerateTranscriptSsa(t *testing.T) {
+	service, client := createCaptionsService()
+	assert := assert.New(t)
+	service.AddProvider(fakeProvider{logger: log.New()})
+	job := &database.Job{
+		ID:       "123",
+		MediaURL: "http://vp.nyt.com/video.mp4",
+		Provider: "test-provider",
+	}
+	client.DB.StoreJob(job)
+	caption, err := client.DownloadCaption("123", "ssa")
+	transcript, err := client.GenerateTranscript(caption, "ssa")
+	assert.Nil(err)
+	assert.Equal("Some more of the speech", string(transcript))
+}
+
+func TestGenerateTranscriptVtt(t *testing.T) {
 	service, client := createCaptionsService()
 	assert := assert.New(t)
 	service.AddProvider(fakeProvider{logger: log.New()})
@@ -240,6 +256,38 @@ func TestGenerateTranscript(t *testing.T) {
 	transcript, err := client.GenerateTranscript(caption, "vtt")
 	assert.Nil(err)
 	assert.Equal("We're all talking about the Iowa caucuses", string(transcript))
+}
+
+func TestGenerateTranscriptSrt(t *testing.T) {
+	service, client := createCaptionsService()
+	assert := assert.New(t)
+	service.AddProvider(fakeProvider{logger: log.New()})
+	job := &database.Job{
+		ID:       "123",
+		MediaURL: "http://vp.nyt.com/video.mp4",
+		Provider: "test-provider",
+	}
+	client.DB.StoreJob(job)
+	caption, err := client.DownloadCaption("123", "srt")
+	transcript, err := client.GenerateTranscript(caption, "srt")
+	assert.Nil(err)
+	assert.Equal("We’re all talking about the Iowa caucuses right now, less than two weeks till the Iowa caucuses.", string(transcript))
+}
+
+func TestGenerateTranscriptSbv(t *testing.T) {
+	service, client := createCaptionsService()
+	assert := assert.New(t)
+	service.AddProvider(fakeProvider{logger: log.New()})
+	job := &database.Job{
+		ID:       "123",
+		MediaURL: "http://vp.nyt.com/video.mp4",
+		Provider: "test-provider",
+	}
+	client.DB.StoreJob(job)
+	caption, err := client.DownloadCaption("123", "sbv")
+	transcript, err := client.GenerateTranscript(caption, "sbv")
+	assert.Nil(err)
+	assert.Equal("We're all talking about the Iowa caucuses right now, less than two weeks till the Iowa caucuses.", string(transcript))
 }
 
 func TestGenerateTranscriptWrongFormat(t *testing.T) {

@@ -193,7 +193,7 @@ func TestDownload(t *testing.T) {
 	}
 	client.DB.StoreJob(job)
 	server.Register(service)
-	r, _ := http.NewRequest("GET", "/jobs/123/download/srt", bytes.NewReader(nil))
+	r, _ := http.NewRequest("GET", "/jobs/123/download/vtt", bytes.NewReader(nil))
 	w := httptest.NewRecorder()
 	server.ServeHTTP(w, r)
 	assert.Equal(200, w.Code)

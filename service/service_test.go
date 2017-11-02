@@ -25,8 +25,19 @@ func (p fakeProvider) DispatchJob(job *database.Job) error {
 	return nil
 }
 
-func (p fakeProvider) Download(_ string, _ string) ([]byte, error) {
-	return []byte("WEBVTT\n\nNOTE Paragraph\n\n00:00:09.240 --> 00:00:11.010\nWe're all talking\nabout the Iowa caucuses"), nil
+func (p fakeProvider) Download(_ string, captionType string) ([]byte, error) {
+	switch captionType {
+	case "vtt":
+		return []byte("WEBVTT\n\nNOTE Paragraph\n\n00:00:09.240 --> 00:00:11.010\nWe're all talking\nabout the Iowa caucuses"), nil
+	case "srt":
+		return []byte("1\r\n00:00:09,240 --> 00:00:11,010\r\nWe’re all talking\r\nabout the Iowa caucuses\r\n\r\n2\n00:00:11,010 --> 00:00:14,180\r\nright now, less than two\r\nweeks till the Iowa caucuses."), nil
+	case "sbv":
+		return []byte("0:00:09.240,0:00:11.010\nWe're all talking[br]about the Iowa caucuses\r\n\r\n0:00:11.010,0:00:14.190\nright now, less than two[br]weeks till the Iowa caucuses."), nil
+	case "ssa":
+		return []byte("[Script Info]\nTitle:\n[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\nDialogue: 0,0:00:00.00,0:00:01.55,Default,,0000,0000,0000,,Some more of the speech"), nil
+	default:
+		return []byte(""), nil
+	}
 }
 
 func (p fakeProvider) GetProviderJob(id string) (*database.ProviderJob, error) {
