@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"path/filepath"
 	"strings"
 	"time"
@@ -31,6 +32,9 @@ type jobParams struct {
 func newJobFromParams(newJob jobParams) (*database.Job, error) {
 	outputs := make([]database.JobOutput, 0)
 	mediaFile := filepath.Base(newJob.MediaURL)
+	if u, err := url.Parse(mediaFile); err == nil {
+		mediaFile = u.Path
+	}
 	name := strings.TrimSuffix(mediaFile, filepath.Ext(mediaFile))
 	id, err := uuid.NewV4()
 	if err != nil {

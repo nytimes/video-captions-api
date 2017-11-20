@@ -23,7 +23,7 @@ func TestCreateJob(t *testing.T) {
 	service.AddProvider(fakeProvider{logger: client.Logger})
 	job := &database.Job{
 		ID:       "123",
-		MediaURL: "http://vp.nyt.com/video.mp4",
+		MediaURL: "http://vp.nyt.com/2019/video.mp4",
 		Provider: "test-provider",
 	}
 	jobBytes, _ := json.Marshal(job)
@@ -32,6 +32,31 @@ func TestCreateJob(t *testing.T) {
 	job = resultJob.(*database.Job)
 	assert.Nil(err)
 	assert.Equal(201, status)
+	expectedFileName := fmt.Sprintf("video_%s.vtt", job.ID)
+	assert.Equal(job.Outputs, []database.JobOutput{
+		{Filename: expectedFileName, Type: "vtt"},
+	})
+}
+
+func TestCreateJobQueryString(t *testing.T) {
+	assert := assert.New(t)
+	service, client := createCaptionsService()
+	service.AddProvider(fakeProvider{logger: client.Logger})
+	job := &database.Job{
+		ID:       "123",
+		MediaURL: "http://vp.nyt.com/2019/video.mp4?v=19847248429429&a=abc123&GoogleAccessId=user%40exame.iam.gserviceaccount.com",
+		Provider: "test-provider",
+	}
+	jobBytes, _ := json.Marshal(job)
+	r, _ := http.NewRequest("POST", "/captions", bytes.NewReader(jobBytes))
+	status, resultJob, err := service.CreateJob(r)
+	job = resultJob.(*database.Job)
+	assert.Nil(err)
+	assert.Equal(201, status)
+	expectedFileName := fmt.Sprintf("video_%s.vtt", job.ID)
+	assert.Equal(job.Outputs, []database.JobOutput{
+		{Filename: expectedFileName, Type: "vtt"},
+	})
 }
 
 func TestCreateJobNoMediaURL(t *testing.T) {
