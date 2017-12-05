@@ -23,6 +23,7 @@ func main() {
 
 	captionsService.AddProvider(providers.New3PlayProvider(&threeplayConfig, &cfg))
 	captionsService.AddProvider(providers.NewAmaraProvider(&amaraConfig, &cfg))
+	captionsService.AddProvider(providers.NewGCPProvider(&cfg, db))
 	server.Init("video-captions-api", cfg.Server)
 
 	err = server.Register(captionsService)

@@ -27,6 +27,13 @@ type Job struct {
 	Done           bool           `json:"done"`
 	Language       string         `json:"language"`
 	Details        string         `json:"details,omitempty"`
+	CaptionFile    UploadedFile   `json:"caption_file,omitempty"`
+}
+
+// UploadedFile contains the uploaded file and its name
+type UploadedFile struct {
+	File []byte `json:"file"`
+	Name string `json:"name"`
 }
 
 // JobOutput output associated with a Job
