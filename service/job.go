@@ -27,15 +27,26 @@ type jobParams struct {
 	ProviderParams database.ProviderParams `json:"provider_params"`
 	OutputTypes    []string                `json:"output_types"`
 	Language       string                  `json:"language"`
+	CaptionFile    uploadedFile            `json:"caption_file,omitempty"`
+}
+
+type uploadedFile struct {
+	File []byte `json:"file"`
+	Name string `json:"name"`
 }
 
 func newJobFromParams(newJob jobParams) (*database.Job, error) {
 	outputs := make([]database.JobOutput, 0)
-	mediaFile := filepath.Base(newJob.MediaURL)
-	if u, err := url.Parse(mediaFile); err == nil {
-		mediaFile = u.Path
+	var name string
+	if newJob.MediaURL == "" {
+		name = strings.TrimSuffix(newJob.CaptionFile.Name, filepath.Ext(newJob.CaptionFile.Name))
+	} else {
+		mediaFile := filepath.Base(newJob.MediaURL)
+		if u, err := url.Parse(mediaFile); err == nil {
+			mediaFile = u.Path
+		}
+		name = strings.TrimSuffix(mediaFile, filepath.Ext(mediaFile))
 	}
-	name := strings.TrimSuffix(mediaFile, filepath.Ext(mediaFile))
 	id, err := uuid.NewV4()
 	if err != nil {
 		return nil, fmt.Errorf("could not create job id: %v", err)
@@ -46,7 +57,7 @@ func newJobFromParams(newJob jobParams) (*database.Job, error) {
 		outputs = append(outputs, database.JobOutput{Type: outputType, Filename: fileName})
 	}
 
-	return &database.Job{
+	databaseJob := &database.Job{
 		ID:       id.String(),
 		ParentID: newJob.ParentID,
 		//TODO: put all possible status under a type/consts so we dont use strings everywhere
@@ -58,7 +69,15 @@ func newJobFromParams(newJob jobParams) (*database.Job, error) {
 		Outputs:        outputs,
 		Done:           false,
 		Language:       newJob.Language,
-	}, nil
+	}
+
+	if newJob.CaptionFile.File != nil {
+		newFile := database.UploadedFile{}
+		newFile.File = newJob.CaptionFile.File
+		newFile.Name = newJob.CaptionFile.Name
+		databaseJob.CaptionFile = newFile
+	}
+	return databaseJob, nil
 }
 
 // Error implements the error interface
@@ -126,9 +145,9 @@ func (s *CaptionsService) CreateJob(r *http.Request) (int, interface{}, error) {
 		return http.StatusBadRequest, nil, captionsError{"Malformed parameters"}
 	}
 
-	if params.MediaURL == "" {
-		requestLogger.WithError(err).Error("Tried to create a job without a media url")
-		return http.StatusBadRequest, nil, captionsError{"Please provide a media_url"}
+	if params.MediaURL == "" && params.CaptionFile.File == nil {
+		requestLogger.WithError(err).Error("Tried to create a job without a media url or caption file")
+		return http.StatusBadRequest, nil, captionsError{"Please provide a media_url or caption_file"}
 	}
 
 	job, err := newJobFromParams(params)

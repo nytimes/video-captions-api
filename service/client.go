@@ -162,6 +162,10 @@ func (c Client) DownloadCaption(jobID string, captionType string) ([]byte, error
 
 // GenerateTranscript generates a transcript from the provided caption file and format
 func (c Client) GenerateTranscript(captionFile []byte, captionFormat string) (string, error) {
+	fields := log.Fields{"captionFormat": captionFormat}
+	jobLogger := c.Logger.WithFields(fields)
+	jobLogger.Info("Generating transcript for captions")
+
 	type SubtitleParsePreset struct {
 		delimiter     string
 		linesToIgnore int
@@ -234,5 +238,6 @@ func (c Client) GenerateTranscript(captionFile []byte, captionFormat string) (st
 		}
 		return strings.Join(transcript, " "), nil
 	}
+	jobLogger.Error("error generating transcript")
 	return "", fmt.Errorf("Unable to generate a transcript for caption format: %v", captionFormat)
 }

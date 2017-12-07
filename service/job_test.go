@@ -59,6 +59,23 @@ func TestCreateJobQueryString(t *testing.T) {
 	})
 }
 
+func TestCreateUploadJob(t *testing.T) {
+	assert := assert.New(t)
+	service, client := createCaptionsService()
+	service.AddProvider(fakeProvider{logger: client.Logger})
+	job := &database.Job{
+		ID:          "123",
+		CaptionFile: database.UploadedFile{[]byte("captions"), "caption.net"},
+		Provider:    "test-provider",
+	}
+	jobBytes, _ := json.Marshal(job)
+	r, _ := http.NewRequest("POST", "/captions", bytes.NewReader(jobBytes))
+	status, resultJob, err := service.CreateJob(r)
+	job = resultJob.(*database.Job)
+	assert.Nil(err)
+	assert.Equal(201, status)
+}
+
 func TestCreateJobNoMediaURL(t *testing.T) {
 	assert := assert.New(t)
 	service, client := createCaptionsService()
@@ -71,7 +88,7 @@ func TestCreateJobNoMediaURL(t *testing.T) {
 	r, _ := http.NewRequest("POST", "/captions", bytes.NewReader(jobBytes))
 	status, resultJob, err := service.CreateJob(r)
 	assert.NotNil(err)
-	assert.Equal("Please provide a media_url", err.Error())
+	assert.Equal("Please provide a media_url or caption_file", err.Error())
 	assert.Nil(resultJob)
 	assert.Equal(400, status)
 }
