@@ -32,7 +32,7 @@ type Job struct {
 
 // UploadedFile contains the uploaded file and its name
 type UploadedFile struct {
-	File []byte `json:"file"`
+	File []byte `json:"file" datastore:",noindex"`
 	Name string `json:"name"`
 }
 
