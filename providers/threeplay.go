@@ -8,7 +8,7 @@ import (
 	"github.com/NYTimes/threeplay"
 	captionsConfig "github.com/NYTimes/video-captions-api/config"
 	"github.com/NYTimes/video-captions-api/database"
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 const providerName string = "3play"

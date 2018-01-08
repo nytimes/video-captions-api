@@ -12,8 +12,8 @@ import (
 
 	"github.com/NYTimes/gizmo/web"
 	"github.com/NYTimes/video-captions-api/database"
-	log "github.com/Sirupsen/logrus"
 	uuid "github.com/nu7hatch/gouuid"
+	log "github.com/sirupsen/logrus"
 )
 
 type captionsError struct {

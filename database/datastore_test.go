@@ -1,10 +1,9 @@
 package database
 
 import (
+	"context"
 	"reflect"
 	"testing"
-
-	"golang.org/x/net/context"
 
 	"cloud.google.com/go/datastore"
 	"github.com/stretchr/testify/assert"

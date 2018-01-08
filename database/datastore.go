@@ -1,9 +1,8 @@
 package database
 
 import (
+	"context"
 	"errors"
-
-	"golang.org/x/net/context"
 
 	"cloud.google.com/go/datastore"
 )

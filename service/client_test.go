@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/NYTimes/video-captions-api/database"
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
 

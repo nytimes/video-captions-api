@@ -9,7 +9,7 @@ import (
 	"github.com/NYTimes/gizmo/config"
 	captionsConfig "github.com/NYTimes/video-captions-api/config"
 	"github.com/NYTimes/video-captions-api/database"
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 // AmaraProvider amara client wrapper that implements the Provider interface

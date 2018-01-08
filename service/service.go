@@ -9,7 +9,7 @@ import (
 	"github.com/NYTimes/video-captions-api/config"
 	"github.com/NYTimes/video-captions-api/database"
 	"github.com/NYTimes/video-captions-api/providers"
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 // CaptionsService the service responsible to wrapping interactions with Providers

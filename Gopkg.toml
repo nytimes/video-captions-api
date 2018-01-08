@@ -30,5 +30,13 @@
   name = "github.com/NYTimes/threeplay"
 
 [[constraint]]
-  name = "github.com/Sirupsen/logrus"
-  version = "=1.0.2"
+  branch = "master"
+  name = "github.com/sirupsen/logrus"
+
+[[override]]
+  branch = "master"
+  name = "github.com/NYTimes/gizmo"
+
+[[override]]
+  branch = "master"
+  name = "github.com/julienschmidt/httprouter"

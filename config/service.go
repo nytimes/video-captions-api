@@ -2,7 +2,7 @@ package config
 
 import (
 	"github.com/NYTimes/gizmo/server"
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 // CaptionsServiceConfig is the configuration needed to create a CaptionsService

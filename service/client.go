@@ -8,7 +8,7 @@ import (
 
 	"github.com/NYTimes/video-captions-api/database"
 	"github.com/NYTimes/video-captions-api/providers"
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 // Client CaptionsService client
