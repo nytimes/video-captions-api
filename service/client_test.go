@@ -177,7 +177,7 @@ func TestCancelClientJob404(t *testing.T) {
 
 	canceled, err := client.CancelJob("404")
 	assert.NotNil(err)
-	assert.EqualValues("Job doesn't exist", err.Error())
+	assert.EqualValues("job not found", err.Error())
 	assert.False(canceled)
 }
 
@@ -208,7 +208,7 @@ func TestDownloadNonexistentCaption(t *testing.T) {
 	client.DB.StoreJob(job)
 	_, err := client.DownloadCaption("404", "vtt")
 	assert.NotNil(err)
-	assert.EqualValues("Job doesn't exist", err.Error())
+	assert.EqualValues("job not found", err.Error())
 }
 
 func TestDownloadCaptionProviderError(t *testing.T) {

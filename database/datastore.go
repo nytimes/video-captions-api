@@ -65,7 +65,7 @@ func (d *DatastoreDatabase) GetJob(id string) (*Job, error) {
 	key := newNameKeyWithNamespace(d.kind, id, d.namespace)
 	err := d.client.Get(ctx, key, result)
 	if err == datastore.ErrNoSuchEntity {
-		return nil, errors.New("Job not found")
+		return nil, ErrJobNotFound
 	}
 	if err != nil {
 		return nil, errors.New("Unkown error from Datastore")
@@ -83,7 +83,7 @@ func (d *DatastoreDatabase) GetJobs(parentID string) ([]Job, error) {
 		return nil, errors.New("Unkown error from Datastore")
 	}
 	if len(jobs) == 0 {
-		return nil, errors.New("No Jobs found for this ParentID")
+		return nil, ErrNoJobs
 	}
 	return jobs, nil
 }
