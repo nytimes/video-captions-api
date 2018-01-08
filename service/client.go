@@ -23,7 +23,7 @@ type Client struct {
 func (c Client) GetJobs(parentID string) ([]*database.JobSummary, error) {
 	jobs, err := c.DB.GetJobs(parentID)
 	if err != nil {
-		c.Logger.Errorf("Error loading jobs from DB for parent ID: %s", parentID)
+		c.Logger.Errorf("Error loading jobs from DB for parent ID %s: %v", parentID, err)
 		return nil, err
 	}
 	sort.Sort(database.ByCreatedAt(jobs))
