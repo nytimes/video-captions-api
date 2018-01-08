@@ -34,7 +34,7 @@ func (db *MemoryDatabase) StoreJob(job *Job) (string, error) {
 // UpdateJob updates Job in-memory
 func (db *MemoryDatabase) UpdateJob(id string, job *Job) error {
 	if _, err := db.GetJob(id); err != nil {
-		return errors.New("Job doesn't exist")
+		return ErrJobNotFound
 	}
 
 	db.mtx.Lock()
@@ -52,7 +52,7 @@ func (db *MemoryDatabase) GetJob(id string) (*Job, error) {
 	if job, ok := db.jobs[id]; ok {
 		return job, nil
 	}
-	return nil, errors.New("Job doesn't exist")
+	return nil, ErrJobNotFound
 }
 
 // DeleteJob deletes a Job given its ID

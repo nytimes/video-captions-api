@@ -65,7 +65,7 @@ func TestCreateUploadJob(t *testing.T) {
 	service.AddProvider(fakeProvider{logger: client.Logger})
 	job := &database.Job{
 		ID:          "123",
-		CaptionFile: database.UploadedFile{[]byte("captions"), "caption.net"},
+		CaptionFile: database.UploadedFile{File: []byte("captions"), Name: "caption.net"},
 		Provider:    "test-provider",
 	}
 	jobBytes, _ := json.Marshal(job)
@@ -136,7 +136,7 @@ func TestGetJob404(t *testing.T) {
 		t.Errorf("%s: unable to JSON decode response body: %s", w.Body, err)
 	}
 	assert.Equal(w.Code, 404)
-	assert.Equal("Job doesn't exist", jobBody["error"])
+	assert.Equal("job not found", jobBody["error"])
 }
 
 func TestCancelJob(t *testing.T) {
@@ -195,7 +195,7 @@ func TestCancelJob404(t *testing.T) {
 	}
 
 	assert.Equal(w.Code, 404)
-	assert.Equal("Job doesn't exist", cancelBody["error"])
+	assert.Equal("job not found", cancelBody["error"])
 }
 
 func TestCancelJobDone(t *testing.T) {

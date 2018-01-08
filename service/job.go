@@ -90,7 +90,10 @@ func (s *CaptionsService) GetJobs(r *http.Request) (int, interface{}, error) {
 	parentID := web.Vars(r)["id"]
 	jobs, err := s.client.GetJobs(parentID)
 	if err != nil {
-		return http.StatusNotFound, nil, captionsError{err.Error()}
+		if err == database.ErrNoJobs {
+			return http.StatusNotFound, nil, captionsError{err.Error()}
+		}
+		return http.StatusInternalServerError, err, captionsError{err.Error()}
 	}
 	return http.StatusOK, jobs, nil
 }
@@ -101,7 +104,10 @@ func (s *CaptionsService) GetJob(r *http.Request) (int, interface{}, error) {
 	// TODO: on the 3play client, we should look at the errors field and check for not_found errors at least
 	job, err := s.client.GetJob(id)
 	if err != nil {
-		return http.StatusNotFound, nil, captionsError{err.Error()}
+		if err == database.ErrJobNotFound {
+			return http.StatusNotFound, nil, captionsError{err.Error()}
+		}
+		return http.StatusInternalServerError, nil, captionsError{err.Error()}
 	}
 	return http.StatusOK, job, nil
 }
@@ -111,7 +117,10 @@ func (s *CaptionsService) CancelJob(r *http.Request) (int, interface{}, error) {
 	id := web.Vars(r)["id"]
 	canceled, err := s.client.CancelJob(id)
 	if err != nil {
-		return http.StatusNotFound, nil, captionsError{err.Error()}
+		if err == database.ErrJobNotFound {
+			return http.StatusNotFound, nil, captionsError{err.Error()}
+		}
+		return http.StatusInternalServerError, nil, captionsError{err.Error()}
 	}
 	if !canceled {
 		return http.StatusConflict, nil, captionsError{"Cannot cancel a job that is already done"}

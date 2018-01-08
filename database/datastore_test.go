@@ -83,7 +83,7 @@ func TestGetJob(t *testing.T) {
 	assert.Nil(err)
 
 	_, err = db.GetJob("456")
-	assert.EqualError(err, "Job not found")
+	assert.Equal(err, ErrJobNotFound)
 }
 
 func TestUpdateJob(t *testing.T) {
@@ -107,7 +107,7 @@ func TestUpdateJob(t *testing.T) {
 	assert.Equal(newJob, afterChange)
 
 	err = db.UpdateJob("234", newJob)
-	assert.EqualError(err, "Job not found")
+	assert.Equal(err, ErrJobNotFound)
 }
 
 func TestDeleteJob(t *testing.T) {
