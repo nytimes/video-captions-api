@@ -10,5 +10,14 @@ dev:
 		BUCKET_NAME=video-captions-api-dev \
 		go run main.go
 
+coverage:
+	@ echo "" > coverage.txt; \
+		for p in $$(go list ./...); do \
+			go test -coverprofile=profile.out -covermode=atomic $$p || export status=2; \
+			if [ -f profile.out ]; then cat profile.out >> coverage.txt; rm profile.out; fi; \
+		done; \
+		exit ${status:-0}
+
+
 test:
-	go test -v $$(go list ./... |grep -v vendor)
+	go test -v ./...
