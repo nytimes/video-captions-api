@@ -8,12 +8,11 @@ Agnostic API to generate captions for media assets across different cloud servic
 
 ## Development
 
-Use `dep` to install dependencies:  
-`go get -u github.com/golang/dep/cmd/dep`  
-`dep ensure`
+GCP credentials are required to access Google Datastore.
 
-GCP credentials are required to access Google Datastore.  
-`gcloud auth application-default login`
+```
+$ gcloud auth application-default login
+```
 
 Environment variables required:
 
@@ -24,16 +23,22 @@ THREE_PLAY_API_SECRET
 
 Run:
 
-`$ make dev`
+```
+$ make dev
+```
 
 Test:
 
-`$ make test`
+```
+$ make test
+```
 
 Go to http://localhost:8000
+
+## Docker image
+
+A pre-built image is available on Docker Hub: https://hub.docker.com/r/nytimes/video-captions-api
 
 ## Documentation
 
 For more info check the [docs](https://github.com/NYTimes/video-captions-api/wiki/Home)
-
-
