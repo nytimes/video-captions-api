@@ -1,5 +1,12 @@
 language: go
-sudo: false
+sudo: required
+addons:
+  apt:
+    packages:
+    - docker-ce
+env:
+  global:
+  - GO_FOR_RELEASE=1.9
 go:
 - 1.9.x
 - tip
@@ -9,6 +16,7 @@ script:
 - golint -set_exit_status $(go list ./...)
 - make coverage
 after_success:
-  - 'if [ "${JOB}" = "test" ]; then bash <(curl -s https://codecov.io/bash); fi'
+- bash <(curl -s https://codecov.io/bash)
+- travis-scripts/docker.bash
 notifications:
   email: false
