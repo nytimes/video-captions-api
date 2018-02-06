@@ -4,7 +4,6 @@ ENV CGO_ENABLED 0
 ENV PROJ github.com/NYTimes/video-captions-api
 
 ADD . /go/src/$PROJ
-RUN go test $PROJ/...
 RUN go install $PROJ
 
 FROM alpine:3.7
