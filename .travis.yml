@@ -24,10 +24,12 @@ deploy:
 - provider: script
   script: travis-scripts/deploy.bash stg
   on:
+    repo: NYTimes/video-captions-api
     branch: master
     go: 1.9.x
 - provider: script
   script: travis-scripts/deploy.bash prd
   on:
+    repo: NYTimes/video-captions-api
     tags: true
     go: 1.9.x
