@@ -25,7 +25,9 @@ deploy:
   script: travis-scripts/deploy.bash stg
   on:
     branch: master
+    go: 1.9.x
 - provider: script
   script: travis-scripts/deploy.bash prd
   on:
     tags: true
+    go: 1.9.x
