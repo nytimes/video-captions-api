@@ -20,3 +20,12 @@ after_success:
 - travis-scripts/docker.bash
 notifications:
   email: false
+deploy:
+- provider: script
+  script: travis-scripts/deploy.bash stg
+  on:
+    branch: master
+- provider: script
+  script: travis-scripts/deploy.bash prd
+  on:
+    tags: true
