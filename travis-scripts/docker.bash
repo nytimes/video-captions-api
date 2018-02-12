@@ -1,4 +1,4 @@
-#!/bin/bash -el
+#!/bin/bash -e
 
 TRAVIS_MINOR_GO_VERSION=$(echo $TRAVIS_GO_VERSION | sed -r 's/([0-9]+\.[0-9]+).*$/\1/')
 GO_FOR_RELEASE=$(echo $GO_FOR_RELEASE | sed -r 's/([0-9]+\.[0-9]+).*$/\1/')
