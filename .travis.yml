@@ -17,11 +17,6 @@ script:
 - make coverage
 after_success:
 - bash <(curl -s https://codecov.io/bash)
+- travis-scripts/docker.bash
 notifications:
   email: false
-deploy:
-- provider: script
-  script: travis-scripts/docker.bash
-  on:
-    tags: true
-    branch: master
