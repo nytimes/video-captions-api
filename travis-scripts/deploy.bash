@@ -12,7 +12,7 @@ function install_drone() {
 
 function main() {
 	env=$1
-	image_tag=${TRAVIS_COMMIT:0:8}
+	image_tag=${TRAVIS_TAG:-${TRAVIS_COMMIT:0:8}}
 
 	if [ -z "$env" ]; then
 		echo >&2 "missing env name"
