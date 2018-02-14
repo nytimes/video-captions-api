@@ -14,8 +14,8 @@
     "internal/version",
     "storage"
   ]
-  revision = "050b16d2314d5fc3d4c9a51e4cd5c7468e77f162"
-  version = "v0.17.0"
+  revision = "767c40d6a2e058483c25fa193e963a22da17236d"
+  version = "v0.18.0"
 
 [[projects]]
   branch = "master"
@@ -32,13 +32,13 @@
     "server",
     "web"
   ]
-  revision = "1f8be3aa2aebbf2a3225e26a5072b299a148e9e5"
+  revision = "6fdbe2c1590e782aedb01eb3510fc0d9580bf3bd"
 
 [[projects]]
   branch = "master"
   name = "github.com/NYTimes/gziphandler"
   packages = ["."]
-  revision = "47ca22a0aeea4c9ceddfb935d818d636d934c312"
+  revision = "289a3b81f5aedc99f8d6eb0f67827c142f1310d8"
 
 [[projects]]
   branch = "master"
@@ -104,7 +104,6 @@
   version = "v1.7.0"
 
 [[projects]]
-  branch = "master"
   name = "github.com/golang/protobuf"
   packages = [
     "proto",
@@ -116,7 +115,8 @@
     "ptypes/timestamp",
     "ptypes/wrappers"
   ]
-  revision = "1e59b77b52bf8e4b449a57e6f79f21226d571845"
+  revision = "925541529c1fa6821df4e44ce2723319eb2be768"
+  version = "v1.0.0"
 
 [[projects]]
   name = "github.com/googleapis/gax-go"
@@ -139,14 +139,14 @@
 [[projects]]
   name = "github.com/gorilla/mux"
   packages = ["."]
-  revision = "7f08801859139f86dfafd1c296e2cba9a80d292e"
-  version = "v1.6.0"
+  revision = "53c1911da2b537f792e7cafcb446b05ffe33b996"
+  version = "v1.6.1"
 
 [[projects]]
   name = "github.com/hashicorp/consul"
   packages = ["api"]
-  revision = "b55059fc3d0327c92c41431e57dfd2df3f956b03"
-  version = "v1.0.2"
+  revision = "9a494b5fb9c86180a5702e29c485df1507a47198"
+  version = "v1.0.6"
 
 [[projects]]
   branch = "master"
@@ -173,8 +173,8 @@
     "models",
     "pkg/escape"
   ]
-  revision = "6d2685d1738277a1c2672fc58df7994627769be6"
-  version = "v1.4.2"
+  revision = "60d27e6995558f38a39e90b35a92cbac080310a3"
+  version = "v1.4.3"
 
 [[projects]]
   branch = "master"
@@ -238,40 +238,42 @@
     "internal/bitbucket.org/ww/goautoneg",
     "model"
   ]
-  revision = "2e54d0b93cba2fd133edc32211dcc32c06ef72ca"
+  revision = "89604d197083d4781071d3c65855d24ecfb0a563"
 
 [[projects]]
   branch = "master"
   name = "github.com/prometheus/procfs"
   packages = [
     ".",
+    "internal/util",
+    "nfs",
     "xfs"
   ]
-  revision = "b15cd069a83443be3154b719d0cc9fe8117f09fb"
+  revision = "282c8707aa210456a825798969cc27edda34992a"
 
 [[projects]]
   branch = "master"
   name = "github.com/sethgrid/pester"
   packages = ["."]
-  revision = "760f8913c0483b776294e1bee43f1d687527127b"
+  revision = "b18953f5db2922a73aaf89652abf7b5ee95cb516"
 
 [[projects]]
+  branch = "master"
   name = "github.com/sirupsen/logrus"
   packages = ["."]
-  revision = "d682213848ed68c0a260ca37d6dd5ace8423f5ba"
-  version = "v1.0.4"
+  revision = "8c0189d9f6bbf301e5d055d34268156b317016af"
 
 [[projects]]
   name = "github.com/stretchr/testify"
   packages = ["assert"]
-  revision = "b91bfb9ebec76498946beb6af7c0230c7cc7ba6c"
-  version = "v1.2.0"
+  revision = "12b6f73e6084dad08a7c6e575284b177ecafbc71"
+  version = "v1.2.1"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
-  revision = "0fcca4842a8d74bfddc2c96a073bd2a4d2a7a2e8"
+  revision = "650f4a345ab4e5b245a3034b110ebc7299e68186"
 
 [[projects]]
   branch = "master"
@@ -286,7 +288,7 @@
     "lex/httplex",
     "trace"
   ]
-  revision = "434ec0c7fe3742c984919a691b2018a6e9694425"
+  revision = "f5dfe339be1d06f81b22525fe34671ee7d2c8904"
 
 [[projects]]
   branch = "master"
@@ -298,7 +300,7 @@
     "jws",
     "jwt"
   ]
-  revision = "30785a2c434e431ef7c507b54617d6a951d5f2b4"
+  revision = "543e37812f10c46c622c9575afd7ad22f22a12ba"
 
 [[projects]]
   branch = "master"
@@ -307,7 +309,7 @@
     "unix",
     "windows"
   ]
-  revision = "1792d66dc88e503d3cb2400578221cdf1f7fe26f"
+  revision = "37707fdb30a5b38865cfb95e5aab41707daec7fd"
 
 [[projects]]
   branch = "master"
@@ -328,7 +330,7 @@
     "unicode/norm",
     "unicode/rangetable"
   ]
-  revision = "e19ae1496984b1c655b8044a65c0300a3c878dd3"
+  revision = "4e4a3210bb54bb31f6ab2cdca2edcc0b50c420c1"
 
 [[projects]]
   branch = "master"
@@ -345,7 +347,7 @@
     "transport/grpc",
     "transport/http"
   ]
-  revision = "af40bece8f577b6beb316373ad9d96e4720a567a"
+  revision = "b0284fdf28b5e4d7c9aa5c26e67035437f711304"
 
 [[projects]]
   name = "google.golang.org/appengine"
@@ -376,7 +378,7 @@
     "googleapis/rpc/status",
     "googleapis/type/latlng"
   ]
-  revision = "a8101f21cf983e773d0c1133ebc5424792003214"
+  revision = "2b5a72b8730b0b16380010cfe5286c42108d88e7"
 
 [[projects]]
   name = "google.golang.org/grpc"
@@ -405,8 +407,8 @@
     "tap",
     "transport"
   ]
-  revision = "f3955b8e9e244dd4dd4bc4f7b7a23a8445400a76"
-  version = "v1.9.0"
+  revision = "6b51017f791ae1cfbec89c52efdf444b13b550ef"
+  version = "v1.9.2"
 
 [solve-meta]
   analyzer-name = "dep"
