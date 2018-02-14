@@ -27,7 +27,7 @@ docker build -t ${IMAGE_NAME}:latest .
 docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:${COMMIT_TAG}
 
 if [ -n "${TRAVIS_TAG}" ]; then
-	docker tag ${IMAGE_NAME}:${TRAVIS_TAG}
+	docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:${TRAVIS_TAG}
 fi
 
 docker push ${IMAGE_NAME}
