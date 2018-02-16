@@ -1,4 +1,4 @@
-FROM golang:1.9-alpine AS builder
+FROM golang:1.10-alpine AS builder
 
 ENV CGO_ENABLED 0
 ENV PROJ github.com/NYTimes/video-captions-api
