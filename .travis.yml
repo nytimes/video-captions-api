@@ -6,9 +6,9 @@ addons:
     - docker-ce
 env:
   global:
-  - GO_FOR_RELEASE=1.9
+  - GO_FOR_RELEASE=1.10
 go:
-- 1.9.4
+- "1.10"
 - tip
 install:
 - go get github.com/golang/lint/golint
@@ -26,10 +26,10 @@ deploy:
   on:
     repo: NYTimes/video-captions-api
     branch: master
-    go: 1.9.4
+    go: "1.10"
 - provider: script
   script: travis-scripts/deploy.bash prd
   on:
     repo: NYTimes/video-captions-api
     tags: true
-    go: 1.9.4
+    go: "1.10"
