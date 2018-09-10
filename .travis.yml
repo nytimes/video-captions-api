@@ -23,12 +23,14 @@ notifications:
   email: false
 deploy:
 - provider: script
+  skip_cleanup: true
   script: travis-scripts/deploy.bash stg
   on:
     repo: NYTimes/video-captions-api
     branch: master
     go: 1.11.x
 - provider: script
+  skip_cleanup: true
   script: travis-scripts/deploy.bash prd
   on:
     repo: NYTimes/video-captions-api
