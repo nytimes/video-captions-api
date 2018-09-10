@@ -20,6 +20,8 @@ after_success:
 - travis-scripts/docker.bash
 notifications:
   email: false
+env:
+- GO111MODULE=on
 deploy:
 - provider: script
   script: travis-scripts/deploy.bash stg
