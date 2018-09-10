@@ -1,8 +1,5 @@
 #!/bin/bash -e
 
-TRAVIS_MINOR_GO_VERSION=$(echo $TRAVIS_GO_VERSION | sed -r 's/([0-9]+\.[0-9]+).*$/\1/')
-GO_FOR_RELEASE=$(echo $GO_FOR_RELEASE | sed -r 's/([0-9]+\.[0-9]+).*$/\1/')
-
 if [ "${TRAVIS_PULL_REQUEST}" != "false" ]; then
 	echo >&2 "Skipping image build on pull requests..."
 	exit 0
