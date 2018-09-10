@@ -7,6 +7,7 @@ addons:
 env:
   global:
   - GO_FOR_RELEASE=1.11.x
+  - GO111MODULE=on
 go:
 - 1.11.x
 - tip
@@ -20,8 +21,6 @@ after_success:
 - travis-scripts/docker.bash
 notifications:
   email: false
-env:
-- GO111MODULE=on
 deploy:
 - provider: script
   script: travis-scripts/deploy.bash stg
