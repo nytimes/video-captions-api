@@ -1,14 +1,14 @@
-FROM golang:1.10-alpine AS builder
+FROM golang:1.11 AS builder
 
 ENV CGO_ENABLED 0
-ENV PROJ github.com/NYTimes/video-captions-api
 
-ADD . /go/src/$PROJ
-RUN go install $PROJ
+ADD     . /code
+WORKDIR /code
+RUN     go build -o /bin/captions-api
 
-FROM alpine:3.7
+FROM alpine:3.8
 
 RUN  apk add --no-cache ca-certificates
-COPY --from=builder /go/bin/video-captions-api /bin/captions-api
+COPY --from=builder /bin/captions-api /bin/captions-api
 
 ENTRYPOINT ["/bin/captions-api"]
