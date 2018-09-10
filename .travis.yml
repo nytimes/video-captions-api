@@ -6,7 +6,7 @@ addons:
     - docker-ce
 env:
   global:
-  - GO_FOR_RELEASE=1.11
+  - GO_FOR_RELEASE=1.11.x
 go:
 - 1.11.x
 - tip

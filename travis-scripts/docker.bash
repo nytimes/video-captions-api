@@ -8,7 +8,7 @@ if [ "${TRAVIS_PULL_REQUEST}" != "false" ]; then
 	exit 0
 fi
 
-if [ "${TRAVIS_MINOR_GO_VERSION}" != "${GO_FOR_RELEASE}" ]; then
+if [ "${TRAVIS_GO_VERSION}" != "${GO_FOR_RELEASE}" ]; then
 	echo >&2 "Skipping image build on Go ${TRAVIS_GO_VERSION}"
 	exit 0
 fi
