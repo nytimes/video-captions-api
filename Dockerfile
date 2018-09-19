@@ -1,7 +1,8 @@
-FROM golang:1.11 AS builder
+FROM golang:1.11-alpine AS builder
 
 ENV CGO_ENABLED 0
 
+RUN     apk add --no-cache git
 ADD     . /code
 WORKDIR /code
 RUN     go build -o /bin/captions-api
