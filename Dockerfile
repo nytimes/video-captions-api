@@ -2,7 +2,7 @@ FROM golang:1.11.3-alpine AS builder
 
 ENV CGO_ENABLED 0
 
-RUN     apk add --no-cache git
+RUN     apk add --no-cache git bzr
 ADD     . /code
 WORKDIR /code
 RUN     go build -o /bin/captions-api
