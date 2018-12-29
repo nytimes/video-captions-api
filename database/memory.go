@@ -14,7 +14,7 @@ type MemoryDatabase struct {
 // NewMemoryDatabase creates a MemoryDatabase
 func NewMemoryDatabase() *MemoryDatabase {
 	return &MemoryDatabase{
-		jobs: make(map[string]*Job, 0),
+		jobs: make(map[string]*Job),
 	}
 }
 

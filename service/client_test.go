@@ -237,6 +237,7 @@ func TestGenerateTranscriptSsa(t *testing.T) {
 	}
 	client.DB.StoreJob(job)
 	caption, err := client.DownloadCaption("123", "ssa")
+	assert.Nil(err)
 	transcript, err := client.GenerateTranscript(caption, "ssa")
 	assert.Nil(err)
 	assert.Equal("Some more of the speech", string(transcript))
@@ -253,6 +254,7 @@ func TestGenerateTranscriptVtt(t *testing.T) {
 	}
 	client.DB.StoreJob(job)
 	caption, err := client.DownloadCaption("123", "vtt")
+	assert.Nil(err)
 	transcript, err := client.GenerateTranscript(caption, "vtt")
 	assert.Nil(err)
 	assert.Equal("We're all talking about the Iowa caucuses", string(transcript))
@@ -269,6 +271,7 @@ func TestGenerateTranscriptSrt(t *testing.T) {
 	}
 	client.DB.StoreJob(job)
 	caption, err := client.DownloadCaption("123", "srt")
+	assert.Nil(err)
 	transcript, err := client.GenerateTranscript(caption, "srt")
 	assert.Nil(err)
 	assert.Equal("We’re all talking about the Iowa caucuses right now, less than two weeks till the Iowa caucuses.", string(transcript))
@@ -285,6 +288,7 @@ func TestGenerateTranscriptSbv(t *testing.T) {
 	}
 	client.DB.StoreJob(job)
 	caption, err := client.DownloadCaption("123", "sbv")
+	assert.Nil(err)
 	transcript, err := client.GenerateTranscript(caption, "sbv")
 	assert.Nil(err)
 	assert.Equal("We're all talking about the Iowa caucuses right now, less than two weeks till the Iowa caucuses.", string(transcript))
@@ -301,6 +305,7 @@ func TestGenerateTranscriptWrongFormat(t *testing.T) {
 	}
 	client.DB.StoreJob(job)
 	caption, err := client.DownloadCaption("123", "vtt")
+	assert.Nil(err)
 	_, err = client.GenerateTranscript(caption, "wrong")
 	assert.NotNil(err)
 	assert.EqualValues("Unable to generate a transcript for caption format: wrong", err.Error())

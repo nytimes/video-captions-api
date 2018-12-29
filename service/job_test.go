@@ -71,9 +71,10 @@ func TestCreateUploadJob(t *testing.T) {
 	jobBytes, _ := json.Marshal(job)
 	r, _ := http.NewRequest("POST", "/captions", bytes.NewReader(jobBytes))
 	status, resultJob, err := service.CreateJob(r)
-	job = resultJob.(*database.Job)
 	assert.Nil(err)
 	assert.Equal(201, status)
+	_, ok := resultJob.(*database.Job)
+	assert.True(ok)
 }
 
 func TestCreateJobNoMediaURL(t *testing.T) {

@@ -104,6 +104,7 @@ func TestUpdateJob(t *testing.T) {
 	assert.Nil(err)
 	assert.Equal(1, len(db.client.(*datastoreTestClient).jobs))
 	afterChange, err := db.GetJob("123")
+	assert.Nil(err)
 	assert.Equal(newJob, afterChange)
 
 	err = db.UpdateJob("234", newJob)
