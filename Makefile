@@ -10,6 +10,10 @@ dev:
 		BUCKET_NAME=video-captions-api-dev \
 		go run main.go
 
+lint:
+	cd /tmp && go get github.com/golangci/golangci-lint/cmd/golangci-lint
+	golangci-lint run --fast -D errcheck -E megacheck --deadline 5m ./...
+
 coverage:
 	go test -coverprofile=coverage.txt -covermode=atomic ./...
 
