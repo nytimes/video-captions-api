@@ -13,8 +13,9 @@ go:
   - tip
 install:
   - go mod download
+  - go install github.com/golangci/golangci-lint/cmd/golangci-lint
 script:
-  - make lint coverage
+  - make run-lint coverage
 after_success:
   - bash <(curl -s https://codecov.io/bash)
   - travis-scripts/docker.bash
