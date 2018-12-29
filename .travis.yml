@@ -3,36 +3,36 @@ sudo: false
 addons:
   apt:
     packages:
-    - docker-ce
+      - docker-ce
 env:
   global:
-  - GO_FOR_RELEASE=1.11.x
-  - GO111MODULE=on
+    - GO_FOR_RELEASE=1.11.x
+    - GO111MODULE=on
 go:
-- 1.11.x
-- tip
+  - 1.11.x
+  - tip
 install:
-- go get github.com/golang/lint/golint
+  - go get github.com/golang/lint/golint
 script:
-- golint -set_exit_status $(go list ./...)
-- make coverage
+  - golint -set_exit_status $(go list ./...)
+  - make coverage
 after_success:
-- bash <(curl -s https://codecov.io/bash)
-- travis-scripts/docker.bash
+  - bash <(curl -s https://codecov.io/bash)
+  - travis-scripts/docker.bash
 notifications:
   email: false
 deploy:
-- provider: script
-  skip_cleanup: true
-  script: travis-scripts/deploy.bash stg
-  on:
-    repo: NYTimes/video-captions-api
-    branch: master
-    go: 1.11.x
-- provider: script
-  skip_cleanup: true
-  script: travis-scripts/deploy.bash prd
-  on:
-    repo: NYTimes/video-captions-api
-    tags: true
-    go: 1.11.x
+  - provider: script
+    skip_cleanup: true
+    script: travis-scripts/deploy.bash stg
+    on:
+      repo: NYTimes/video-captions-api
+      branch: master
+      go: 1.11.x
+  - provider: script
+    skip_cleanup: true
+    script: travis-scripts/deploy.bash prd
+    on:
+      repo: NYTimes/video-captions-api
+      tags: true
+      go: 1.11.x
