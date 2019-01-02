@@ -4,10 +4,10 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/NYTimes/gizmo/config"
 	"github.com/NYTimes/threeplay"
-	captionsConfig "github.com/NYTimes/video-captions-api/config"
+	"github.com/NYTimes/video-captions-api/config"
 	"github.com/NYTimes/video-captions-api/database"
+	"github.com/kelseyhightower/envconfig"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -28,7 +28,7 @@ type ThreePlayConfig struct {
 }
 
 // New3PlayProvider creates a ThreePlayProvider instance
-func New3PlayProvider(cfg *ThreePlayConfig, svcCfg *captionsConfig.CaptionsServiceConfig) Provider {
+func New3PlayProvider(cfg *ThreePlayConfig, svcCfg *config.CaptionsServiceConfig) Provider {
 	return &ThreePlayProvider{
 		threeplay.NewClient(cfg.APIKey, cfg.APISecret),
 		svcCfg.Logger,
@@ -39,7 +39,7 @@ func New3PlayProvider(cfg *ThreePlayConfig, svcCfg *captionsConfig.CaptionsServi
 // Load3PlayConfigFromEnv loads 3play API Key/Secret from environment
 func Load3PlayConfigFromEnv() ThreePlayConfig {
 	var providerConfig ThreePlayConfig
-	config.LoadEnvConfig(&providerConfig)
+	envconfig.Process("", &providerConfig)
 	return providerConfig
 }
 

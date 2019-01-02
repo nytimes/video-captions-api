@@ -6,9 +6,9 @@ import (
 	"strconv"
 
 	"github.com/NYTimes/amara"
-	"github.com/NYTimes/gizmo/config"
-	captionsConfig "github.com/NYTimes/video-captions-api/config"
+	"github.com/NYTimes/video-captions-api/config"
 	"github.com/NYTimes/video-captions-api/database"
+	"github.com/kelseyhightower/envconfig"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -28,7 +28,7 @@ type AmaraConfig struct {
 }
 
 // NewAmaraProvider creates an AmaraProvider
-func NewAmaraProvider(cfg *AmaraConfig, svcCfg *captionsConfig.CaptionsServiceConfig) Provider {
+func NewAmaraProvider(cfg *AmaraConfig, svcCfg *config.CaptionsServiceConfig) Provider {
 	return &AmaraProvider{
 		amara.NewClient(cfg.Username, cfg.Token, cfg.Team),
 		svcCfg.Logger,
@@ -40,7 +40,7 @@ func NewAmaraProvider(cfg *AmaraConfig, svcCfg *captionsConfig.CaptionsServiceCo
 // LoadAmaraConfigFromEnv loads Amara username, token and team from environment
 func LoadAmaraConfigFromEnv() AmaraConfig {
 	var providerConfig AmaraConfig
-	config.LoadEnvConfig(&providerConfig)
+	envconfig.Process("", &providerConfig)
 	return providerConfig
 }
 

@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/NYTimes/gizmo/web"
+	"github.com/NYTimes/gizmo/server"
 	"github.com/NYTimes/video-captions-api/database"
 	uuid "github.com/nu7hatch/gouuid"
 	log "github.com/sirupsen/logrus"
@@ -87,7 +87,7 @@ func (e captionsError) Error() string {
 
 // GetJobs returns all the Jobs associated with a ParentID
 func (s *CaptionsService) GetJobs(r *http.Request) (int, interface{}, error) {
-	parentID := web.Vars(r)["id"]
+	parentID := server.Vars(r)["id"]
 	jobs, err := s.client.GetJobs(parentID)
 	if err != nil {
 		if err == database.ErrNoJobs {
@@ -100,7 +100,7 @@ func (s *CaptionsService) GetJobs(r *http.Request) (int, interface{}, error) {
 
 // GetJob returns a Job given its ID
 func (s *CaptionsService) GetJob(r *http.Request) (int, interface{}, error) {
-	id := web.Vars(r)["id"]
+	id := server.Vars(r)["id"]
 	// TODO: on the 3play client, we should look at the errors field and check for not_found errors at least
 	job, err := s.client.GetJob(id)
 	if err != nil {
@@ -114,7 +114,7 @@ func (s *CaptionsService) GetJob(r *http.Request) (int, interface{}, error) {
 
 // CancelJob cancels a given Job by its ID
 func (s *CaptionsService) CancelJob(r *http.Request) (int, interface{}, error) {
-	id := web.Vars(r)["id"]
+	id := server.Vars(r)["id"]
 	canceled, err := s.client.CancelJob(id)
 	if err != nil {
 		if err == database.ErrJobNotFound {
@@ -176,8 +176,8 @@ func (s *CaptionsService) CreateJob(r *http.Request) (int, interface{}, error) {
 
 // DownloadCaption downloads a caption in the specified format
 func (s *CaptionsService) DownloadCaption(w http.ResponseWriter, r *http.Request) {
-	id := web.Vars(r)["id"]
-	captionFormat := web.Vars(r)["captionFormat"]
+	id := server.Vars(r)["id"]
+	captionFormat := server.Vars(r)["captionFormat"]
 
 	defer r.Body.Close()
 
@@ -193,8 +193,8 @@ func (s *CaptionsService) DownloadCaption(w http.ResponseWriter, r *http.Request
 
 // GetTranscript returns a transcript of a given caption job
 func (s *CaptionsService) GetTranscript(w http.ResponseWriter, r *http.Request) {
-	id := web.Vars(r)["id"]
-	captionFormat := web.Vars(r)["captionFormat"]
+	id := server.Vars(r)["id"]
+	captionFormat := server.Vars(r)["captionFormat"]
 
 	defer r.Body.Close()
 

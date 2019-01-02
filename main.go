@@ -1,17 +1,17 @@
 package main
 
 import (
-	"github.com/NYTimes/gizmo/config"
 	"github.com/NYTimes/gizmo/server"
-	captionsConfig "github.com/NYTimes/video-captions-api/config"
+	"github.com/NYTimes/video-captions-api/config"
 	"github.com/NYTimes/video-captions-api/database"
 	"github.com/NYTimes/video-captions-api/providers"
 	"github.com/NYTimes/video-captions-api/service"
+	"github.com/kelseyhightower/envconfig"
 )
 
 func main() {
-	var cfg captionsConfig.CaptionsServiceConfig
-	config.LoadEnvConfig(&cfg)
+	var cfg config.CaptionsServiceConfig
+	envconfig.Process("", &cfg)
 	cfg.Logger = server.Log
 	db, err := database.NewDatastoreDatabase(cfg.ProjectID)
 	if err != nil {
