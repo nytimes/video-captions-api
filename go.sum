@@ -10,8 +10,8 @@ github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03
 github.com/DataDog/datadog-go v0.0.0-20180822151419-281ae9f2d895 h1:dmc/C8bpE5VkQn65PNbbyACDC8xw8Hpp/NEurdPmQDQ=
 github.com/DataDog/datadog-go v0.0.0-20180822151419-281ae9f2d895/go.mod h1:LButxg5PwREeZtORoXG3tL4fMGNddJ+vMq1mwgfaqoQ=
 github.com/Masterminds/semver v1.4.2/go.mod h1:MB6lktGJrhw8PrUyiEoblNEGEQ+RzHPF078ddwwvV3Y=
-github.com/NYTimes/amara v0.0.0-20171025164241-387ea10e924d h1:X0By3AWtI5T4fB75h+GJDewmCAtJAITTyAlyF/l3KwY=
-github.com/NYTimes/amara v0.0.0-20171025164241-387ea10e924d/go.mod h1:z3q86vcd0Akmb5mq+brIB8groCimaBetd9JXyll+Evg=
+github.com/NYTimes/amara v0.1.0 h1:T5mGf7tMtG4WUguDxdSpFHR+Z0piVwS18Dkau+OfKU8=
+github.com/NYTimes/amara v0.1.0/go.mod h1:oZw+eJDf7DKEn9st+lBbH6AhE963zCGaeMdWSQa+3kI=
 github.com/NYTimes/gizmo v0.3.14 h1:7eMVety1IEAY/lV/PavUK1Pzhb1cQF3njlj58faWWUA=
 github.com/NYTimes/gizmo v0.3.14/go.mod h1:P/KEJNHfSP0DeoQegoFpttq6By+02g0ZYEr1C81J8Ks=
 github.com/NYTimes/gziphandler v1.0.1 h1:iLrQrdwjDd52kHDA5op2UBJFjmOb9g+7scBan4RN8F0=
@@ -19,8 +19,8 @@ github.com/NYTimes/gziphandler v1.0.1/go.mod h1:3wb06e3pkSAbeQ52E9H9iFoQsEEwGN64
 github.com/NYTimes/logrotate v0.0.0-20170824154650-2b6e866fd507 h1:S0NXkQpfmcwUz5kHr2G8fqepsknsnNr9j6uQqdTYEck=
 github.com/NYTimes/logrotate v0.0.0-20170824154650-2b6e866fd507/go.mod h1:nY7g3XV/OVxvEUGniTjBf6DFoeHz7sRl8yv/ocNx9y4=
 github.com/NYTimes/sqliface v0.0.0-20180310195202-f8e6c8b78d37/go.mod h1:kyL8Cd2vQCEDjsCaFWSARXwRfyQfXv9/mHvr59mHxD8=
-github.com/NYTimes/threeplay v0.0.0-20180413152523-9fc60b113665 h1:EgtuyFaSOu2kpggA4uYNwKosL8lYbY1iLZvi6ya3qPQ=
-github.com/NYTimes/threeplay v0.0.0-20180413152523-9fc60b113665/go.mod h1:0F0lFwQUBAflQ1GxKOAUm+C7hIBRwLXB3Y14vyJKMcU=
+github.com/NYTimes/threeplay v0.1.0 h1:ZM+eQRNH4BylWF/kxGz0+fGTnpmz/p3cLEy6jsPR/Ik=
+github.com/NYTimes/threeplay v0.1.0/go.mod h1:N7TXMv5aPfrl+TWLD0B4aCyg1+8vwZ9ms/cWmjD7cZU=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/RoaringBitmap/roaring v0.4.16/go.mod h1:8khRDP4HmeXns4xIj9oGrKSz7XTQiJx2zgh7AcNke4w=
 github.com/Shopify/sarama v1.19.0/go.mod h1:FVkBWblsNy7DGZRfXLU0O9RCGt5g3g3yEuWXgklEdEo=
@@ -394,8 +394,6 @@ gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 h1:qIbj1fsPNlZgppZ+VLlY7N33
 gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/fsnotify.v1 v1.4.7/go.mod h1:Tz8NjZHkW78fSQdbUxIjBTcgA1z1m8ZHf0WmKUhAMys=
 gopkg.in/gemnasium/logrus-airbrake-hook.v2 v2.1.2/go.mod h1:Xk6kEKp8OKb+X14hQBKWaSkCsqBpgog8nAV2xsGOxlo=
-gopkg.in/h2non/gock.v1 v1.0.12 h1:o3JJqe+h7R9Ay6LtMeFrKz1WnokrJDrNpDQs9KGqVn8=
-gopkg.in/h2non/gock.v1 v1.0.12/go.mod h1:KHI4Z1sxDW6P4N3DfTWSEza07YpkQP7KJBfglRMEjKY=
 gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce/go.mod h1:yeKp02qBN3iKW1OzL3MGk2IdtZzaj7SFntXj72NppTA=
 gopkg.in/robfig/cron.v2 v2.0.0-20150107220207-be2e0b0deed5/go.mod h1:hiOFpYm0ZJbusNj2ywpbrXowU3G8U6GIQzqn2mw1UIE=
 gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7/go.mod h1:dt/ZhP58zS4L8KSrWDmTeBkI65Dw0HsyUHuEVlX15mw=
