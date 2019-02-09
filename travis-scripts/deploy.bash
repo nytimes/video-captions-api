@@ -14,9 +14,14 @@ function main() {
 	env=$1
 	image_tag=${TRAVIS_TAG:-${TRAVIS_COMMIT:0:8}}
 
+	if [ "$TRAVIS_EVENT_TYPE" = "cron" ]; then
+		echo >&2 "skipping deployment on cron"
+		return 0
+	fi
+
 	if [ -z "$env" ]; then
 		echo >&2 "missing env name"
-		exit 2
+		return 2
 	fi
 
 	install_drone $DRONE_VERSION
