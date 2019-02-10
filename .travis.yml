@@ -13,7 +13,7 @@ go:
   - tip
 install:
   - go mod download
-  - go install github.com/golangci/golangci-lint/cmd/golangci-lint
+  - go install github.com/golangci/golangci-lint/cmd/golangci-lint@master
 script:
   - make run-lint coverage
 after_success:
