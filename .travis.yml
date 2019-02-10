@@ -4,12 +4,16 @@ addons:
   apt:
     packages:
       - docker-ce
+cache:
+  directories:
+    - $GOPATH/pkg
+    - $GOPATH/bin
 env:
   global:
-    - GO_FOR_RELEASE=1.11.x
+    - GO_FOR_RELEASE=1.x
     - GO111MODULE=on
 go:
-  - 1.11.x
+  - 1.x
   - tip
 install:
   - go mod download
@@ -28,11 +32,11 @@ deploy:
     on:
       repo: NYTimes/video-captions-api
       branch: master
-      go: 1.11.x
+      go: 1.x
   - provider: script
     skip_cleanup: true
     script: travis-scripts/deploy.bash prd
     on:
       repo: NYTimes/video-captions-api
       tags: true
-      go: 1.11.x
+      go: 1.x
