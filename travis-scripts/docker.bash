@@ -24,7 +24,7 @@ COMMIT_TAG=${TRAVIS_COMMIT:0:8}
 IMAGE_NAME=nytimes/video-captions-api
 
 docker login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}"
-docker build -t ${IMAGE_NAME}:latest .
+docker build -t ${IMAGE_NAME}:latest -f Dockerfile.ci .
 
 docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:${COMMIT_TAG}
 
