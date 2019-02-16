@@ -7,7 +7,6 @@ addons:
 cache:
   directories:
     - $GOPATH/pkg
-    - $GOPATH/bin
 env:
   global:
     - GO_FOR_RELEASE=1.x
@@ -17,8 +16,8 @@ go:
   - 1.x
   - tip
 install:
+  - curl https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | BINDIR=$GOPATH/bin sh
   - go mod download
-  - go get github.com/golangci/golangci-lint/cmd/golangci-lint@master
 script:
   - make run-lint coverage
   - go build -o video-captions-api
