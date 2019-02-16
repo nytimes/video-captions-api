@@ -27,7 +27,7 @@ func TestGetJob(t *testing.T) {
 func TestDispatchJobNoProvider(t *testing.T) {
 	_, client := createCaptionsService()
 	err := client.DispatchJob(&database.Job{Provider: "wrong-provider"})
-	assert.Equal(t, "Provider not found", err.Error())
+	assert.Equal(t, "provider not found", err.Error())
 }
 
 func TestGetJobReady(t *testing.T) {
@@ -193,7 +193,7 @@ func TestDownloadCaption(t *testing.T) {
 	client.DB.StoreJob(job)
 	caption, err := client.DownloadCaption("123", "vtt")
 	assert.Nil(err)
-	assert.Equal("WEBVTT\n\nNOTE Paragraph\n\n00:00:09.240 --> 00:00:11.010\nWe're all talking\nabout the Iowa caucuses", string(caption[:]))
+	assert.Equal("WEBVTT\n\nNOTE Paragraph\n\n00:00:09.240 --> 00:00:11.010\nWe're all talking\nabout the Iowa caucuses", string(caption))
 }
 
 func TestDownloadNonexistentCaption(t *testing.T) {
@@ -240,7 +240,7 @@ func TestGenerateTranscriptSsa(t *testing.T) {
 	assert.Nil(err)
 	transcript, err := client.GenerateTranscript(caption, "ssa")
 	assert.Nil(err)
-	assert.Equal("Some more of the speech", string(transcript))
+	assert.Equal("Some more of the speech", transcript)
 }
 
 func TestGenerateTranscriptVtt(t *testing.T) {
@@ -257,7 +257,7 @@ func TestGenerateTranscriptVtt(t *testing.T) {
 	assert.Nil(err)
 	transcript, err := client.GenerateTranscript(caption, "vtt")
 	assert.Nil(err)
-	assert.Equal("We're all talking about the Iowa caucuses", string(transcript))
+	assert.Equal("We're all talking about the Iowa caucuses", transcript)
 }
 
 func TestGenerateTranscriptSrt(t *testing.T) {
@@ -274,7 +274,7 @@ func TestGenerateTranscriptSrt(t *testing.T) {
 	assert.Nil(err)
 	transcript, err := client.GenerateTranscript(caption, "srt")
 	assert.Nil(err)
-	assert.Equal("We’re all talking about the Iowa caucuses right now, less than two weeks till the Iowa caucuses.", string(transcript))
+	assert.Equal("We’re all talking about the Iowa caucuses right now, less than two weeks till the Iowa caucuses.", transcript)
 }
 
 func TestGenerateTranscriptSbv(t *testing.T) {
@@ -291,7 +291,7 @@ func TestGenerateTranscriptSbv(t *testing.T) {
 	assert.Nil(err)
 	transcript, err := client.GenerateTranscript(caption, "sbv")
 	assert.Nil(err)
-	assert.Equal("We're all talking about the Iowa caucuses right now, less than two weeks till the Iowa caucuses.", string(transcript))
+	assert.Equal("We're all talking about the Iowa caucuses right now, less than two weeks till the Iowa caucuses.", transcript)
 }
 
 func TestGenerateTranscriptWrongFormat(t *testing.T) {
@@ -308,5 +308,5 @@ func TestGenerateTranscriptWrongFormat(t *testing.T) {
 	assert.Nil(err)
 	_, err = client.GenerateTranscript(caption, "wrong")
 	assert.NotNil(err)
-	assert.EqualValues("Unable to generate a transcript for caption format: wrong", err.Error())
+	assert.EqualValues("unable to generate a transcript for caption format: wrong", err.Error())
 }

@@ -65,7 +65,7 @@ func TestStoreJob(t *testing.T) {
 	assert.Equal(1, len(db.client.(*datastoreTestClient).jobs))
 
 	_, err = db.StoreJob(job)
-	assert.EqualError(err, "Job already exists")
+	assert.EqualError(err, "job already exists")
 }
 
 func TestGetJob(t *testing.T) {

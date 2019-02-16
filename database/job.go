@@ -87,7 +87,7 @@ func (p *ProviderParams) Load(ps []datastore.Property) error {
 
 // Save makes ProviderParams implement datastore.PropertyLoadSaver interface
 func (p *ProviderParams) Save() ([]datastore.Property, error) {
-	var result []datastore.Property
+	result := make([]datastore.Property, 0, len(*p))
 	for k, v := range *p {
 		result = append(result, datastore.Property{
 			Name:  k,

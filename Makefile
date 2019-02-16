@@ -11,10 +11,10 @@ dev:
 		go run main.go
 
 install-golangcilint:
-	cd /tmp && go get github.com/golangci/golangci-lint/cmd/golangci-lint
+	GO111MODULE=off go get github.com/golangci/golangci-lint/cmd/golangci-lint
 
 run-lint:
-	golangci-lint run --fast -D errcheck -E megacheck --deadline 5m ./...
+	golangci-lint run --enable-all -D errcheck -D lll --deadline 5m ./...
 
 lint: install-golangcilint run-lint
 
@@ -22,4 +22,4 @@ coverage:
 	go test -coverprofile=coverage.txt -covermode=atomic ./...
 
 test:
-	go test -v ./...
+	go test -race ./...

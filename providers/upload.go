@@ -31,7 +31,7 @@ func (c *UploadProvider) GetName() string {
 func (c *UploadProvider) Download(id string, captionsType string) ([]byte, error) {
 	job, err := c.DB.GetJob(id)
 	if err != nil {
-		return nil, fmt.Errorf("Could not find job in DB")
+		return nil, fmt.Errorf("could not find job in DB")
 	}
 	return job.CaptionFile.File, nil
 }
@@ -40,7 +40,7 @@ func (c *UploadProvider) Download(id string, captionsType string) ([]byte, error
 func (c *UploadProvider) GetProviderJob(id string) (*database.ProviderJob, error) {
 	job, err := c.DB.GetJob(id)
 	if err != nil {
-		return nil, fmt.Errorf("Could not find job in DB")
+		return nil, fmt.Errorf("could not find job in DB")
 	}
 	providerJob := &database.ProviderJob{
 		ID:      job.ProviderParams["ProviderID"],

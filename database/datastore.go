@@ -45,7 +45,7 @@ func NewDatastoreDatabase(projectID string) (*DatastoreDatabase, error) {
 // StoreJob stores a job
 func (d *DatastoreDatabase) StoreJob(job *Job) (string, error) {
 	if _, err := d.GetJob(job.ID); err == nil {
-		return "", errors.New("Job already exists")
+		return "", errors.New("job already exists")
 	}
 
 	ctx := context.Background()
@@ -68,7 +68,7 @@ func (d *DatastoreDatabase) GetJob(id string) (*Job, error) {
 		return nil, ErrJobNotFound
 	}
 	if err != nil {
-		return nil, errors.New("Unknown error from Datastore")
+		return nil, errors.New("unknown error from Datastore")
 	}
 	return result, nil
 }
@@ -80,7 +80,7 @@ func (d *DatastoreDatabase) GetJobs(parentID string) ([]Job, error) {
 	query := datastore.NewQuery(d.kind).Namespace(d.namespace).Filter("ParentID =", parentID)
 	_, err := d.client.GetAll(ctx, query, &jobs)
 	if err != nil {
-		return nil, errors.New("Unknown error from Datastore")
+		return nil, errors.New("unknown error from Datastore")
 	}
 	if len(jobs) == 0 {
 		return nil, ErrNoJobs

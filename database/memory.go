@@ -21,7 +21,7 @@ func NewMemoryDatabase() *MemoryDatabase {
 // StoreJob stores Job in-memory
 func (db *MemoryDatabase) StoreJob(job *Job) (string, error) {
 	if _, err := db.GetJob(job.ID); err == nil {
-		return "", errors.New("Job already exists")
+		return "", errors.New("job already exists")
 	}
 
 	db.mtx.Lock()

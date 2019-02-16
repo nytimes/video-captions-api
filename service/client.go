@@ -99,8 +99,8 @@ func (c Client) DispatchJob(job *database.Job) error {
 	provider := c.Providers[job.Provider]
 	jobLogger := c.Logger.WithFields(log.Fields{"JobID": job.ID, "Provider": job.Provider})
 	if provider == nil {
-		jobLogger.Error("Provider not found")
-		return errors.New("Provider not found")
+		jobLogger.Error("provider not found")
+		return errors.New("provider not found")
 	}
 
 	jobLogger.Info("Dispatching job to provider")
@@ -239,5 +239,5 @@ func (c Client) GenerateTranscript(captionFile []byte, captionFormat string) (st
 		return strings.Join(transcript, " "), nil
 	}
 	jobLogger.Error("error generating transcript")
-	return "", fmt.Errorf("Unable to generate a transcript for caption format: %v", captionFormat)
+	return "", fmt.Errorf("unable to generate a transcript for caption format: %v", captionFormat)
 }
