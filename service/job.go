@@ -12,7 +12,7 @@ import (
 
 	"github.com/NYTimes/gizmo/server"
 	"github.com/NYTimes/video-captions-api/database"
-	uuid "github.com/nu7hatch/gouuid"
+	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -47,7 +47,7 @@ func newJobFromParams(newJob jobParams) (*database.Job, error) {
 		}
 		name = strings.TrimSuffix(mediaFile, filepath.Ext(mediaFile))
 	}
-	id, err := uuid.NewV4()
+	id, err := uuid.NewRandom()
 	if err != nil {
 		return nil, fmt.Errorf("could not create job id: %v", err)
 	}
