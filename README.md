@@ -1,8 +1,8 @@
 # video-captions-api
 
-[![Build Status](https://travis-ci.org/NYTimes/video-captions-api.svg?branch=master)](https://travis-ci.org/NYTimes/video-captions-api)
-[![codecov](https://codecov.io/gh/NYTimes/video-captions-api/branch/master/graph/badge.svg)](https://codecov.io/gh/NYTimes/video-captions-api)
-[![Go Report Card](https://goreportcard.com/badge/github.com/NYTimes/video-captions-api)](https://goreportcard.com/report/github.com/NYTimes/video-captions-api)
+[![Build Status](https://travis-ci.org/nytimes/video-captions-api.svg?branch=master)](https://travis-ci.org/nytimes/video-captions-api)
+[![codecov](https://codecov.io/gh/nytimes/video-captions-api/branch/master/graph/badge.svg)](https://codecov.io/gh/nytimes/video-captions-api)
+[![Go Report Card](https://goreportcard.com/badge/github.com/nytimes/video-captions-api)](https://goreportcard.com/report/github.com/nytimes/video-captions-api)
 
 Agnostic API to generate captions for media assets across different cloud services.
 
@@ -41,4 +41,4 @@ A pre-built image is available on Docker Hub: https://hub.docker.com/r/nytimes/v
 
 ## Documentation
 
-For more info check the [docs](https://github.com/NYTimes/video-captions-api/wiki/Home)
+For more info check the [docs](https://github.com/nytimes/video-captions-api/wiki/Home)
