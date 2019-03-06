@@ -32,13 +32,13 @@ deploy:
     skip_cleanup: true
     script: travis-scripts/deploy.bash stg
     on:
-      repo: NYTimes/video-captions-api
+      repo: nytimes/video-captions-api
       branch: master
       go: 1.x
   - provider: script
     skip_cleanup: true
     script: travis-scripts/deploy.bash prd
     on:
-      repo: NYTimes/video-captions-api
+      repo: nytimes/video-captions-api
       tags: true
       go: 1.x
