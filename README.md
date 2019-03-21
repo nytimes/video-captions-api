@@ -41,4 +41,4 @@ A pre-built image is available on Docker Hub: https://hub.docker.com/r/nytimes/v
 
 ## Documentation
 
-For more info check the [docs](https://github.com/nytimes/video-captions-api/wiki/Home)
+For more info check the [docs](https://github.com/nytimes/video-captions-api/wiki/Endpoints)
