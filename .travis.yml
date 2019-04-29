@@ -4,9 +4,6 @@ addons:
   apt:
     packages:
       - docker-ce
-cache:
-  directories:
-    - $GOPATH/pkg
 env:
   global:
     - GO_FOR_RELEASE=1.x
@@ -17,7 +14,6 @@ go:
   - 1.x
   - tip
 install:
-  - export GOCACHE=$GOPATH/pkg/cache
   - curl https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | BINDIR=$GOPATH/bin sh
   - go mod download
 script:
