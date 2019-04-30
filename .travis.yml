@@ -39,3 +39,6 @@ deploy:
       repo: nytimes/video-captions-api
       tags: true
       go: 1.x
+matrix:
+  allow_failures:
+    - go: tip
