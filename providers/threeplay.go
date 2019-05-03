@@ -4,10 +4,10 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/NYTimes/threeplay"
 	"github.com/NYTimes/video-captions-api/config"
 	"github.com/NYTimes/video-captions-api/database"
 	"github.com/kelseyhightower/envconfig"
+	"github.com/nytimes/threeplay"
 	log "github.com/sirupsen/logrus"
 )
 
