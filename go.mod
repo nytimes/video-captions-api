@@ -13,4 +13,6 @@ require (
 	github.com/stretchr/testify v1.3.0
 )
 
+replace github.com/nytimes/threeplay v0.2.0 => ../threeplay
+
 go 1.13

@@ -9,7 +9,7 @@ import (
 	"github.com/NYTimes/video-captions-api/database"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/nytimes/threeplay/types"
-	threeplay "github.com/nytimes/threeplay/v3"
+	threeplay "github.com/nytimes/threeplay/v3api"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -17,7 +17,7 @@ const providerName string = "3play"
 
 // ThreePlayProvider is a 3play client that implements the Provider interface
 type ThreePlayProvider struct {
-	*threeplay.ClientV3
+	*threeplay.Client
 	logger *log.Logger
 	config ThreePlayConfig
 }
@@ -102,6 +102,7 @@ func (c *ThreePlayProvider) DispatchJob(job *database.Job) error {
 	return nil
 }
 
+// CancelJob cancels a job if it is in a cancellable state
 func (c *ThreePlayProvider) CancelJob(id string) (bool, error) {
 	providerJob, err := c.GetProviderJob(id)
 	if err != nil {
@@ -113,7 +114,6 @@ func (c *ThreePlayProvider) CancelJob(id string) (bool, error) {
 			return providerJob.Cancellable, err
 		}
 		return providerJob.Cancellable, nil
-	} else {
-		return providerJob.Cancellable, errors.New("job is not cancellable")
 	}
+	return providerJob.Cancellable, errors.New("job is not cancellable")
 }

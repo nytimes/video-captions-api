@@ -126,6 +126,7 @@ func (c *AmaraProvider) DispatchJob(job *database.Job) error {
 	return nil
 }
 
+// CancelJob dummy method as amara cannot cancel jobs
 func (c *AmaraProvider) CancelJob(id string) (bool, error) {
 	return false, nil
 }

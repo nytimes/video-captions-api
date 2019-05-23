@@ -68,7 +68,6 @@ func (c Client) GetJob(jobID string) (*database.Job, error) {
 		}
 	}
 
-
 	if job.UpdateStatus(providerJob.Status, providerJob.Details) || shouldUpdate {
 		err = c.DB.UpdateJob(jobID, job)
 	}
@@ -136,19 +135,20 @@ func (c Client) CancelJob(jobID string) (bool, error) {
 	job.Done = true
 
 	err = c.DB.UpdateJob(jobID, job)
-
+	c.Logger.Info("Cancelled job in the database")
 	if job.Provider == "3play" {
 		cancellable, err := c.Providers[job.Provider].CancelJob(job.ProviderParams["ProviderID"])
 		if err != nil {
 			if cancellable {
 				c.Logger.Errorf("Could not cancel job with 3play but set to cancel in DB: %v", err)
-				return true, errors.New(fmt.Sprintf("Could not cancel job with 3play but set to cancel in DB: %v", err))
-			}  else {
-				c.Logger.Error("job is no longer cancellable with 3play but was updated in the DB")
-				return true, errors.New("job is no longer cancellable with 3play but was updated in the DB")
+				return true, fmt.Errorf("could not cancel job with 3play but set to cancel in DB: %v", err)
 			}
+			c.Logger.Error("job is no longer cancellable with 3play but was updated in the DB")
+			return true, errors.New("job is no longer cancellable with 3play but was updated in the DB")
+
 		}
 	}
+	c.Logger.Infof("Cancelled job with %s", job.Provider)
 	return true, err
 }
 
