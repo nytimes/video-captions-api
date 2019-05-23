@@ -61,3 +61,7 @@ func (c *UploadProvider) DispatchJob(job *database.Job) error {
 	}
 	return nil
 }
+
+func (c *UploadProvider) CancelJob(id string) (bool, error) {
+	return false, nil
+}

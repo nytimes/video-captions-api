@@ -8,4 +8,5 @@ type Provider interface {
 	Download(id string, captionsType string) ([]byte, error)
 	GetProviderJob(id string) (*database.ProviderJob, error)
 	GetName() string
+	CancelJob(id string) (bool, error)
 }

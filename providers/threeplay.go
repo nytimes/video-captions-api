@@ -1,13 +1,16 @@
 package providers
 
 import (
+	"errors"
 	"net/url"
 	"strconv"
 
-	"github.com/NYTimes/video-captions-api/config"
+	"github.com/NYTimes/gizmo/config"
+	threeplay "github.com/nytimes/threeplay/v3"
+	"github.com/nytimes/threeplay/common"
+	captionsConfig "github.com/NYTimes/video-captions-api/config"
 	"github.com/NYTimes/video-captions-api/database"
 	"github.com/kelseyhightower/envconfig"
-	"github.com/nytimes/threeplay"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -15,7 +18,7 @@ const providerName string = "3play"
 
 // ThreePlayProvider is a 3play client that implements the Provider interface
 type ThreePlayProvider struct {
-	*threeplay.Client
+	*threeplay.ClientV3
 	logger *log.Logger
 	config ThreePlayConfig
 }
@@ -23,14 +26,12 @@ type ThreePlayProvider struct {
 // ThreePlayConfig holds config necessary to create a ThreePlayProvider
 type ThreePlayConfig struct {
 	APIKey        string            `envconfig:"THREE_PLAY_API_KEY"`
-	APISecret     string            `envconfig:"THREE_PLAY_API_SECRET"`
-	FormatMapping map[string]string `envconfig:"THREE_PLAY_FORMAT_MAPPING"`
 }
 
 // New3PlayProvider creates a ThreePlayProvider instance
 func New3PlayProvider(cfg *ThreePlayConfig, svcCfg *config.CaptionsServiceConfig) Provider {
 	return &ThreePlayProvider{
-		threeplay.NewClient(cfg.APIKey, cfg.APISecret),
+		threeplay.NewClient(cfg.APIKey),
 		svcCfg.Logger,
 		*cfg,
 	}
@@ -50,37 +51,25 @@ func (c *ThreePlayProvider) GetName() string {
 
 // Download downloads captions file from specified type
 func (c *ThreePlayProvider) Download(id, captionsType string) ([]byte, error) {
-	fileID, err := strconv.Atoi(id)
+	transcript, err :=  c.GetTranscriptText(id, "", common.CaptionsFormat(captionsType))
 	if err != nil {
 		return nil, err
 	}
-	opts := threeplay.GetCaptionsOptions{
-		FileID: uint(fileID),
-		Format: threeplay.CaptionsFormat(captionsType),
-	}
-	if customFormat := c.config.FormatMapping[captionsType]; customFormat != "" {
-		opts.OutputFormat = customFormat
-		opts.Format = ""
-	}
-	return c.GetCaptions(opts)
+	return []byte(transcript), nil
 }
 
 // GetProviderJob returns a 3play file
 func (c *ThreePlayProvider) GetProviderJob(id string) (*database.ProviderJob, error) {
-	i, err := strconv.Atoi(id)
-	if err != nil {
-		return nil, err
-	}
-
-	file, err := c.GetFile(uint(i))
+	file, err := c.GetTranscriptInfo(id)
 	if err != nil {
 		return nil, err
 	}
 
 	providerJob := &database.ProviderJob{
-		ID:      strconv.FormatUint(uint64(file.ID), 10),
-		Status:  file.State,
-		Details: file.ErrorDescription,
+		ID:      strconv.Itoa(file.ID),
+		Status:  file.Status,
+		Details: file.Type,
+		Cancellable: file.Cancellable,
 	}
 	return providerJob, nil
 }
@@ -89,18 +78,43 @@ func (c *ThreePlayProvider) GetProviderJob(id string) (*database.ProviderJob, er
 func (c *ThreePlayProvider) DispatchJob(job *database.Job) error {
 	jobLogger := c.logger.WithFields(log.Fields{"JobID": job.ID, "Provider": job.Provider})
 	query := url.Values{}
-
+	turnaroundLevel := "asr"
 	for k, v := range job.ProviderParams {
-		query.Add(k, v)
+		if k == "turnaround_level_id" {
+			turnaroundLevel = v
+		} else {
+			query.Add(k, v)
+		}
 	}
-	fileID, err := c.UploadFileFromURL(job.MediaURL, query)
+	fileID, err := c.UploadFileFromURL(query)
 
 	if err != nil {
-		jobLogger.Error("Failed to dispatch job to 3Play", err)
+		jobLogger.Error("Failed to upload file to 3Play", err)
 		return err
 	}
 
-	job.ProviderParams["ProviderID"] = strconv.FormatUint(uint64(fileID), 10)
+	transcriptResponse, err := c.OrderTranscript(strconv.Itoa(fileID), "", turnaroundLevel)
+	if err != nil {
+		jobLogger.Error("Failed to order caption", err)
+	}
+
+	job.ProviderParams["ProviderID"] = strconv.Itoa(transcriptResponse.ID)
 
 	return nil
+}
+
+func (c *ThreePlayProvider) CancelJob(id string) (bool, error) {
+	providerJob, err := c.GetProviderJob(id)
+	if err != nil {
+		return false, err
+	}
+	if providerJob.Cancellable {
+		err = c.CancelTranscript(providerJob.ID)
+		if err != nil {
+			return providerJob.Cancellable, err
+		}
+		return providerJob.Cancellable, nil
+	} else {
+		return providerJob.Cancellable, errors.New("job is not cancellable")
+	}
 }

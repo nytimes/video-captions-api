@@ -116,11 +116,8 @@ func (s *CaptionsService) GetJob(r *http.Request) (int, interface{}, error) {
 func (s *CaptionsService) CancelJob(r *http.Request) (int, interface{}, error) {
 	id := server.Vars(r)["id"]
 	canceled, err := s.client.CancelJob(id)
-	if err != nil {
-		if err == database.ErrJobNotFound {
-			return http.StatusNotFound, nil, captionsError{err.Error()}
-		}
-		return http.StatusInternalServerError, nil, captionsError{err.Error()}
+	if err != nil && !canceled {
+		return http.StatusNotFound, nil, captionsError{err.Error()}
 	}
 	if !canceled {
 		return http.StatusConflict, nil, captionsError{"Cannot cancel a job that is already done"}

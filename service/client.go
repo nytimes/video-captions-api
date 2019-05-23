@@ -68,11 +68,12 @@ func (c Client) GetJob(jobID string) (*database.Job, error) {
 		}
 	}
 
+
 	if job.UpdateStatus(providerJob.Status, providerJob.Details) || shouldUpdate {
 		err = c.DB.UpdateJob(jobID, job)
 	}
 
-	if job.Status == "delivered" && !job.Done {
+	if (job.Status == "complete" || job.Status == "delivered") && !job.Done {
 		jobLogger.Info("Job is ready on the provider, downloading")
 		for i, output := range job.Outputs {
 			data, err := provider.Download(providerID, output.Type)
@@ -131,11 +132,23 @@ func (c Client) CancelJob(jobID string) (bool, error) {
 		return false, nil
 	}
 
-	job.Status = "canceled"
+	job.Status = "cancelled"
 	job.Done = true
 
 	err = c.DB.UpdateJob(jobID, job)
 
+	if job.Provider == "3play" {
+		cancellable, err := c.Providers[job.Provider].CancelJob(job.ProviderParams["ProviderID"])
+		if err != nil {
+			if cancellable {
+				c.Logger.Errorf("Could not cancel job with 3play but set to cancel in DB: %v", err)
+				return true, errors.New(fmt.Sprintf("Could not cancel job with 3play but set to cancel in DB: %v", err))
+			}  else {
+				c.Logger.Error("job is no longer cancellable with 3play but was updated in the DB")
+				return true, errors.New("job is no longer cancellable with 3play but was updated in the DB")
+			}
+		}
+	}
 	return true, err
 }
 

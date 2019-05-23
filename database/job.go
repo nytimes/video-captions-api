@@ -12,6 +12,7 @@ type ProviderJob struct {
 	Status  string
 	Details string
 	Params  map[string]string
+	Cancellable bool
 }
 
 // Job representation of a captions job

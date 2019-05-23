@@ -167,7 +167,7 @@ func TestCancelJob(t *testing.T) {
 	}
 
 	urlStr := fmt.Sprintf("/jobs/%v/cancel", captionsBody["id"])
-	r2, _ := http.NewRequest("POST", urlStr, nil)
+	r2, _ := http.NewRequest("GET", urlStr, nil)
 	w2 := httptest.NewRecorder()
 	server.ServeHTTP(w2, r2)
 	assert.Equal(200, w2.Code)
@@ -185,7 +185,7 @@ func TestCancelJob404(t *testing.T) {
 	service, client := createCaptionsService()
 	service.AddProvider(fakeProvider{logger: client.Logger})
 	server.Register(service)
-	r, _ := http.NewRequest("POST", "/jobs/404/cancel", nil)
+	r, _ := http.NewRequest("GET", "/jobs/404/cancel", nil)
 	w := httptest.NewRecorder()
 	server.ServeHTTP(w, r)
 
@@ -212,7 +212,7 @@ func TestCancelJobDone(t *testing.T) {
 	}
 	client.DB.StoreJob(job)
 	server.Register(service)
-	r, _ := http.NewRequest("POST", "/jobs/123/cancel", nil)
+	r, _ := http.NewRequest("GET", "/jobs/123/cancel", nil)
 	w := httptest.NewRecorder()
 	server.ServeHTTP(w, r)
 	assert.Equal(409, w.Code)

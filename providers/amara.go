@@ -125,3 +125,7 @@ func (c *AmaraProvider) DispatchJob(job *database.Job) error {
 	job.ProviderParams["ReviewURL"] = editorSession.URL
 	return nil
 }
+
+func (c *AmaraProvider) CancelJob(id string) (bool, error) {
+	return false, nil
+}
