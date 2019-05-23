@@ -5,12 +5,11 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/NYTimes/gizmo/config"
-	threeplay "github.com/nytimes/threeplay/v3"
-	"github.com/nytimes/threeplay/common"
-	captionsConfig "github.com/NYTimes/video-captions-api/config"
+	"github.com/NYTimes/video-captions-api/config"
 	"github.com/NYTimes/video-captions-api/database"
 	"github.com/kelseyhightower/envconfig"
+	"github.com/nytimes/threeplay/types"
+	threeplay "github.com/nytimes/threeplay/v3"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -25,7 +24,7 @@ type ThreePlayProvider struct {
 
 // ThreePlayConfig holds config necessary to create a ThreePlayProvider
 type ThreePlayConfig struct {
-	APIKey        string            `envconfig:"THREE_PLAY_API_KEY"`
+	APIKey string `envconfig:"THREE_PLAY_API_KEY"`
 }
 
 // New3PlayProvider creates a ThreePlayProvider instance
@@ -51,7 +50,7 @@ func (c *ThreePlayProvider) GetName() string {
 
 // Download downloads captions file from specified type
 func (c *ThreePlayProvider) Download(id, captionsType string) ([]byte, error) {
-	transcript, err :=  c.GetTranscriptText(id, "", common.CaptionsFormat(captionsType))
+	transcript, err := c.GetTranscriptText(id, "", types.CaptionsFormat(captionsType))
 	if err != nil {
 		return nil, err
 	}
@@ -66,9 +65,9 @@ func (c *ThreePlayProvider) GetProviderJob(id string) (*database.ProviderJob, er
 	}
 
 	providerJob := &database.ProviderJob{
-		ID:      strconv.Itoa(file.ID),
-		Status:  file.Status,
-		Details: file.Type,
+		ID:          strconv.Itoa(file.ID),
+		Status:      file.Status,
+		Details:     file.Type,
 		Cancellable: file.Cancellable,
 	}
 	return providerJob, nil
