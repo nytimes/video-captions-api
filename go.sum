@@ -123,6 +123,8 @@ github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d h1:VhgPp6v9qf9Agr/
 github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d/go.mod h1:YUTz3bUH2ZwIWBy3CJBeOBEugqcmXREj14T+iG/4k4U=
 github.com/nytimes/amara v0.2.0 h1:/Hkhzzao2MTqUG7M3gDtcW6dKMrD8+Ed8qDGJhqNd6E=
 github.com/nytimes/amara v0.2.0/go.mod h1:pfACvrYOIo7fA0uLLE2v6BK2tufSaOx8d9XH2a6Ztqk=
+github.com/nytimes/amara v0.3.0 h1:Wgx60hgSyChOji90s3MF0rWmN9CDz3b44dXv88iihGQ=
+github.com/nytimes/amara v0.3.0/go.mod h1:pfACvrYOIo7fA0uLLE2v6BK2tufSaOx8d9XH2a6Ztqk=
 github.com/nytimes/threeplay v0.2.0 h1:43ihNm5uA4l6LXhcUV926xnrUXyvxwQpSDDmsPEo8oE=
 github.com/nytimes/threeplay v0.2.0/go.mod h1:YR6ADhpSV3bYXTuxme7gxVUtpFtO5X0EHOavYBSZOy4=
 github.com/openzipkin/zipkin-go v0.1.1/go.mod h1:NtoC/o8u3JlF1lSlyPNswIbeQH9bJTmOf0Erfk+hxe8=
