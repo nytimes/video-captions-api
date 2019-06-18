@@ -30,7 +30,7 @@ type AmaraConfig struct {
 // NewAmaraProvider creates an AmaraProvider
 func NewAmaraProvider(cfg *AmaraConfig, svcCfg *config.CaptionsServiceConfig) Provider {
 	return &AmaraProvider{
-		amara.NewClient(cfg.Username, cfg.Token, cfg.Team),
+		amara.NewClient(cfg.Token, cfg.Team),
 		svcCfg.Logger,
 		cfg.Username,
 		cfg.Team,
@@ -51,16 +51,16 @@ func (c *AmaraProvider) GetName() string {
 
 // Download download latest subtitle version from Amara
 func (c *AmaraProvider) Download(id, captionFormat string) ([]byte, error) {
-	sub, err := c.GetSubtitles(id, "en", captionFormat)
+	sub, err := c.GetRawSubtitles(id, "en", captionFormat)
 	if err != nil {
 		return nil, err
 	}
-	return []byte(sub.Subtitles), nil
+	return sub, nil
 }
 
 // GetProviderJob returns current job status from Amara
 func (c *AmaraProvider) GetProviderJob(id string) (*database.ProviderJob, error) {
-	subs, err := c.GetSubtitles(id, "en", "vtt")
+	subs, err := c.GetSubtitleInfo(id, "en")
 	status := "in review"
 	if err != nil {
 		return nil, err
