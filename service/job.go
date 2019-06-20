@@ -116,7 +116,7 @@ func (s *CaptionsService) GetJob(r *http.Request) (int, interface{}, error) {
 func (s *CaptionsService) CancelJob(r *http.Request) (int, interface{}, error) {
 	id := server.Vars(r)["id"]
 	canceled, err := s.client.CancelJob(id)
-	if err != nil && !canceled {
+	if err != nil {
 		return http.StatusNotFound, nil, captionsError{err.Error()}
 	}
 	if !canceled {

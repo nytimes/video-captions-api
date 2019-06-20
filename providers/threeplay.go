@@ -95,6 +95,7 @@ func (c *ThreePlayProvider) DispatchJob(job *database.Job) error {
 	transcriptResponse, err := c.OrderTranscript(strconv.Itoa(fileID), "", turnaroundLevel)
 	if err != nil {
 		jobLogger.Error("Failed to order caption", err)
+		return err
 	}
 
 	job.ProviderParams["ProviderID"] = strconv.Itoa(transcriptResponse.ID)
