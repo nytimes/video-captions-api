@@ -8,10 +8,11 @@ import (
 
 // ProviderJob holds data coming from a Provider
 type ProviderJob struct {
-	ID      string
-	Status  string
-	Details string
-	Params  map[string]string
+	ID          string
+	Status      string
+	Details     string
+	Params      map[string]string
+	Cancellable bool
 }
 
 // Job representation of a captions job

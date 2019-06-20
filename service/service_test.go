@@ -62,6 +62,10 @@ func (p fakeProvider) GetName() string {
 	return "test-provider"
 }
 
+func (p fakeProvider) CancelJob(id string) (bool, error) {
+	return true, nil
+}
+
 type brokenProvider fakeProvider
 
 func (p brokenProvider) GetName() string {
@@ -79,6 +83,10 @@ func (p brokenProvider) DispatchJob(job *database.Job) error {
 func (p brokenProvider) GetProviderJob(id string) (*database.ProviderJob, error) {
 	p.logger.Info("fetching job", id)
 	return nil, errors.New("failed to get job")
+}
+
+func (p brokenProvider) CancelJob(id string) (bool, error) {
+	return false, nil
 }
 
 func createCaptionsService() (*CaptionsService, Client) {
