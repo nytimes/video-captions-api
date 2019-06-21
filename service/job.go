@@ -49,7 +49,7 @@ func newJobFromParams(newJob jobParams) (*database.Job, error) {
 	}
 	id, err := uuid.NewRandom()
 	if err != nil {
-		return nil, fmt.Errorf("could not create job id: %v", err)
+		return nil, fmt.Errorf("could not create a job id: %v", err)
 	}
 
 	for _, outputType := range newJob.OutputTypes {
