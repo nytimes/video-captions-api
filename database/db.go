@@ -17,4 +17,5 @@ type DB interface {
 	GetJob(string) (*Job, error)
 	DeleteJob(string) error
 	GetJobs(string) ([]Job, error)
+	GetJobByProviderID(string) (*Job, error)
 }

@@ -23,10 +23,12 @@ func NewCaptionsService(cfg *config.CaptionsServiceConfig, db database.DB) *Capt
 	storage, _ := NewGCSStorage(cfg.BucketName, cfg.Logger)
 	return &CaptionsService{
 		Client{
-			Providers: make(map[string]providers.Provider),
-			DB:        db,
-			Logger:    cfg.Logger,
-			Storage:   storage,
+			Providers:      make(map[string]providers.Provider),
+			DB:             db,
+			Logger:         cfg.Logger,
+			Storage:        storage,
+			CallbackURL:    cfg.CallbackURL,
+			CallbackAPIKey: cfg.CallbackAPIKey,
 		},
 		cfg.Logger,
 	}
@@ -67,6 +69,9 @@ func (s *CaptionsService) Endpoints() map[string]map[string]http.HandlerFunc {
 		},
 		"/jobs/{id}/transcript/{captionFormat}": {
 			"GET": s.GetTranscript,
+		},
+		"/callback": {
+			"POST": server.JSONToHTTP(s.ProcessCallback).ServeHTTP,
 		},
 	}
 }

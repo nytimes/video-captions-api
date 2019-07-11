@@ -35,6 +35,27 @@ type uploadedFile struct {
 	Name string `json:"name"`
 }
 
+type Callback struct {
+	Code int          `json:"code"`
+	Data CallbackData `json:"data"`
+}
+
+type CallbackData struct {
+	Cancellable         bool    `json:"cancellable"`
+	Default             bool    `json:"default"`
+	ID                  int     `json:"id"`
+	BatchID             int     `json:"batch_id"`
+	LanguageID          int     `json:"language_id"`
+	MediaFileID         int     `json:"media_file_id"`
+	LanguageIDs         []int   `json:"language_ids"`
+	CancellationDetails string  `json:"cancellation_details"`
+	CancellationReason  string  `json:"cancellation_reason"`
+	ReferenceID         string  `json:"reference_id"`
+	Status              string  `json:"status"`
+	Type                string  `json:"type"`
+	Duration            float64 `json:"duration"`
+}
+
 func newJobFromParams(newJob jobParams) (*database.Job, error) {
 	outputs := make([]database.JobOutput, 0)
 	var name string
@@ -207,4 +228,36 @@ func (s *CaptionsService) GetTranscript(w http.ResponseWriter, r *http.Request) 
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(transcript))
+}
+
+func (s *CaptionsService) ProcessCallback(r *http.Request) (int, interface{}, error) {
+	requestLogger := s.logger.WithFields(log.Fields{
+		"Handler": "ProcessCallback",
+		"Method":  r.Method,
+		"URI":     r.RequestURI,
+	})
+	id := server.Vars(r)["id"]
+	requestLogger.Infof("Received a callback for ID: %v", id)
+
+	defer r.Body.Close()
+
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		requestLogger.WithError(err).Error("Could not read request body: ")
+		return http.StatusBadRequest, nil, captionsError{err.Error()}
+	}
+
+	callbackObject := Callback{}
+	err = json.Unmarshal(data, &callbackObject)
+	if err != nil {
+		requestLogger.WithError(err).Error("Could unmarshal callback")
+		return http.StatusBadRequest, nil, captionsError{"Malformed parameters"}
+	}
+
+	err = s.client.ProcessCallback(callbackObject.Data)
+	if err != nil {
+		requestLogger.Errorf("Could not process callback for ID: %v", id)
+		return http.StatusInternalServerError, nil, captionsError{err.Error()}
+	}
+	return http.StatusOK, nil, nil
 }

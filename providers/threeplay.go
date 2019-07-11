@@ -73,15 +73,43 @@ func (c *ThreePlayProvider) GetProviderJob(id string) (*database.ProviderJob, er
 	return providerJob, nil
 }
 
-// DispatchJob sends a video file to 3play for transcription and captions generation
+// DispatchJob sends a video file to 3play for transcription and captions generation or generates a expiring editing link
+// when the media_file_url param is provided
 func (c *ThreePlayProvider) DispatchJob(job *database.Job) error {
 	jobLogger := c.logger.WithFields(log.Fields{"JobID": job.ID, "Provider": job.Provider})
+	// Review job route
+	if mediaFileID, ok := job.ProviderParams["media_file_id"]; ok {
+		hoursInt := 2
+		var err error
+		if hoursUntilExpiration, ok := job.ProviderParams["hours_until_expiration"]; ok {
+			hoursInt, err = strconv.Atoi(hoursUntilExpiration)
+			if err != nil {
+				jobLogger.WithError(err).Error("Could not convert hours until expiration")
+			}
+		}
+
+		reviewURL, err := c.GetEditingLink(mediaFileID, hoursInt)
+		if err != nil {
+			jobLogger.WithError(err).Error("Could not generate review url")
+			return err
+		}
+
+		job.ProviderParams["ProviderID"] = mediaFileID
+		job.ProviderParams["ReviewURL"] = reviewURL
+		return nil
+	}
+
+	// Creation job route
 	query := url.Values{}
 	turnaroundLevel := "asr"
+	callbackURL := ""
 	for k, v := range job.ProviderParams {
-		if k == "turnaround_level_id" {
+		switch k {
+		case "turnaround_level_id":
 			turnaroundLevel = v
-		} else {
+		case "callback_url":
+			callbackURL = v
+		default:
 			query.Add(k, v)
 		}
 	}
@@ -92,14 +120,13 @@ func (c *ThreePlayProvider) DispatchJob(job *database.Job) error {
 		return err
 	}
 
-	transcriptResponse, err := c.OrderTranscript(strconv.Itoa(fileID), "", turnaroundLevel)
+	transcriptResponse, err := c.OrderTranscript(strconv.Itoa(fileID), callbackURL, turnaroundLevel)
 	if err != nil {
 		jobLogger.Error("Failed to order caption", err)
 		return err
 	}
 
 	job.ProviderParams["ProviderID"] = strconv.Itoa(transcriptResponse.ID)
-
 	return nil
 }
 

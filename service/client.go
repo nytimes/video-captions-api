@@ -1,9 +1,13 @@
 package service
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/NYTimes/video-captions-api/database"
@@ -13,10 +17,12 @@ import (
 
 // Client CaptionsService client
 type Client struct {
-	Providers map[string]providers.Provider
-	DB        database.DB
-	Logger    *log.Logger
-	Storage   Storage
+	Providers      map[string]providers.Provider
+	DB             database.DB
+	Logger         *log.Logger
+	Storage        Storage
+	CallbackURL    string
+	CallbackAPIKey string
 }
 
 // GetJobs gets all jobs associated with a ParentID
@@ -253,4 +259,52 @@ func (c Client) GenerateTranscript(captionFile []byte, captionFormat string) (st
 	}
 	jobLogger.Error("error generating transcript")
 	return "", fmt.Errorf("unable to generate a transcript for caption format: %v", captionFormat)
+}
+
+func (c Client) ProcessCallback(callbackData CallbackData) error {
+	jobLogger := c.Logger
+	jobLogger.Info("Processing a callback for captions")
+	if callbackData.ID == 0 {
+		jobLogger.Error("Invalid Provider ID")
+		return errors.New("invalid Provider ID")
+	}
+	databaseJob, err := c.DB.GetJobByProviderID(strconv.Itoa(callbackData.ID))
+	if err != nil {
+		jobLogger.Errorf("Could not retrieve job by provider ID: %v", err)
+		return err
+	}
+	job, err := c.GetJob(databaseJob.ID)
+	if err != nil {
+		jobLogger.Errorf("Could not get job data: %v", err)
+		return err
+	}
+	if c.CallbackURL != "" {
+		jobLogger.Infof("Making API call to: %v", c.CallbackURL)
+		err = c.makeAPICall(job)
+		if err != nil {
+			jobLogger.Errorf("Encountered an error while making a callback call: %v", err)
+			return err
+		}
+	}
+	return nil
+}
+
+func (c Client) makeAPICall(job *database.Job) error {
+	requestBody, err := json.Marshal(job)
+	if err != nil {
+		return err
+	}
+	url := c.CallbackURL
+	if c.CallbackAPIKey != "" {
+		url = fmt.Sprintf("%v?api_key=%v", c.CallbackURL, c.CallbackAPIKey)
+	}
+
+	resp, err := http.Post(url, "application/json", bytes.NewBuffer(requestBody)) // #nosec
+	if err != nil {
+		return err
+	}
+	if !(resp.StatusCode >= 200 && resp.StatusCode < 300) {
+		return fmt.Errorf("%v", resp.Status)
+	}
+	return nil
 }
