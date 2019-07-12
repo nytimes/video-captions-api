@@ -143,6 +143,8 @@ github.com/nytimes/threeplay v0.2.0 h1:43ihNm5uA4l6LXhcUV926xnrUXyvxwQpSDDmsPEo8
 github.com/nytimes/threeplay v0.2.0/go.mod h1:YR6ADhpSV3bYXTuxme7gxVUtpFtO5X0EHOavYBSZOy4=
 github.com/nytimes/threeplay v0.3.0 h1:KNRBzlhfGCjpw8mCeHSTyHpafh1CO2tUv2LTnKvgMjQ=
 github.com/nytimes/threeplay v0.3.0/go.mod h1:7Ttlufr7v1zBWMJ3BgyNP/FU/bReMX2cWzQByXMAijU=
+github.com/nytimes/threeplay v0.3.1 h1:Q4Y/5zd1gWQScEqbaLCWf374uwCPL1s3vCAevotEvDc=
+github.com/nytimes/threeplay v0.3.1/go.mod h1:7RYQwk6M28F77xLPmzb0DAe7fBmdLD3MAFvXrF7Q2us=
 github.com/openzipkin/zipkin-go v0.1.1/go.mod h1:NtoC/o8u3JlF1lSlyPNswIbeQH9bJTmOf0Erfk+hxe8=
 github.com/openzipkin/zipkin-go v0.1.3/go.mod h1:NtoC/o8u3JlF1lSlyPNswIbeQH9bJTmOf0Erfk+hxe8=
 github.com/pierrec/lz4 v2.0.5+incompatible/go.mod h1:pdkljMzZIN41W+lC3N2tnIh5sFi+IEE17M5jbnwPHcY=
@@ -369,6 +371,7 @@ gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 h1:qIbj1fsPNlZgppZ+VLlY7N33
 gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/h2non/gock.v1 v1.0.14 h1:fTeu9fcUvSnLNacYvYI54h+1/XEteDyHvrVCZEEEYNM=
 gopkg.in/h2non/gock.v1 v1.0.14/go.mod h1:sX4zAkdYX1TRGJ2JY156cFspQn4yRWn6p9EMdODlynE=
+gopkg.in/h2non/gock.v1 v1.0.15/go.mod h1:sX4zAkdYX1TRGJ2JY156cFspQn4yRWn6p9EMdODlynE=
 gopkg.in/inf.v0 v0.9.1/go.mod h1:cWUDdTG/fYaXco+Dcufb5Vnc6Gp2YChqWtbxRZE0mXw=
 gopkg.in/yaml.v2 v2.2.1/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
 gopkg.in/yaml.v2 v2.2.2/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
