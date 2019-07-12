@@ -302,6 +302,7 @@ func (c Client) makeAPICall(job *database.Job) error {
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
 	if !(resp.StatusCode >= 200 && resp.StatusCode < 300) {
 		return fmt.Errorf("%v", resp.Status)
 	}
