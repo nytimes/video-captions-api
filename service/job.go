@@ -250,11 +250,14 @@ func (s *CaptionsService) ProcessCallback(r *http.Request) (int, interface{}, er
 	callbackObject := Callback{}
 	err = json.Unmarshal(data, &callbackObject)
 	if err != nil {
-		requestLogger.WithError(err).Error("Could unmarshal callback")
+		requestLogger.WithError(err).Error("Could not unmarshal callback")
 		return http.StatusBadRequest, nil, captionsError{"Malformed parameters"}
 	}
 
-	err = s.client.ProcessCallback(callbackObject.Data)
+	queryParams := r.URL.Query()
+	jobID := queryParams.Get("job_id")
+
+	err = s.client.ProcessCallback(callbackObject.Data, jobID)
 	if err != nil {
 		requestLogger.Errorf("Could not process callback for ID: %v", id)
 		return http.StatusInternalServerError, nil, captionsError{err.Error()}

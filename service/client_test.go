@@ -317,6 +317,7 @@ func TestGenerateTranscriptWrongFormat(t *testing.T) {
 type processCallbackClientTest struct {
 	name            string
 	providerID      int
+	jobID           string
 	startFakeServer bool
 	error           error
 	serverResponse  int
@@ -325,11 +326,20 @@ type processCallbackClientTest struct {
 func TestProcessCallbackClient(t *testing.T) {
 	tests := []processCallbackClientTest{
 		{
-			name:            "Happy path",
+			name:            "Happy path without jobID",
 			providerID:      11214314,
+			jobID:           "",
 			startFakeServer: true,
 			error:           nil,
 			serverResponse:  http.StatusOK,
+		},
+		{
+			name:            "Happy path with jobID",
+			providerID:      11214314,
+			jobID:           "123",
+			startFakeServer: false,
+			error:           nil,
+			serverResponse:  0,
 		},
 		{
 			name:            "Invalid provider ID",
@@ -348,6 +358,7 @@ func TestProcessCallbackClient(t *testing.T) {
 		{
 			name:            "Callback error",
 			providerID:      11214314,
+			jobID:           "123",
 			startFakeServer: true,
 			error:           fmt.Errorf("500 Internal Server Error"),
 			serverResponse:  http.StatusInternalServerError,
@@ -390,7 +401,7 @@ func TestProcessCallbackClient(t *testing.T) {
 				Cancellable: false,
 			}
 
-			err := client.ProcessCallback(callbackData)
+			err := client.ProcessCallback(callbackData, test.jobID)
 			assert.Equal(test.error, err)
 		})
 	}

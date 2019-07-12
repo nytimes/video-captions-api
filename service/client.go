@@ -261,19 +261,22 @@ func (c Client) GenerateTranscript(captionFile []byte, captionFormat string) (st
 	return "", fmt.Errorf("unable to generate a transcript for caption format: %v", captionFormat)
 }
 
-func (c Client) ProcessCallback(callbackData CallbackData) error {
+func (c Client) ProcessCallback(callbackData CallbackData, jobID string) error {
 	jobLogger := c.Logger
 	jobLogger.Info("Processing a callback for captions")
 	if callbackData.ID == 0 {
 		jobLogger.Error("Invalid Provider ID")
 		return errors.New("invalid Provider ID")
 	}
-	databaseJob, err := c.DB.GetJobByProviderID(strconv.Itoa(callbackData.ID))
-	if err != nil {
-		jobLogger.Errorf("Could not retrieve job by provider ID: %v", err)
-		return err
+	if jobID == "" {
+		databaseJob, err := c.DB.GetJobByProviderID(strconv.Itoa(callbackData.ID))
+		if err != nil {
+			jobLogger.Errorf("Could not retrieve job by provider ID: %v", err)
+			return err
+		}
+		jobID = databaseJob.ID
 	}
-	job, err := c.GetJob(databaseJob.ID)
+	job, err := c.GetJob(jobID)
 	if err != nil {
 		jobLogger.Errorf("Could not get job data: %v", err)
 		return err
@@ -294,12 +297,8 @@ func (c Client) makeAPICall(job *database.Job) error {
 	if err != nil {
 		return err
 	}
-	url := c.CallbackURL
-	if c.CallbackAPIKey != "" {
-		url = fmt.Sprintf("%v?api_key=%v", c.CallbackURL, c.CallbackAPIKey)
-	}
 
-	resp, err := http.Post(url, "application/json", bytes.NewBuffer(requestBody)) // #nosec
+	resp, err := http.Post(c.CallbackURL, "application/json", bytes.NewBuffer(requestBody))
 	if err != nil {
 		return err
 	}

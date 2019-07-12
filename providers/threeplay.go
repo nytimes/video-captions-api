@@ -107,8 +107,15 @@ func (c *ThreePlayProvider) DispatchJob(job *database.Job) error {
 		switch k {
 		case "turnaround_level_id":
 			turnaroundLevel = v
-		case "callback_url":
-			callbackURL = v
+		case "callback":
+			url, err := url.Parse(v)
+			if err != nil {
+				break
+			}
+			query := url.Query()
+			query.Add("job_id", job.ID)
+			url.RawQuery = query.Encode()
+			callbackURL = url.String()
 		default:
 			query.Add(k, v)
 		}

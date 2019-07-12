@@ -23,12 +23,11 @@ func NewCaptionsService(cfg *config.CaptionsServiceConfig, db database.DB) *Capt
 	storage, _ := NewGCSStorage(cfg.BucketName, cfg.Logger)
 	return &CaptionsService{
 		Client{
-			Providers:      make(map[string]providers.Provider),
-			DB:             db,
-			Logger:         cfg.Logger,
-			Storage:        storage,
-			CallbackURL:    cfg.CallbackURL,
-			CallbackAPIKey: cfg.CallbackAPIKey,
+			Providers:   make(map[string]providers.Provider),
+			DB:          db,
+			Logger:      cfg.Logger,
+			Storage:     storage,
+			CallbackURL: cfg.CallbackURL,
 		},
 		cfg.Logger,
 	}
