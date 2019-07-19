@@ -78,3 +78,19 @@ func (db *MemoryDatabase) GetJobs(parentID string) ([]Job, error) {
 
 	return jobList, nil
 }
+
+// GetJobByProviderID Returns returns a job matching the ProviderID
+func (db *MemoryDatabase) GetJobByProviderID(providerID string) (*Job, error) {
+	db.mtx.Lock()
+	defer db.mtx.Unlock()
+
+	for _, job := range db.jobs {
+		if _, ok := job.ProviderParams["ProviderID"]; ok {
+			if providerID == job.ProviderParams["ProviderID"] {
+				return job, nil
+			}
+		}
+	}
+
+	return nil, ErrNoJobs
+}

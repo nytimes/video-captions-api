@@ -89,12 +89,13 @@ func (p brokenProvider) CancelJob(id string) (bool, error) {
 	return false, nil
 }
 
-func createCaptionsService() (*CaptionsService, Client) {
+func createCaptionsService(callbackURL string) (*CaptionsService, Client) {
 	client := Client{
-		Providers: make(map[string]providers.Provider),
-		DB:        database.NewMemoryDatabase(),
-		Logger:    log.New(),
-		Storage:   ignoreStorage{},
+		Providers:   make(map[string]providers.Provider),
+		DB:          database.NewMemoryDatabase(),
+		Logger:      log.New(),
+		Storage:     ignoreStorage{},
+		CallbackURL: callbackURL,
 	}
 	service := &CaptionsService{
 		client: client,
@@ -111,7 +112,7 @@ func (i ignoreStorage) Store(_ []byte, filename string) (string, error) {
 
 func TestAddProvider(t *testing.T) {
 	assert := assert.New(t)
-	service, client := createCaptionsService()
+	service, client := createCaptionsService("")
 
 	service.AddProvider(fakeProvider{})
 	provider := client.Providers["test-provider"]
@@ -153,4 +154,5 @@ func TestNewCaptionsService(t *testing.T) {
 	assert.Contains(service.Endpoints(), "/jobs/{id}/cancel")
 	assert.Contains(service.Endpoints(), "/jobs/{id}/download/{captionFormat}")
 	assert.Contains(service.Endpoints(), "/jobs/{id}/transcript/{captionFormat}")
+	assert.Contains(service.Endpoints(), "/callback")
 }

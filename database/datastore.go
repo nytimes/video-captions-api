@@ -108,6 +108,20 @@ func (d *DatastoreDatabase) DeleteJob(id string) error {
 	return d.client.Delete(ctx, key)
 }
 
+// GetJobByProviderID returns a job associated with a given provider ID
+func (d *DatastoreDatabase) GetJobByProviderID(providerID string) (*Job, error) {
+	ctx := context.Background()
+	query := datastore.NewQuery(d.kind).Namespace(d.namespace).Filter("ProviderParams.ProviderID =", providerID).Limit(1)
+	var jobs []Job
+	if _, err := d.client.GetAll(ctx, query, &jobs); err != nil {
+		return nil, err
+	}
+	if len(jobs) == 0 {
+		return nil, ErrNoJobs
+	}
+	return &jobs[0], nil
+}
+
 func newNameKeyWithNamespace(kind, name, namespace string) *datastore.Key {
 	key := datastore.NameKey(kind, name, nil)
 	key.Namespace = namespace

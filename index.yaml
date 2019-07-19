@@ -1,0 +1,7 @@
+indexes:
+
+- kind: Jobs
+  properties:
+  - name: ProviderParams.ProviderID
+  - name: created
+    direction: desc

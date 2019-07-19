@@ -8,6 +8,8 @@ dev:
 		AMARA_TOKEN=$(AMARA_TOKEN) \
 		PROJECT_ID=nyt-video-dev \
 		BUCKET_NAME=video-captions-api-dev \
+		CALLBACK_URL=$(CALLBACK_URL) \
+		CALLBACK_API_KEY=$(CALLBACK_API_KEY) \
 		go run main.go
 
 install-golangcilint:

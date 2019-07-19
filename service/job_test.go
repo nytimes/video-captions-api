@@ -19,7 +19,7 @@ import (
 
 func TestCreateJob(t *testing.T) {
 	assert := assert.New(t)
-	service, client := createCaptionsService()
+	service, client := createCaptionsService("")
 	service.AddProvider(fakeProvider{logger: client.Logger})
 	job := &database.Job{
 		ID:       "123",
@@ -40,7 +40,7 @@ func TestCreateJob(t *testing.T) {
 
 func TestCreateJobQueryString(t *testing.T) {
 	assert := assert.New(t)
-	service, client := createCaptionsService()
+	service, client := createCaptionsService("")
 	service.AddProvider(fakeProvider{logger: client.Logger})
 	job := &database.Job{
 		ID:       "123",
@@ -61,7 +61,7 @@ func TestCreateJobQueryString(t *testing.T) {
 
 func TestCreateUploadJob(t *testing.T) {
 	assert := assert.New(t)
-	service, client := createCaptionsService()
+	service, client := createCaptionsService("")
 	service.AddProvider(fakeProvider{logger: client.Logger})
 	job := &database.Job{
 		ID:          "123",
@@ -79,7 +79,7 @@ func TestCreateUploadJob(t *testing.T) {
 
 func TestCreateJobNoMediaURL(t *testing.T) {
 	assert := assert.New(t)
-	service, client := createCaptionsService()
+	service, client := createCaptionsService("")
 	service.AddProvider(fakeProvider{logger: client.Logger})
 	job := &database.Job{
 		ID:       "123",
@@ -96,7 +96,7 @@ func TestCreateJobNoMediaURL(t *testing.T) {
 
 func TestCreateJobDispatchError(t *testing.T) {
 	assert := assert.New(t)
-	service, client := createCaptionsService()
+	service, client := createCaptionsService("")
 	service.AddProvider(brokenProvider{logger: client.Logger})
 	job := &database.Job{
 		ID:       "123",
@@ -113,7 +113,7 @@ func TestCreateJobDispatchError(t *testing.T) {
 
 func TestCreateJobInvalidBody(t *testing.T) {
 	assert := assert.New(t)
-	service, client := createCaptionsService()
+	service, client := createCaptionsService("")
 	service.AddProvider(fakeProvider{logger: client.Logger})
 	r, _ := http.NewRequest("POST", "/captions", bytes.NewReader([]byte("not json")))
 	status, resultJob, err := service.CreateJob(r)
@@ -126,7 +126,7 @@ func TestCreateJobInvalidBody(t *testing.T) {
 func TestGetJob404(t *testing.T) {
 	assert := assert.New(t)
 	server := server.NewSimpleServer(&server.Config{})
-	service, _ := createCaptionsService()
+	service, _ := createCaptionsService("")
 	server.Register(service)
 	r, _ := http.NewRequest("GET", "/jobs/404", nil)
 	w := httptest.NewRecorder()
@@ -143,7 +143,7 @@ func TestGetJob404(t *testing.T) {
 func TestCancelJob(t *testing.T) {
 	assert := assert.New(t)
 	server := server.NewSimpleServer(&server.Config{})
-	service, client := createCaptionsService()
+	service, client := createCaptionsService("")
 	service.AddProvider(fakeProvider{logger: client.Logger})
 	job := &database.Job{
 		ParentID: "123",
@@ -182,7 +182,7 @@ func TestCancelJob(t *testing.T) {
 func TestCancelJob404(t *testing.T) {
 	assert := assert.New(t)
 	server := server.NewSimpleServer(&server.Config{})
-	service, client := createCaptionsService()
+	service, client := createCaptionsService("")
 	service.AddProvider(fakeProvider{logger: client.Logger})
 	server.Register(service)
 	r, _ := http.NewRequest("POST", "/jobs/404/cancel", nil)
@@ -200,7 +200,7 @@ func TestCancelJob404(t *testing.T) {
 }
 
 func TestCancelJobDone(t *testing.T) {
-	service, client := createCaptionsService()
+	service, client := createCaptionsService("")
 	server := server.NewSimpleServer(&server.Config{})
 	assert := assert.New(t)
 	service.AddProvider(fakeProvider{logger: client.Logger})
@@ -225,7 +225,7 @@ func TestCancelJobDone(t *testing.T) {
 }
 
 func TestDownload(t *testing.T) {
-	service, client := createCaptionsService()
+	service, client := createCaptionsService("")
 	server := server.NewSimpleServer(&server.Config{})
 	assert := assert.New(t)
 	service.AddProvider(fakeProvider{logger: client.Logger})
@@ -245,7 +245,7 @@ func TestDownload(t *testing.T) {
 }
 
 func TestDownloadMissingCaption(t *testing.T) {
-	service, client := createCaptionsService()
+	service, client := createCaptionsService("")
 	server := server.NewSimpleServer(&server.Config{})
 	assert := assert.New(t)
 	service.AddProvider(fakeProvider{logger: client.Logger})
@@ -265,7 +265,7 @@ func TestDownloadMissingCaption(t *testing.T) {
 }
 
 func TestDownloadBadRequest(t *testing.T) {
-	service, client := createCaptionsService()
+	service, client := createCaptionsService("")
 	server := server.NewSimpleServer(&server.Config{})
 	assert := assert.New(t)
 	service.AddProvider(fakeProvider{logger: client.Logger})
@@ -285,7 +285,7 @@ func TestDownloadBadRequest(t *testing.T) {
 }
 
 func TestTranscript(t *testing.T) {
-	service, client := createCaptionsService()
+	service, client := createCaptionsService("")
 	server := server.NewSimpleServer(&server.Config{})
 	assert := assert.New(t)
 	service.AddProvider(fakeProvider{logger: client.Logger})
@@ -305,7 +305,7 @@ func TestTranscript(t *testing.T) {
 }
 
 func TestTranscriptMissingCaption(t *testing.T) {
-	service, client := createCaptionsService()
+	service, client := createCaptionsService("")
 	server := server.NewSimpleServer(&server.Config{})
 	assert := assert.New(t)
 	service.AddProvider(fakeProvider{logger: client.Logger})
@@ -325,7 +325,7 @@ func TestTranscriptMissingCaption(t *testing.T) {
 }
 
 func TestTranscriptBadRequest(t *testing.T) {
-	service, client := createCaptionsService()
+	service, client := createCaptionsService("")
 	server := server.NewSimpleServer(&server.Config{})
 	assert := assert.New(t)
 	service.AddProvider(fakeProvider{logger: client.Logger})
@@ -340,4 +340,79 @@ func TestTranscriptBadRequest(t *testing.T) {
 	w := httptest.NewRecorder()
 	server.ServeHTTP(w, r)
 	assert.Equal(400, w.Code)
+}
+
+type processCallbackTest struct {
+	name            string
+	callbackID      int
+	responseCode    int
+	startFakeServer bool
+}
+
+func TestProcessCallback(t *testing.T) {
+	tests := []processCallbackTest{
+		{
+			name:            "Success",
+			callbackID:      11214314,
+			responseCode:    200,
+			startFakeServer: true,
+		},
+		{
+			name:            "Provider ID not found",
+			callbackID:      67849,
+			responseCode:    500,
+			startFakeServer: false,
+		},
+	}
+	for _, test := range tests {
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			callbackURL := ""
+			if test.startFakeServer {
+				fakeServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.Header().Set("Content-Type", "application/json")
+					w.WriteHeader(http.StatusOK)
+				}))
+				defer fakeServer.Close()
+				callbackURL = fakeServer.URL
+			}
+
+			service, client := createCaptionsService(callbackURL)
+			server := server.NewSimpleServer(&server.Config{})
+			assert := assert.New(t)
+			service.AddProvider(fakeProvider{logger: client.Logger})
+			job := &database.Job{
+				ID:             "123",
+				MediaURL:       "http://vp.nyt.com/video.mp4",
+				Provider:       "test-provider",
+				ProviderParams: map[string]string{"ProviderID": "11214314"},
+			}
+			client.DB.StoreJob(job)
+			server.Register(service)
+
+			captionCallback := Callback{
+				Code: 200,
+				Data: CallbackData{
+					ID:          test.callbackID,
+					MediaFileID: 3765758,
+					BatchID:     68841,
+					ReferenceID: "",
+					Duration:    190.848,
+					Default:     true,
+					Type:        "AsrTranscript",
+					LanguageID:  1,
+					LanguageIDs: []int{1},
+					Status:      "complete",
+					Cancellable: false,
+				},
+			}
+
+			callbackBody, _ := json.Marshal(captionCallback)
+			r, _ := http.NewRequest("POST", "/callback", bytes.NewReader(callbackBody))
+			r.Header.Set("Content-Type", "application/json")
+			w := httptest.NewRecorder()
+			server.ServeHTTP(w, r)
+			assert.Equal(test.responseCode, w.Code)
+		})
+	}
 }
