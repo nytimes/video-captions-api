@@ -12,7 +12,6 @@ env:
     - GOPROXY=https://proxy.golang.org
 go:
   - 1.x
-  - tip
 install:
   - curl https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | BINDIR=$GOPATH/bin sh
   - go mod download
@@ -39,6 +38,3 @@ deploy:
       repo: nytimes/video-captions-api
       tags: true
       go: 1.x
-matrix:
-  allow_failures:
-    - go: tip
