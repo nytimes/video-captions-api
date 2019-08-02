@@ -29,6 +29,7 @@ type Job struct {
 	Language       string         `json:"language"`
 	Details        string         `json:"details,omitempty"`
 	CaptionFile    UploadedFile   `json:"caption_file,omitempty"`
+	JobType        string         `json:"job_type"`
 }
 
 // UploadedFile contains the uploaded file and its name

@@ -28,8 +28,8 @@ func (c *UploadProvider) GetName() string {
 }
 
 // Download returns the uploaded caption file
-func (c *UploadProvider) Download(id string, captionsType string) ([]byte, error) {
-	job, err := c.DB.GetJob(id)
+func (c *UploadProvider) Download(job *database.Job, captionsType string) ([]byte, error) {
+	job, err := c.DB.GetJob(job.ProviderParams["ProviderID"])
 	if err != nil {
 		return nil, fmt.Errorf("could not find job in DB")
 	}
@@ -37,8 +37,8 @@ func (c *UploadProvider) Download(id string, captionsType string) ([]byte, error
 }
 
 // GetProviderJob returns the provider's job parameters.
-func (c *UploadProvider) GetProviderJob(id string) (*database.ProviderJob, error) {
-	job, err := c.DB.GetJob(id)
+func (c *UploadProvider) GetProviderJob(job *database.Job) (*database.ProviderJob, error) {
+	job, err := c.DB.GetJob(job.ProviderParams["ProviderID"])
 	if err != nil {
 		return nil, fmt.Errorf("could not find job in DB")
 	}
@@ -62,6 +62,6 @@ func (c *UploadProvider) DispatchJob(job *database.Job) error {
 	return nil
 }
 
-func (c *UploadProvider) CancelJob(id string) (bool, error) {
+func (c *UploadProvider) CancelJob(job *database.Job) (bool, error) {
 	return false, nil
 }

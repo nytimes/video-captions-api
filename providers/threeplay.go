@@ -24,13 +24,13 @@ type ThreePlayProvider struct {
 
 // ThreePlayConfig holds config necessary to create a ThreePlayProvider
 type ThreePlayConfig struct {
-	APIKey string `envconfig:"THREE_PLAY_API_KEY"`
+	APIKeyByJobType map[string]string `envconfig:"THREE_PLAY_API_KEY"`
 }
 
 // New3PlayProvider creates a ThreePlayProvider instance
 func New3PlayProvider(cfg *ThreePlayConfig, svcCfg *config.CaptionsServiceConfig) Provider {
 	return &ThreePlayProvider{
-		threeplay.NewClient(cfg.APIKey),
+		threeplay.NewClient(cfg.APIKeyByJobType["captions"]),
 		svcCfg.Logger,
 		*cfg,
 	}
@@ -49,8 +49,9 @@ func (c *ThreePlayProvider) GetName() string {
 }
 
 // Download downloads captions file from specified type
-func (c *ThreePlayProvider) Download(id, captionsType string) ([]byte, error) {
-	transcript, err := c.GetTranscriptText(id, "", types.CaptionsFormat(captionsType))
+func (c *ThreePlayProvider) Download(job *database.Job, captionsType string) ([]byte, error) {
+	callParams := threeplay.CallParams{APIKey: c.config.APIKeyByJobType[job.JobType]}
+	transcript, err := c.GetTranscriptText(job.ProviderParams["ProviderID"], "", types.CaptionsFormat(captionsType), callParams)
 	if err != nil {
 		return nil, err
 	}
@@ -58,8 +59,9 @@ func (c *ThreePlayProvider) Download(id, captionsType string) ([]byte, error) {
 }
 
 // GetProviderJob returns a 3play file
-func (c *ThreePlayProvider) GetProviderJob(id string) (*database.ProviderJob, error) {
-	file, err := c.GetTranscriptInfo(id)
+func (c *ThreePlayProvider) GetProviderJob(job *database.Job) (*database.ProviderJob, error) {
+	callParams := threeplay.CallParams{APIKey: c.config.APIKeyByJobType[job.JobType]}
+	file, err := c.GetTranscriptInfo(job.ProviderParams["ProviderID"], callParams)
 	if err != nil {
 		return nil, err
 	}
@@ -77,6 +79,7 @@ func (c *ThreePlayProvider) GetProviderJob(id string) (*database.ProviderJob, er
 // when the media_file_url param is provided
 func (c *ThreePlayProvider) DispatchJob(job *database.Job) error {
 	jobLogger := c.logger.WithFields(log.Fields{"JobID": job.ID, "Provider": job.Provider})
+	callParams := threeplay.CallParams{APIKey: c.config.APIKeyByJobType[job.JobType]}
 	// Review job route
 	if mediaFileID, ok := job.ProviderParams["media_file_id"]; ok {
 		hoursInt := 2
@@ -87,8 +90,7 @@ func (c *ThreePlayProvider) DispatchJob(job *database.Job) error {
 				jobLogger.WithError(err).Error("Could not convert hours until expiration")
 			}
 		}
-
-		reviewURL, err := c.GetEditingLink(mediaFileID, hoursInt)
+		reviewURL, err := c.GetEditingLink(mediaFileID, hoursInt, callParams)
 		if err != nil {
 			jobLogger.WithError(err).Error("Could not generate review url")
 			return err
@@ -120,14 +122,14 @@ func (c *ThreePlayProvider) DispatchJob(job *database.Job) error {
 			query.Add(k, v)
 		}
 	}
-	fileID, err := c.UploadFileFromURL(query)
+	fileID, err := c.UploadFileFromURL(query, callParams)
 
 	if err != nil {
 		jobLogger.Error("Failed to upload file to 3Play", err)
 		return err
 	}
 
-	transcriptResponse, err := c.OrderTranscript(strconv.Itoa(fileID), callbackURL, turnaroundLevel)
+	transcriptResponse, err := c.OrderTranscript(strconv.Itoa(fileID), callbackURL, turnaroundLevel, callParams)
 	if err != nil {
 		jobLogger.Error("Failed to order caption", err)
 		return err
@@ -138,13 +140,14 @@ func (c *ThreePlayProvider) DispatchJob(job *database.Job) error {
 }
 
 // CancelJob cancels a job if it is in a cancellable state
-func (c *ThreePlayProvider) CancelJob(id string) (bool, error) {
-	providerJob, err := c.GetProviderJob(id)
+func (c *ThreePlayProvider) CancelJob(job *database.Job) (bool, error) {
+	callParams := threeplay.CallParams{APIKey: c.config.APIKeyByJobType[job.JobType]}
+	providerJob, err := c.GetProviderJob(job)
 	if err != nil {
 		return false, err
 	}
 	if providerJob.Cancellable {
-		err = c.CancelTranscript(providerJob.ID)
+		err = c.CancelTranscript(providerJob.ID, callParams)
 		if err != nil {
 			return providerJob.Cancellable, err
 		}
