@@ -81,7 +81,7 @@ func (c *ThreePlayProvider) DispatchJob(job *database.Job) error {
 	jobLogger := c.logger.WithFields(log.Fields{"JobID": job.ID, "Provider": job.Provider})
 	callParams := threeplay.CallParams{APIKey: c.config.APIKeyByJobType[job.JobType]}
 	// Review job route
-	if mediaFileID, ok := job.ProviderParams["media_file_id"]; ok {
+	if providerID, ok := job.ProviderParams["provider_id"]; ok {
 		hoursInt := 2
 		var err error
 		if hoursUntilExpiration, ok := job.ProviderParams["hours_until_expiration"]; ok {
@@ -90,13 +90,13 @@ func (c *ThreePlayProvider) DispatchJob(job *database.Job) error {
 				jobLogger.WithError(err).Error("Could not convert hours until expiration")
 			}
 		}
-		reviewURL, err := c.GetEditingLink(mediaFileID, hoursInt, callParams)
+		reviewURL, err := c.GetEditingLink(providerID, hoursInt, callParams)
 		if err != nil {
 			jobLogger.WithError(err).Error("Could not generate review url")
 			return err
 		}
 
-		job.ProviderParams["ProviderID"] = mediaFileID
+		job.ProviderParams["ProviderID"] = providerID
 		job.ProviderParams["ReviewURL"] = reviewURL
 		return nil
 	}
