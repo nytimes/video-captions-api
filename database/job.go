@@ -77,10 +77,7 @@ func (j *Job) UpdateStatus(status, details string) bool {
 }
 
 func (j *Job) GetProviderID() string {
-	if _, ok := j.ProviderParams["ProviderID"]; ok {
-		return j.ProviderParams["ProviderID"]
-	}
-	return ""
+	return j.ProviderParams["ProviderID"]
 }
 
 // Load makes ProviderParams implement datastore.PropertyLoadSaver interface
