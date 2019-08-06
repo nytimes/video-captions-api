@@ -51,7 +51,7 @@ func (c *AmaraProvider) GetName() string {
 
 // Download download latest subtitle version from Amara
 func (c *AmaraProvider) Download(job *database.Job, captionFormat string) ([]byte, error) {
-	sub, err := c.GetRawSubtitles(job.ProviderParams["ProviderID"], "en", captionFormat)
+	sub, err := c.GetRawSubtitles(job.GetProviderID(), "en", captionFormat)
 	if err != nil {
 		return nil, err
 	}
@@ -60,12 +60,12 @@ func (c *AmaraProvider) Download(job *database.Job, captionFormat string) ([]byt
 
 // GetProviderJob returns current job status from Amara
 func (c *AmaraProvider) GetProviderJob(job *database.Job) (*database.ProviderJob, error) {
-	subs, err := c.GetSubtitleInfo(job.ProviderParams["ProviderID"], "en")
+	subs, err := c.GetSubtitleInfo(job.GetProviderID(), "en")
 	status := "in review"
 	if err != nil {
 		return nil, err
 	}
-	lang, err := c.GetLanguage(job.ProviderParams["ProviderID"], "en")
+	lang, err := c.GetLanguage(job.GetProviderID(), "en")
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (c *AmaraProvider) GetProviderJob(job *database.Job) (*database.ProviderJob
 	}
 
 	return &database.ProviderJob{
-		ID:      job.ProviderParams["ProviderID"],
+		ID:      job.GetProviderID(),
 		Status:  status,
 		Details: "Version " + strconv.Itoa(subs.VersionNumber),
 		Params: map[string]string{

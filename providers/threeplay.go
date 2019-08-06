@@ -51,7 +51,7 @@ func (c *ThreePlayProvider) GetName() string {
 // Download downloads captions file from specified type
 func (c *ThreePlayProvider) Download(job *database.Job, captionsType string) ([]byte, error) {
 	callParams := threeplay.CallParams{APIKey: c.config.APIKeyByJobType[job.JobType]}
-	transcript, err := c.GetTranscriptText(job.ProviderParams["ProviderID"], "", types.CaptionsFormat(captionsType), callParams)
+	transcript, err := c.GetTranscriptText(job.GetProviderID(), "", types.CaptionsFormat(captionsType), callParams)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +61,7 @@ func (c *ThreePlayProvider) Download(job *database.Job, captionsType string) ([]
 // GetProviderJob returns a 3play file
 func (c *ThreePlayProvider) GetProviderJob(job *database.Job) (*database.ProviderJob, error) {
 	callParams := threeplay.CallParams{APIKey: c.config.APIKeyByJobType[job.JobType]}
-	file, err := c.GetTranscriptInfo(job.ProviderParams["ProviderID"], callParams)
+	file, err := c.GetTranscriptInfo(job.GetProviderID(), callParams)
 	if err != nil {
 		return nil, err
 	}
@@ -80,8 +80,9 @@ func (c *ThreePlayProvider) GetProviderJob(job *database.Job) (*database.Provide
 func (c *ThreePlayProvider) DispatchJob(job *database.Job) error {
 	jobLogger := c.logger.WithFields(log.Fields{"JobID": job.ID, "Provider": job.Provider})
 	callParams := threeplay.CallParams{APIKey: c.config.APIKeyByJobType[job.JobType]}
+
 	// Review job route
-	if providerID, ok := job.ProviderParams["provider_id"]; ok {
+	if transcriptID, ok := job.ProviderParams["transcript_id"]; ok {
 		hoursInt := 2
 		var err error
 		if hoursUntilExpiration, ok := job.ProviderParams["hours_until_expiration"]; ok {
@@ -90,13 +91,13 @@ func (c *ThreePlayProvider) DispatchJob(job *database.Job) error {
 				jobLogger.WithError(err).Error("Could not convert hours until expiration")
 			}
 		}
-		reviewURL, err := c.GetEditingLink(providerID, hoursInt, callParams)
+		reviewURL, err := c.GetEditingLink(transcriptID, hoursInt, callParams)
 		if err != nil {
 			jobLogger.WithError(err).Error("Could not generate review url")
 			return err
 		}
 
-		job.ProviderParams["ProviderID"] = providerID
+		job.ProviderParams["ProviderID"] = transcriptID
 		job.ProviderParams["ReviewURL"] = reviewURL
 		return nil
 	}

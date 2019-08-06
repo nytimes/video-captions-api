@@ -52,7 +52,7 @@ func (c Client) GetJob(jobID string) (*database.Job, error) {
 		return job, nil
 	}
 
-	providerID := job.ProviderParams["ProviderID"]
+	providerID := job.GetProviderID()
 	fields := log.Fields{"JobID": jobID, "Provider": job.Provider, "ProviderID": providerID}
 	jobLogger := c.Logger.WithFields(fields)
 	provider := c.Providers[job.Provider]
@@ -166,7 +166,7 @@ func (c Client) DownloadCaption(jobID string, captionType string) ([]byte, error
 		return nil, err
 	}
 
-	providerID := job.ProviderParams["ProviderID"]
+	providerID := job.GetProviderID()
 	fields := log.Fields{"JobID": jobID, "Provider": job.Provider, "ProviderID": providerID}
 	jobLogger := c.Logger.WithFields(fields)
 	provider := c.Providers[job.Provider]

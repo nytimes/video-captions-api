@@ -54,7 +54,7 @@ func (p fakeProvider) GetProviderJob(job *database.Job) (*database.ProviderJob, 
 		}
 		return job, nil
 	}
-	p.logger.Info("fetching job", job.ProviderParams["ProviderID"])
+	p.logger.Info("fetching job", job.GetProviderID())
 	return &database.ProviderJob{}, nil
 }
 
@@ -62,7 +62,7 @@ func (p fakeProvider) GetName() string {
 	return "test-provider"
 }
 
-func (p fakeProvider) CancelJob(ijob *database.Job) (bool, error) {
+func (p fakeProvider) CancelJob(job *database.Job) (bool, error) {
 	return true, nil
 }
 
@@ -81,7 +81,7 @@ func (p brokenProvider) DispatchJob(job *database.Job) error {
 }
 
 func (p brokenProvider) GetProviderJob(job *database.Job) (*database.ProviderJob, error) {
-	p.logger.Info("fetching job", job.ProviderParams["ProviderID"])
+	p.logger.Info("fetching job", job.GetProviderID())
 	return nil, errors.New("failed to get job")
 }
 
