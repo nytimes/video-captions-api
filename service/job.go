@@ -21,6 +21,7 @@ type captionsError struct {
 }
 
 type jobParams struct {
+	JobType        string                  `json:"job_type"`
 	ParentID       string                  `json:"parent_id"`
 	MediaURL       string                  `json:"media_url"`
 	Provider       string                  `json:"provider"`
@@ -90,6 +91,7 @@ func newJobFromParams(newJob jobParams) (*database.Job, error) {
 		Outputs:        outputs,
 		Done:           false,
 		Language:       newJob.Language,
+		JobType:        newJob.JobType,
 	}
 
 	if newJob.CaptionFile.File != nil {
@@ -236,8 +238,6 @@ func (s *CaptionsService) ProcessCallback(r *http.Request) (int, interface{}, er
 		"Method":  r.Method,
 		"URI":     r.RequestURI,
 	})
-	id := server.Vars(r)["id"]
-	requestLogger.Infof("Received a callback for ID: %v", id)
 
 	defer r.Body.Close()
 
@@ -254,12 +254,14 @@ func (s *CaptionsService) ProcessCallback(r *http.Request) (int, interface{}, er
 		return http.StatusBadRequest, nil, captionsError{"Malformed parameters"}
 	}
 
+	requestLogger.Infof("Received a callback for ID: %v", callbackObject.Data.ID)
+
 	queryParams := r.URL.Query()
 	jobID := queryParams.Get("job_id")
 
 	err = s.client.ProcessCallback(callbackObject.Data, jobID)
 	if err != nil {
-		requestLogger.Errorf("Could not process callback for ID: %v", id)
+		requestLogger.Errorf("Could not process callback for ID: %v", callbackObject.Data.ID)
 		return http.StatusInternalServerError, nil, captionsError{err.Error()}
 	}
 	return http.StatusOK, nil, nil

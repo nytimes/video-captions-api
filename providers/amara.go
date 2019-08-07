@@ -50,8 +50,8 @@ func (c *AmaraProvider) GetName() string {
 }
 
 // Download download latest subtitle version from Amara
-func (c *AmaraProvider) Download(id, captionFormat string) ([]byte, error) {
-	sub, err := c.GetRawSubtitles(id, "en", captionFormat)
+func (c *AmaraProvider) Download(job *database.Job, captionFormat string) ([]byte, error) {
+	sub, err := c.GetRawSubtitles(job.GetProviderID(), "en", captionFormat)
 	if err != nil {
 		return nil, err
 	}
@@ -59,13 +59,13 @@ func (c *AmaraProvider) Download(id, captionFormat string) ([]byte, error) {
 }
 
 // GetProviderJob returns current job status from Amara
-func (c *AmaraProvider) GetProviderJob(id string) (*database.ProviderJob, error) {
-	subs, err := c.GetSubtitleInfo(id, "en")
+func (c *AmaraProvider) GetProviderJob(job *database.Job) (*database.ProviderJob, error) {
+	subs, err := c.GetSubtitleInfo(job.GetProviderID(), "en")
 	status := "in review"
 	if err != nil {
 		return nil, err
 	}
-	lang, err := c.GetLanguage(id, "en")
+	lang, err := c.GetLanguage(job.GetProviderID(), "en")
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (c *AmaraProvider) GetProviderJob(id string) (*database.ProviderJob, error)
 	}
 
 	return &database.ProviderJob{
-		ID:      id,
+		ID:      job.GetProviderID(),
 		Status:  status,
 		Details: "Version " + strconv.Itoa(subs.VersionNumber),
 		Params: map[string]string{
@@ -127,6 +127,6 @@ func (c *AmaraProvider) DispatchJob(job *database.Job) error {
 }
 
 // CancelJob dummy method as amara cannot cancel jobs
-func (c *AmaraProvider) CancelJob(id string) (bool, error) {
+func (c *AmaraProvider) CancelJob(job *database.Job) (bool, error) {
 	return false, nil
 }

@@ -25,7 +25,7 @@ func (p fakeProvider) DispatchJob(job *database.Job) error {
 	return nil
 }
 
-func (p fakeProvider) Download(_ string, captionType string) ([]byte, error) {
+func (p fakeProvider) Download(_ *database.Job, captionType string) ([]byte, error) {
 	switch captionType {
 	case "vtt":
 		return []byte("WEBVTT\n\nNOTE Paragraph\n\n00:00:09.240 --> 00:00:11.010\nWe're all talking\nabout the Iowa caucuses"), nil
@@ -40,7 +40,7 @@ func (p fakeProvider) Download(_ string, captionType string) ([]byte, error) {
 	}
 }
 
-func (p fakeProvider) GetProviderJob(id string) (*database.ProviderJob, error) {
+func (p fakeProvider) GetProviderJob(job *database.Job) (*database.ProviderJob, error) {
 	if p.params["jobError"] {
 		return nil, errors.New("oh no")
 	}
@@ -54,7 +54,7 @@ func (p fakeProvider) GetProviderJob(id string) (*database.ProviderJob, error) {
 		}
 		return job, nil
 	}
-	p.logger.Info("fetching job", id)
+	p.logger.Info("fetching job", job.GetProviderID())
 	return &database.ProviderJob{}, nil
 }
 
@@ -62,7 +62,7 @@ func (p fakeProvider) GetName() string {
 	return "test-provider"
 }
 
-func (p fakeProvider) CancelJob(id string) (bool, error) {
+func (p fakeProvider) CancelJob(job *database.Job) (bool, error) {
 	return true, nil
 }
 
@@ -72,7 +72,7 @@ func (p brokenProvider) GetName() string {
 	return "broken-provider"
 }
 
-func (p brokenProvider) Download(_ string, _ string) ([]byte, error) {
+func (p brokenProvider) Download(_ *database.Job, _ string) ([]byte, error) {
 	return nil, errors.New("download error")
 }
 
@@ -80,12 +80,12 @@ func (p brokenProvider) DispatchJob(job *database.Job) error {
 	return errors.New("provider error")
 }
 
-func (p brokenProvider) GetProviderJob(id string) (*database.ProviderJob, error) {
-	p.logger.Info("fetching job", id)
+func (p brokenProvider) GetProviderJob(job *database.Job) (*database.ProviderJob, error) {
+	p.logger.Info("fetching job", job.GetProviderID())
 	return nil, errors.New("failed to get job")
 }
 
-func (p brokenProvider) CancelJob(id string) (bool, error) {
+func (p brokenProvider) CancelJob(job *database.Job) (bool, error) {
 	return false, nil
 }
 

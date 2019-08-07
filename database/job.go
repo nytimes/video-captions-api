@@ -29,6 +29,7 @@ type Job struct {
 	Language       string         `json:"language"`
 	Details        string         `json:"details,omitempty"`
 	CaptionFile    UploadedFile   `json:"caption_file,omitempty"`
+	JobType        string         `json:"job_type"`
 }
 
 // UploadedFile contains the uploaded file and its name
@@ -73,6 +74,10 @@ func (j *Job) UpdateStatus(status, details string) bool {
 	j.Status = status
 	j.Details = details
 	return true
+}
+
+func (j *Job) GetProviderID() string {
+	return j.ProviderParams["ProviderID"]
 }
 
 // Load makes ProviderParams implement datastore.PropertyLoadSaver interface

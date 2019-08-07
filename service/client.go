@@ -52,12 +52,12 @@ func (c Client) GetJob(jobID string) (*database.Job, error) {
 		return job, nil
 	}
 
-	providerID := job.ProviderParams["ProviderID"]
+	providerID := job.GetProviderID()
 	fields := log.Fields{"JobID": jobID, "Provider": job.Provider, "ProviderID": providerID}
 	jobLogger := c.Logger.WithFields(fields)
 	provider := c.Providers[job.Provider]
 	jobLogger.Info("Fetching job from Provider")
-	providerJob, err := provider.GetProviderJob(providerID)
+	providerJob, err := provider.GetProviderJob(job)
 	if err != nil {
 		jobLogger.Error("error getting job from provider", err)
 		return nil, err
@@ -81,7 +81,7 @@ func (c Client) GetJob(jobID string) (*database.Job, error) {
 	if (job.Status == "complete" || job.Status == "delivered") && !job.Done {
 		jobLogger.Info("Job is ready on the provider, downloading")
 		for i, output := range job.Outputs {
-			data, err := provider.Download(providerID, output.Type)
+			data, err := provider.Download(job, output.Type)
 			if err != nil {
 				jobLogger.WithError(err).Error("Failed to download file")
 				return job, nil
@@ -143,7 +143,7 @@ func (c Client) CancelJob(jobID string) (bool, error) {
 	err = c.DB.UpdateJob(jobID, job)
 	c.Logger.Info("Cancelled job in the database")
 	if job.Provider == "3play" {
-		cancellable, err := c.Providers[job.Provider].CancelJob(job.ProviderParams["ProviderID"])
+		cancellable, err := c.Providers[job.Provider].CancelJob(job)
 		if err != nil {
 			if cancellable {
 				c.Logger.Errorf("Could not cancel job with 3play but set to cancel in DB: %v", err)
@@ -166,12 +166,12 @@ func (c Client) DownloadCaption(jobID string, captionType string) ([]byte, error
 		return nil, err
 	}
 
-	providerID := job.ProviderParams["ProviderID"]
+	providerID := job.GetProviderID()
 	fields := log.Fields{"JobID": jobID, "Provider": job.Provider, "ProviderID": providerID}
 	jobLogger := c.Logger.WithFields(fields)
 	provider := c.Providers[job.Provider]
 	jobLogger.Info("Downloading captions from provider")
-	captions, err := provider.Download(providerID, captionType)
+	captions, err := provider.Download(job, captionType)
 	if err != nil {
 		jobLogger.Error("error downloading captions from provider", err)
 		return nil, err
@@ -262,7 +262,11 @@ func (c Client) GenerateTranscript(captionFile []byte, captionFormat string) (st
 }
 
 func (c Client) ProcessCallback(callbackData CallbackData, jobID string) error {
-	jobLogger := c.Logger
+	jobLogger := c.Logger.WithFields(log.Fields{
+		"JobID":      jobID,
+		"ProviderID": callbackData.ID,
+		"Status":     callbackData.Status,
+	})
 	jobLogger.Info("Processing a callback for captions")
 	if callbackData.ID == 0 {
 		jobLogger.Error("Invalid Provider ID")
