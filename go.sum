@@ -160,6 +160,8 @@ github.com/nytimes/threeplay v0.3.0 h1:KNRBzlhfGCjpw8mCeHSTyHpafh1CO2tUv2LTnKvgM
 github.com/nytimes/threeplay v0.3.0/go.mod h1:7Ttlufr7v1zBWMJ3BgyNP/FU/bReMX2cWzQByXMAijU=
 github.com/nytimes/threeplay v0.3.1 h1:Q4Y/5zd1gWQScEqbaLCWf374uwCPL1s3vCAevotEvDc=
 github.com/nytimes/threeplay v0.3.1/go.mod h1:7RYQwk6M28F77xLPmzb0DAe7fBmdLD3MAFvXrF7Q2us=
+github.com/nytimes/threeplay v0.3.2 h1:vJNX/g6i+U012rKOYVWICKCY1JLBLkmTwcgAXIouhSw=
+github.com/nytimes/threeplay v0.3.2/go.mod h1:7RYQwk6M28F77xLPmzb0DAe7fBmdLD3MAFvXrF7Q2us=
 github.com/openzipkin/zipkin-go v0.1.1/go.mod h1:NtoC/o8u3JlF1lSlyPNswIbeQH9bJTmOf0Erfk+hxe8=
 github.com/openzipkin/zipkin-go v0.1.3/go.mod h1:NtoC/o8u3JlF1lSlyPNswIbeQH9bJTmOf0Erfk+hxe8=
 github.com/pierrec/lz4 v2.0.5+incompatible/go.mod h1:pdkljMzZIN41W+lC3N2tnIh5sFi+IEE17M5jbnwPHcY=
