@@ -9,6 +9,7 @@ env:
     - GO_FOR_RELEASE=1.x
     - GO111MODULE=on
     - CGO_ENABLED=0
+    - GOPROXY=https://proxy.golang.org
 go:
   - 1.x
 install:
