@@ -2,7 +2,7 @@ module github.com/NYTimes/video-captions-api
 
 require (
 	cloud.google.com/go v0.44.3
-	github.com/NYTimes/gizmo v1.2.14
+	github.com/NYTimes/gizmo v1.2.17
 	github.com/NYTimes/gziphandler v1.1.1
 	github.com/google/uuid v1.1.1
 	github.com/kelseyhightower/envconfig v1.4.0
