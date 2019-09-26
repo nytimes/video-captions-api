@@ -151,7 +151,6 @@ func (c Client) CancelJob(jobID string) (bool, error) {
 			}
 			c.Logger.Error("job is no longer cancellable with 3play but was updated in the DB")
 			return true, errors.New("job is no longer cancellable with 3play but was updated in the DB")
-
 		}
 	}
 	c.Logger.Infof("Cancelled job with %s", job.Provider)

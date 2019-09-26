@@ -82,7 +82,8 @@ func newJobFromParams(newJob jobParams) (*database.Job, error) {
 	databaseJob := &database.Job{
 		ID:       id.String(),
 		ParentID: newJob.ParentID,
-		//TODO: put all possible status under a type/consts so we dont use strings everywhere //nolint:godox
+		//nolint:godox
+		//TODO: put all possible status under a type/consts so we dont use strings everywhere
 		Status:         "processing",
 		MediaURL:       newJob.MediaURL,
 		Provider:       newJob.Provider,
@@ -124,7 +125,8 @@ func (s *CaptionsService) GetJobs(r *http.Request) (int, interface{}, error) {
 // GetJob returns a Job given its ID
 func (s *CaptionsService) GetJob(r *http.Request) (int, interface{}, error) {
 	id := server.Vars(r)["id"]
-	// TODO: on the 3play client, we should look at the errors field and check for not_found errors at least //nolint:godox
+	//nolint:godox
+	// TODO: on the 3play client, we should look at the errors field and check for not_found errors at least
 	job, err := s.client.GetJob(id)
 	if err != nil {
 		if err == database.ErrJobNotFound {
