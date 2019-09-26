@@ -180,6 +180,7 @@ func (c Client) DownloadCaption(jobID string, captionType string) ([]byte, error
 }
 
 // GenerateTranscript generates a transcript from the provided caption file and format
+//nolint:funlen
 func (c Client) GenerateTranscript(captionFile []byte, captionFormat string) (string, error) {
 	fields := log.Fields{"captionFormat": captionFormat}
 	jobLogger := c.Logger.WithFields(fields)
