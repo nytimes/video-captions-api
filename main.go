@@ -35,5 +35,4 @@ func main() {
 	if err != nil {
 		server.Log.Fatal("Server encountered a fatal error: ", err)
 	}
-
 }
