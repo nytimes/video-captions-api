@@ -82,6 +82,7 @@ func newJobFromParams(newJob jobParams) (*database.Job, error) {
 	databaseJob := &database.Job{
 		ID:       id.String(),
 		ParentID: newJob.ParentID,
+		//nolint:godox
 		//TODO: put all possible status under a type/consts so we dont use strings everywhere
 		Status:         "processing",
 		MediaURL:       newJob.MediaURL,
@@ -124,6 +125,7 @@ func (s *CaptionsService) GetJobs(r *http.Request) (int, interface{}, error) {
 // GetJob returns a Job given its ID
 func (s *CaptionsService) GetJob(r *http.Request) (int, interface{}, error) {
 	id := server.Vars(r)["id"]
+	//nolint:godox
 	// TODO: on the 3play client, we should look at the errors field and check for not_found errors at least
 	job, err := s.client.GetJob(id)
 	if err != nil {

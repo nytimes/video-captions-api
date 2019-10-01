@@ -151,7 +151,6 @@ func (c Client) CancelJob(jobID string) (bool, error) {
 			}
 			c.Logger.Error("job is no longer cancellable with 3play but was updated in the DB")
 			return true, errors.New("job is no longer cancellable with 3play but was updated in the DB")
-
 		}
 	}
 	c.Logger.Infof("Cancelled job with %s", job.Provider)
@@ -180,6 +179,7 @@ func (c Client) DownloadCaption(jobID string, captionType string) ([]byte, error
 }
 
 // GenerateTranscript generates a transcript from the provided caption file and format
+//nolint:funlen
 func (c Client) GenerateTranscript(captionFile []byte, captionFormat string) (string, error) {
 	fields := log.Fields{"captionFormat": captionFormat}
 	jobLogger := c.Logger.WithFields(fields)

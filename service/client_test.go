@@ -114,7 +114,6 @@ func TestProviderJobError(t *testing.T) {
 	assert := assert.New(t)
 	assert.NotNil(err)
 	assert.EqualValues(err.Error(), "oh no")
-
 }
 
 func TestProviderStatusError(t *testing.T) {
@@ -323,6 +322,7 @@ type processCallbackClientTest struct {
 	serverResponse  int
 }
 
+//nolint:funlen
 func TestProcessCallbackClient(t *testing.T) {
 	tests := []processCallbackClientTest{
 		{

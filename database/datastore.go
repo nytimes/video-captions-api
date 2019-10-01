@@ -39,7 +39,6 @@ func NewDatastoreDatabase(projectID string) (*DatastoreDatabase, error) {
 		entityKind,
 		entityNamespace,
 	}, nil
-
 }
 
 // StoreJob stores a job
