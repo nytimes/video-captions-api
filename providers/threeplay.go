@@ -77,7 +77,6 @@ func (c *ThreePlayProvider) GetProviderJob(job *database.Job) (*database.Provide
 
 // DispatchJob sends a video file to 3play for transcription and captions generation or generates a expiring editing link
 // when the media_file_url param is provided
-//nolint:funlen
 func (c *ThreePlayProvider) DispatchJob(job *database.Job) error {
 	jobLogger := c.logger.WithFields(log.Fields{"JobID": job.ID, "Provider": job.Provider})
 	callParams := threeplay.CallParams{APIKey: c.config.APIKeyByJobType[job.JobType]}
