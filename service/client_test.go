@@ -322,7 +322,6 @@ type processCallbackClientTest struct {
 	serverResponse  int
 }
 
-//nolint:funlen
 func TestProcessCallbackClient(t *testing.T) {
 	tests := []processCallbackClientTest{
 		{

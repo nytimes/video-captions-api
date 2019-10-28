@@ -16,7 +16,7 @@ install-golangcilint:
 	GO111MODULE=off go get github.com/golangci/golangci-lint/cmd/golangci-lint
 
 run-lint:
-	golangci-lint run --enable-all -D errcheck -D lll --deadline 5m ./...
+	golangci-lint run --enable-all -D errcheck -D lll -D funlen -D wsl --deadline 5m ./...
 
 lint: install-golangcilint run-lint
 

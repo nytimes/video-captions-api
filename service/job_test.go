@@ -349,7 +349,6 @@ type processCallbackTest struct {
 	startFakeServer bool
 }
 
-//nolint:funlen
 func TestProcessCallback(t *testing.T) {
 	tests := []processCallbackTest{
 		{
