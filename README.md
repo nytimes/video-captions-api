@@ -21,6 +21,8 @@ THREE_PLAY_API_KEY
 THREE_PLAY_API_SECRET
 ```
 
+Note that `THREE_PLAY_API_KEY` should take the form of `captions:<captions_key>,transcript:<transcript_key>`.
+
 Run:
 
 ```
