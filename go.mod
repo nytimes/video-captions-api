@@ -10,7 +10,7 @@ require (
 	github.com/nytimes/amara v0.3.0
 	github.com/nytimes/threeplay v0.3.2
 	github.com/sirupsen/logrus v1.4.2
-	github.com/stretchr/testify v1.4.0
+	github.com/stretchr/testify v1.5.1
 )
 
 go 1.13
