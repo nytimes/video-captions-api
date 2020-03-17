@@ -1,8 +1,9 @@
 module github.com/NYTimes/video-captions-api
 
 require (
-	cloud.google.com/go v0.54.0
+	cloud.google.com/go v0.54.0 // indirect
 	cloud.google.com/go/datastore v1.1.0
+	cloud.google.com/go/storage v1.6.0
 	github.com/NYTimes/gizmo v1.3.5
 	github.com/NYTimes/gziphandler v1.1.1
 	github.com/google/uuid v1.1.1
@@ -11,6 +12,7 @@ require (
 	github.com/nytimes/threeplay v0.3.2
 	github.com/sirupsen/logrus v1.4.2
 	github.com/stretchr/testify v1.5.1
+	github.com/tdewolff/parse/v2 v2.4.2
 )
 
 go 1.13
