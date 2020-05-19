@@ -6,4 +6,9 @@ FROM alpine:3.11.6
 RUN apk add --no-cache ca-certificates
 ADD video-captions-api /bin/captions-api
 
+RUN chmod a+x /bin/captions-api
+
+RUN addgroup service && adduser -DH -G service service
+USER service
+
 ENTRYPOINT ["/bin/captions-api"]
