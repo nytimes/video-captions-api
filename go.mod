@@ -11,7 +11,7 @@ require (
 	github.com/nytimes/threeplay v0.3.2
 	github.com/sirupsen/logrus v1.7.0
 	github.com/stretchr/testify v1.6.1
-	github.com/tdewolff/parse/v2 v2.4.3
+	github.com/tdewolff/parse/v2 v2.5.6
 )
 
 go 1.13
