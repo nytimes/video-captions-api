@@ -2,7 +2,7 @@ module github.com/NYTimes/video-captions-api
 
 require (
 	cloud.google.com/go/datastore v1.3.0
-	cloud.google.com/go/storage v1.12.0
+	cloud.google.com/go/storage v1.13.0
 	github.com/NYTimes/gizmo v1.3.6
 	github.com/NYTimes/gziphandler v1.1.1
 	github.com/google/uuid v1.1.3
