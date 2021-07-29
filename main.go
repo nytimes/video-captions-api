@@ -7,16 +7,43 @@ import (
 	"github.com/NYTimes/video-captions-api/providers"
 	"github.com/NYTimes/video-captions-api/service"
 	"github.com/kelseyhightower/envconfig"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
+	var (
+		db  database.DB
+		err error
+	)
 	var cfg config.CaptionsServiceConfig
 	envconfig.Process("", &cfg)
 	cfg.Logger = server.Log
-	db, err := database.NewDatastoreDatabase(cfg.ProjectID)
 	if err != nil {
-		server.Log.Fatal("Unable to create Datastore client", err)
+		server.Log.WithFields(
+			logrus.Fields{
+				"err": err,
+			},
+		).Info("Invalid value for linker flag main.inmemorydbpermittted. Using remote store provided in PROJECT_ID and BUCKET_NAME")
+
 	}
+	server.Log.WithFields(
+		logrus.Fields{
+			"projectid":  cfg.ProjectID,
+			"bucketname": cfg.BucketName,
+			"callback":   cfg.CallbackURL,
+		},
+	).Info("Server Starting")
+	if cfg.ProjectID != "" {
+		db, err = database.NewDatastoreDatabase(cfg.ProjectID)
+		if err != nil {
+			server.Log.Fatal("Unable to create Datastore client", err)
+		}
+	} else {
+		server.Log.Warn("Project ID is empty. Using in memory datastore. Are you sure this is what you want?")
+		db = database.NewMemoryDatabase()
+
+	}
+
 	threeplayConfig := providers.Load3PlayConfigFromEnv()
 	amaraConfig := providers.LoadAmaraConfigFromEnv()
 	captionsService := service.NewCaptionsService(&cfg, db)
