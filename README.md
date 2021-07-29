@@ -23,6 +23,14 @@ THREE_PLAY_API_SECRET
 
 Note that `THREE_PLAY_API_KEY` should take the form of `captions:<captions_key>,transcript:<transcript_key>`.
 
+The following env vars are required for production environments, but have fallbacks for development.
+In the even that `PROJECT_ID` is absent, we start an in memory datastore and log a warning. 
+
+```
+PROJECT_ID='nyt-video-dev'
+BUCKET_NAME='bakeoff-trint-3play'
+```
+
 Run:
 
 ```
