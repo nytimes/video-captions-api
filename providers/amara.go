@@ -2,14 +2,16 @@ package providers
 
 import (
 	"fmt"
+	"net/http"
 	"net/url"
 	"strconv"
 
 	"github.com/NYTimes/video-captions-api/config"
 	"github.com/NYTimes/video-captions-api/database"
 	"github.com/kelseyhightower/envconfig"
-	"github.com/nytimes/amara"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/nytimes/amara"
 )
 
 // AmaraProvider amara client wrapper that implements the Provider interface
@@ -129,4 +131,8 @@ func (c *AmaraProvider) DispatchJob(job *database.Job) error {
 // CancelJob dummy method as amara cannot cancel jobs
 func (c *AmaraProvider) CancelJob(job *database.Job) (bool, error) {
 	return false, nil
+}
+
+func (c *AmaraProvider) HandleCallback(_ *http.Request) (*CallbackData, error) {
+	return &CallbackData{}, nil
 }

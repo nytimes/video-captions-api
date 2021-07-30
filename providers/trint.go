@@ -1,6 +1,10 @@
 package providers
 
-import "github.com/NYTimes/video-captions-api/database"
+import (
+	"net/http"
+
+	"github.com/NYTimes/video-captions-api/database"
+)
 
 type trint struct {
 }
@@ -22,5 +26,8 @@ func (t *trint) GetName() string {
 }
 
 func (t *trint) CancelJob(_ *database.Job) (bool, error) {
+	panic("not implemented") // TODO: Implement
+}
+func (t *trint) HandleCallback(req *http.Request) (*CallbackData, error) {
 	panic("not implemented") // TODO: Implement
 }

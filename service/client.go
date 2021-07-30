@@ -260,7 +260,7 @@ func (c Client) GenerateTranscript(captionFile []byte, captionFormat string) (st
 	return "", fmt.Errorf("unable to generate a transcript for caption format: %v", captionFormat)
 }
 
-func (c Client) ProcessCallback(callbackData CallbackData, jobID string) error {
+func (c Client) ProcessCallback(callbackData providers.CallbackData, jobID string) error {
 	jobLogger := c.Logger.WithFields(log.Fields{
 		"JobID":      jobID,
 		"ProviderID": callbackData.ID,

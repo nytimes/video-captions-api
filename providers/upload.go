@@ -3,6 +3,7 @@ package providers
 import (
 	"bytes"
 	"fmt"
+	"net/http"
 	"path/filepath"
 
 	captionsConfig "github.com/NYTimes/video-captions-api/config"
@@ -87,4 +88,7 @@ func (c *UploadProvider) validateCaptionFile(file *database.UploadedFile) error 
 	}
 
 	return nil
+}
+func (c *UploadProvider) HandleCallback(req *http.Request) (*CallbackData, error) {
+	panic("not implemented") // TODO: Implement
 }

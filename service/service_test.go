@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
+	"net/http"
 	"testing"
 
 	"reflect"
@@ -17,8 +18,13 @@ import (
 )
 
 type fakeProvider struct {
-	logger *log.Logger
-	params map[string]bool
+	logger       *log.Logger
+	params       map[string]bool
+	callbackData *providers.CallbackData
+}
+
+func (p fakeProvider) HandleCallback(req *http.Request) (*providers.CallbackData, error) {
+	panic("not implemented") // TODO: Implement
 }
 
 func (p fakeProvider) DispatchJob(job *database.Job) error {
@@ -68,6 +74,10 @@ func (p fakeProvider) CancelJob(job *database.Job) (bool, error) {
 }
 
 type brokenProvider fakeProvider
+
+func (p brokenProvider) HandleCallback(req *http.Request) (*providers.CallbackData, error) {
+	return &providers.CallbackData{}, nil
+}
 
 func (p brokenProvider) GetName() string {
 	return "broken-provider"
@@ -155,5 +165,4 @@ func TestNewCaptionsService(t *testing.T) {
 	assert.Contains(service.Endpoints(), "/jobs/{id}/cancel")
 	assert.Contains(service.Endpoints(), "/jobs/{id}/download/{captionFormat}")
 	assert.Contains(service.Endpoints(), "/jobs/{id}/transcript/{captionFormat}")
-	assert.Contains(service.Endpoints(), "/callback")
 }

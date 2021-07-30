@@ -2,15 +2,17 @@ package providers
 
 import (
 	"errors"
+	"net/http"
 	"net/url"
 	"strconv"
 
 	"github.com/NYTimes/video-captions-api/config"
 	"github.com/NYTimes/video-captions-api/database"
 	"github.com/kelseyhightower/envconfig"
+	log "github.com/sirupsen/logrus"
+
 	"github.com/nytimes/threeplay/types"
 	threeplay "github.com/nytimes/threeplay/v3api"
-	log "github.com/sirupsen/logrus"
 )
 
 const providerName string = "3play"
@@ -155,4 +157,9 @@ func (c *ThreePlayProvider) CancelJob(job *database.Job) (bool, error) {
 		return providerJob.Cancellable, nil
 	}
 	return providerJob.Cancellable, errors.New("job is not cancellable")
+}
+
+func (c *ThreePlayProvider) HandleCallback(req *http.Request) (*CallbackData, error) {
+
+	panic("not implemented") // TODO: Implement
 }

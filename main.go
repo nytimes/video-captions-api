@@ -1,19 +1,18 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
-	"time"
+	"context"
+	"os"
+	"os/signal"
+	"sync"
+	"syscall"
 
-	"contrib.go.opencensus.io/exporter/prometheus"
 	"github.com/NYTimes/gizmo/server"
 	"github.com/NYTimes/video-captions-api/config"
 	"github.com/NYTimes/video-captions-api/database"
 	"github.com/NYTimes/video-captions-api/providers"
 	"github.com/NYTimes/video-captions-api/service"
 	"github.com/kelseyhightower/envconfig"
-	"github.com/pkg/errors"
-	goprom "github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 )
 
@@ -59,42 +58,32 @@ func main() {
 		db = database.NewMemoryDatabase()
 
 	}
-	// metrics server
 
-	exporter, registry := mustInitMetrics()
-	go func(log *logrus.Entry) {
-		addr := ":9000"
-		log.WithField("address", addr).Info("starting metric server")
+	interrupt := make(chan os.Signal, 1)
 
-		mux := http.NewServeMux()
-		mux.Handle("/metrics", exporter)
+	signal.Notify(interrupt, syscall.SIGINT, syscall.SIGTERM)
+	defer signal.Stop(interrupt)
 
-		metricsServer := &http.Server{
-			Addr:         addr,
-			ReadTimeout:  2 * time.Second,
-			WriteTimeout: 2 * time.Second,
-			Handler:      mux,
-		}
-		var err error
-		if err = metricsServer.ListenAndServe(); err != http.ErrServerClosed {
-			log.WithFields(logrus.Fields{
-				"err":     err,
-				"address": addr,
-			}).Fatal("Metrics server failure")
-		}
+	var wg sync.WaitGroup
+	implementedProviders := makeProviders(&cfg, db)
 
-	}(server.Log.WithField("service", "metricsServer"))
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	exporter, registry := MustInitMetrics()
+	StartMetricsServer(ctx, &wg, exporter, server.Log)
+
+	callbacks := StartCallbackListener(ctx, &wg, implementedProviders, server.Log)
 
 	// caption server
+	captionsService := service.NewCaptionsService(&cfg, db, callbacks, registry)
 
-	threeplayConfig := providers.Load3PlayConfigFromEnv()
-	amaraConfig := providers.LoadAmaraConfigFromEnv()
-	captionsService := service.NewCaptionsService(&cfg, db, registry)
-
-	captionsService.AddProvider(providers.New3PlayProvider(&threeplayConfig, &cfg))
-	captionsService.AddProvider(providers.NewAmaraProvider(&amaraConfig, &cfg))
-	captionsService.AddProvider(providers.NewUploadProvider(&cfg, db))
+	for _, p := range implementedProviders {
+		captionsService.AddProvider(p)
+	}
 	server.Init("video-captions-api", cfg.Server)
+
+	//server.WithCloseHandler TODO need to implement gizmo server.Context.Handler to gracefully shut down
 
 	err = server.Register(captionsService)
 	if err != nil {
@@ -105,49 +94,19 @@ func main() {
 	if err != nil {
 		server.Log.Fatal("Server encountered a fatal error: ", err)
 	}
+
+	wg.Wait()
+
 }
 
-func mustInitMetrics() (*prometheus.Exporter, *goprom.Registry) {
-	pe, r, err := initMetrics()
-	if err != nil {
-		panic(errors.Wrap(err, "Failed to initialize metrics service"))
-	}
-	return pe, r
-}
+func makeProviders(cfg *config.CaptionsServiceConfig, db database.DB) []providers.Provider {
+	var p []providers.Provider
+	threeplayConfig := providers.Load3PlayConfigFromEnv()
+	amaraConfig := providers.LoadAmaraConfigFromEnv()
+	providers.New3PlayProvider(&threeplayConfig, cfg)
+	providers.NewAmaraProvider(&amaraConfig, cfg)
+	providers.NewUploadProvider(cfg, db)
 
-func initMetrics() (*prometheus.Exporter, *goprom.Registry, error) {
-	r := goprom.NewRegistry()
-	r.MustRegister(goprom.NewProcessCollector(goprom.ProcessCollectorOpts{}))
-	r.MustRegister(goprom.NewGoCollector())
+	return p
 
-	versionCollector := goprom.NewGaugeVec(goprom.GaugeOpts{
-		Namespace: MetricsNamespace,
-		Name:      "version",
-		Help:      "Application version.",
-	}, []string{"version"})
-
-	r.MustRegister(versionCollector)
-	versionCollector.WithLabelValues(version).Add(1)
-
-	captionTimer := goprom.NewHistogramVec(goprom.HistogramOpts{
-		Namespace: MetricsNamespace,
-		Name:      "asr_execution_time_seconds",
-		Help:      "provider caption time",
-		Buckets:   goprom.LinearBuckets(20, 5, 5),
-	}, []string{
-		"provider",
-	})
-
-	r.MustRegister(captionTimer)
-
-	// Stats exporter: Prometheus
-	pe, err := prometheus.NewExporter(prometheus.Options{
-		Namespace: MetricsNamespace,
-		Registry:  r,
-	})
-	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create the Prometheus stats exporter %w", err)
-	}
-
-	return pe, r, nil
 }
