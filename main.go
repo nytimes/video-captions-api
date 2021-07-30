@@ -132,7 +132,7 @@ func initMetrics() (*prometheus.Exporter, *goprom.Registry, error) {
 	captionTimer := goprom.NewHistogramVec(goprom.HistogramOpts{
 		Namespace: MetricsNamespace,
 		Name:      "asr_execution_time_seconds",
-		Help:      "The temperature of the frog pond.",
+		Help:      "provider caption time",
 		Buckets:   goprom.LinearBuckets(20, 5, 5),
 	}, []string{
 		"provider",
