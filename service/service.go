@@ -3,9 +3,10 @@ package service
 import (
 	"net/http"
 
-	"github.com/NYTimes/gziphandler"
+	prom "github.com/prometheus/client_golang/prometheus"
 
 	"github.com/NYTimes/gizmo/server"
+	"github.com/NYTimes/gziphandler"
 	"github.com/NYTimes/video-captions-api/config"
 	"github.com/NYTimes/video-captions-api/database"
 	"github.com/NYTimes/video-captions-api/providers"
@@ -19,7 +20,7 @@ type CaptionsService struct {
 }
 
 // NewCaptionsService creates a CaptionsService
-func NewCaptionsService(cfg *config.CaptionsServiceConfig, db database.DB) *CaptionsService {
+func NewCaptionsService(cfg *config.CaptionsServiceConfig, db database.DB, metrics *prom.Registry) *CaptionsService {
 	storage, _ := NewGCSStorage(cfg.BucketName, cfg.Logger)
 	return &CaptionsService{
 		Client{

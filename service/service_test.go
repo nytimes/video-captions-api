@@ -11,6 +11,7 @@ import (
 	"github.com/NYTimes/video-captions-api/config"
 	"github.com/NYTimes/video-captions-api/database"
 	"github.com/NYTimes/video-captions-api/providers"
+	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
@@ -131,7 +132,7 @@ func TestNewCaptionsService(t *testing.T) {
 	}
 	db := database.NewMemoryDatabase()
 
-	service := NewCaptionsService(&cfg, db)
+	service := NewCaptionsService(&cfg, db, prometheus.NewRegistry())
 
 	assert := assert.New(t)
 
