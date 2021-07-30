@@ -3,6 +3,7 @@ package service
 import (
 	"net/http"
 
+	"github.com/prometheus/client_golang/prometheus"
 	prom "github.com/prometheus/client_golang/prometheus"
 
 	"github.com/NYTimes/gizmo/server"
@@ -15,8 +16,9 @@ import (
 
 // CaptionsService the service responsible to wrapping interactions with Providers
 type CaptionsService struct {
-	client Client
-	logger *log.Logger
+	client  Client
+	logger  *log.Logger
+	metrics *prometheus.Registry
 }
 
 // NewCaptionsService creates a CaptionsService
@@ -31,6 +33,7 @@ func NewCaptionsService(cfg *config.CaptionsServiceConfig, db database.DB, metri
 			CallbackURL: cfg.CallbackURL,
 		},
 		cfg.Logger,
+		metrics,
 	}
 }
 
