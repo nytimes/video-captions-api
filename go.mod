@@ -1,7 +1,5 @@
 module github.com/NYTimes/video-captions-api
 
-replace github.com/nytimes-labs/client_golang v1.11.0 => github.com/prometheus/client_golang v1.11.0
-
 require (
 	cloud.google.com/go/datastore v1.4.0
 	cloud.google.com/go/storage v1.14.0
@@ -18,6 +16,7 @@ require (
 	github.com/prometheus/client_golang v0.9.4
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/procfs v0.2.0 // indirect
+	github.com/satori/go.uuid v1.2.0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
 	github.com/tdewolff/parse/v2 v2.4.3

@@ -14,6 +14,7 @@ type Callback struct {
 type DataWrapper struct {
 	JobID string
 	Data  CallbackData
+	URL   string
 }
 
 type CallbackData struct {

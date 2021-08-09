@@ -16,7 +16,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type captionsError struct {
+// CaptionsError is an error that occurs as a direct result of issue with the captioning process. Most frequently directly from the provider.
+type CaptionsError struct {
 	Message string `json:"error"`
 }
 
@@ -34,6 +35,26 @@ type jobParams struct {
 type uploadedFile struct {
 	File []byte `json:"file"`
 	Name string `json:"name"`
+}
+type Callback struct {
+	Code int          `json:"code"`
+	Data CallbackData `json:"data"`
+}
+
+type CallbackData struct {
+	Cancellable         bool    `json:"cancellable"`
+	Default             bool    `json:"default"`
+	ID                  int     `json:"id"`
+	BatchID             int     `json:"batch_id"`
+	LanguageID          int     `json:"language_id"`
+	MediaFileID         int     `json:"media_file_id"`
+	LanguageIDs         []int   `json:"language_ids"`
+	CancellationDetails string  `json:"cancellation_details"`
+	CancellationReason  string  `json:"cancellation_reason"`
+	ReferenceID         string  `json:"reference_id"`
+	Status              string  `json:"status"`
+	Type                string  `json:"type"`
+	Duration            float64 `json:"duration"`
 }
 
 func newJobFromParams(newJob jobParams) (*database.Job, error) {
@@ -84,7 +105,7 @@ func newJobFromParams(newJob jobParams) (*database.Job, error) {
 }
 
 // Error implements the error interface
-func (e captionsError) Error() string {
+func (e CaptionsError) Error() string {
 	return e.Message
 }
 
@@ -94,9 +115,9 @@ func (s *CaptionsService) GetJobs(r *http.Request) (int, interface{}, error) {
 	jobs, err := s.client.GetJobs(parentID)
 	if err != nil {
 		if err == database.ErrNoJobs {
-			return http.StatusNotFound, nil, captionsError{err.Error()}
+			return http.StatusNotFound, nil, CaptionsError{err.Error()}
 		}
-		return http.StatusInternalServerError, err, captionsError{err.Error()}
+		return http.StatusInternalServerError, err, CaptionsError{err.Error()}
 	}
 	return http.StatusOK, jobs, nil
 }
@@ -109,9 +130,9 @@ func (s *CaptionsService) GetJob(r *http.Request) (int, interface{}, error) {
 	job, err := s.client.GetJob(id)
 	if err != nil {
 		if err == database.ErrJobNotFound {
-			return http.StatusNotFound, nil, captionsError{err.Error()}
+			return http.StatusNotFound, nil, CaptionsError{err.Error()}
 		}
-		return http.StatusInternalServerError, nil, captionsError{err.Error()}
+		return http.StatusInternalServerError, nil, CaptionsError{err.Error()}
 	}
 	return http.StatusOK, job, nil
 }
@@ -121,10 +142,10 @@ func (s *CaptionsService) CancelJob(r *http.Request) (int, interface{}, error) {
 	id := server.Vars(r)["id"]
 	canceled, err := s.client.CancelJob(id)
 	if err != nil {
-		return http.StatusNotFound, nil, captionsError{err.Error()}
+		return http.StatusNotFound, nil, CaptionsError{err.Error()}
 	}
 	if !canceled {
-		return http.StatusConflict, nil, captionsError{"Cannot cancel a job that is already done"}
+		return http.StatusConflict, nil, CaptionsError{"Cannot cancel a job that is already done"}
 	}
 	return http.StatusOK, nil, nil
 }
@@ -146,30 +167,30 @@ func (s *CaptionsService) CreateJob(r *http.Request) (int, interface{}, error) {
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		requestLogger.WithError(err).Error("Could not read request body: ")
-		return http.StatusBadRequest, nil, captionsError{err.Error()}
+		return http.StatusBadRequest, nil, CaptionsError{err.Error()}
 	}
 
 	err = json.Unmarshal(data, &params)
 	if err != nil {
 		requestLogger.WithError(err).Error("Could not create job from request body")
-		return http.StatusBadRequest, nil, captionsError{"Malformed parameters"}
+		return http.StatusBadRequest, nil, CaptionsError{"Malformed parameters"}
 	}
 
 	if params.MediaURL == "" && params.CaptionFile.File == nil {
 		requestLogger.WithError(err).Error("Tried to create a job without a media url or caption file")
-		return http.StatusBadRequest, nil, captionsError{"Please provide a media_url or caption_file"}
+		return http.StatusBadRequest, nil, CaptionsError{"Please provide a media_url or caption_file"}
 	}
 
 	job, err := newJobFromParams(params)
 	if err != nil {
 		requestLogger.WithError(err).Error("could not create job from parameters")
-		return http.StatusInternalServerError, nil, captionsError{err.Error()}
+		return http.StatusInternalServerError, nil, CaptionsError{err.Error()}
 	}
 
 	err = s.client.DispatchJob(job)
 	if err != nil {
 		requestLogger.WithError(err).Error("could not dispatch job")
-		return http.StatusInternalServerError, nil, captionsError{err.Error()}
+		return http.StatusInternalServerError, nil, CaptionsError{err.Error()}
 	}
 
 	return http.StatusCreated, job, nil

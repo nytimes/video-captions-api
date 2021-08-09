@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -29,54 +28,34 @@ func NewCaptionsService(
 	cfg *config.CaptionsServiceConfig,
 	db database.DB,
 	callbacks chan *providers.DataWrapper,
+	callbackEndpoints map[string]string,
 	metrics *prom.Registry,
 ) *CaptionsService {
 	storage, _ := NewGCSStorage(cfg.BucketName, cfg.Logger)
 	client := Client{
-		Providers:   make(map[string]providers.Provider),
-		DB:          db,
-		Logger:      cfg.Logger,
-		Storage:     storage,
-		CallbackURL: cfg.CallbackURL,
+		Providers: make(map[string]providers.Provider),
+		DB:        db,
+		Logger:    cfg.Logger,
+		Storage:   storage,
 	}
-	go func(log *logrus.Entry) {
-		for wrapper := range callbacks {
-			data, id := wrapper.Data, wrapper.JobID
-			err := client.ProcessCallback(data, id)
-			if err != nil {
-				log.WithFields(logrus.Fields{
-					"err":          err,
-					"callbackdata": fmt.Sprintf("%+v", data),
-					"jobID":        "id",
-					"provider":     data.ID,
-				}).Error("Callback Failed")
-
-				// TODO retry
-
-			}
-
-		}
-	}(log.WithField("service", "Callback Listener Worker"))
-	return &CaptionsService{
+	service := &CaptionsService{
 		client,
 		cfg.Logger,
 		callbacks,
 		metrics,
 	}
-}
+	go func(log *logrus.Entry) {
+		for wrapper := range callbacks {
+			data, id := wrapper.Data, wrapper.JobID
+			client.ProcessCallback(data, id)
 
-//
-//func (s *CaptionsService) ProcessCallbacks() error {
-//
-//
-//
-//	err = s.client.ProcessCallback(callbackObject.Data, jobID)
-//	if err != nil {
-//		requestLogger.Errorf("Could not process callback for ID: %v", callbackObject.Data.ID)
-//		return http.StatusInternalServerError, nil, captionsError{err.Error()}
-//	}
-//	return http.StatusOK, nil, nil
-//}
+			// TODO retry
+
+		}
+
+	}(log.WithField("service", "Callback Listener Worker"))
+	return service
+}
 
 // AddProvider adds a Provider to the CaptionsService
 func (s *CaptionsService) AddProvider(provider providers.Provider) {

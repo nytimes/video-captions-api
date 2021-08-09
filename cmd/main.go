@@ -80,10 +80,10 @@ func main() {
 	exporter, registry := MustInitMetrics()
 	videocaptionsapi.StartMetricsServer(ctx, eg, exporter, server.Log)
 
-	callbacks := videocaptionsapi.StartCallbackListener(ctx, &sync.WaitGroup{}, implementedProviders, server.Log)
+	callbackQueue, endpoints := providers.StartCallbackListener(ctx, &sync.WaitGroup{}, implementedProviders, server.Log)
 
 	// caption server
-	captionsService := service.NewCaptionsService(&cfg, db, callbacks, registry)
+	captionsService := service.NewCaptionsService(&cfg, db, callbackQueue, endpoints, registry)
 
 	for _, p := range implementedProviders {
 		captionsService.AddProvider(p)

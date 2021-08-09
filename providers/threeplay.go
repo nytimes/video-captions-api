@@ -1,7 +1,10 @@
 package providers
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -160,6 +163,24 @@ func (c *ThreePlayProvider) CancelJob(job *database.Job) (bool, error) {
 }
 
 func (c *ThreePlayProvider) HandleCallback(req *http.Request) (*CallbackData, error) {
+	requestLogger := c.logger.WithFields(log.Fields{
+		"Handler": "ThreePlayProcessCallback",
+	})
 
-	panic("not implemented") // TODO: Implement
+	defer req.Body.Close()
+
+	data, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		requestLogger.WithError(err).Error("Could not read request body: ")
+		return nil, err
+	}
+
+	callbackObject := Callback{}
+	err = json.Unmarshal(data, &callbackObject)
+	if err != nil {
+		requestLogger.WithError(err).Error("Could not unmarshal callback")
+		return nil, fmt.Errorf("Malformed parameters: %w", err)
+	}
+
+	return &callbackObject.Data, nil
 }
