@@ -1,5 +1,5 @@
 dev:
-	@go build -v -o captions-api .
+	@go build -o captions cmd/main.go 
 
 	@SERVER_HTTP_PORT=8000\
 		SERVER_GIZMO_HEALTH_CHECK_PATH=/healthz\
@@ -12,7 +12,7 @@ dev:
 		BUCKET_NAME=$(CAPTIONS_BUCKET_NAME) \
 		CALLBACK_URL=$(CALLBACK_URL) \
 		CALLBACK_API_KEY=$(CALLBACK_API_KEY) \
-		./captions-api
+		./captions
 
 install-golangcilint:
 	go get github.com/golangci/golangci-lint/cmd/golangci-lint
@@ -28,3 +28,5 @@ coverage:
 
 test:
 	go test -race ./...
+
+.PHONY: test

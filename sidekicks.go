@@ -1,8 +1,7 @@
-package main
+package videocaptionsapi
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"sync"
 	"time"
@@ -10,16 +9,15 @@ import (
 	"contrib.go.opencensus.io/exporter/prometheus"
 	"github.com/NYTimes/gizmo/server"
 	"github.com/NYTimes/video-captions-api/providers"
-	"github.com/pkg/errors"
-	goprom "github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
+	"golang.org/x/sync/errgroup"
 )
 
 func StartMetricsServer(
 	ctx context.Context,
-	wg *sync.WaitGroup,
+	eg *errgroup.Group,
 	exporter *prometheus.Exporter,
-	log *logrus.Logger) {
+	log *logrus.Logger) error {
 
 	addr := ":9000"
 	log.WithField("address", addr).Info("starting metric server")
@@ -33,31 +31,33 @@ func StartMetricsServer(
 		WriteTimeout: 2 * time.Second,
 		Handler:      mux,
 	}
-	wg.Add(1)
 
 	shutdownCtx, cancel := context.WithCancel(ctx)
-	go func() {
-		defer wg.Done()
+	eg.Go(func() error {
 		defer cancel()
 		var err error
 		if err = srv.Shutdown(shutdownCtx); err != nil {
 			log.Fatalf("server Shutdown Failed:%+s", err)
+			return err
 		}
+		return nil
 
-	}()
+	})
 
-	wg.Add(1)
-	go func(log *logrus.Entry) {
-		defer wg.Done()
+	eg.Go(func() error {
+		log := log.WithField("service", "metrics_server")
 		var err error
 		if err = srv.ListenAndServe(); err != http.ErrServerClosed {
 			log.WithFields(logrus.Fields{
 				"err":     err,
 				"address": addr,
 			}).Fatal("Metrics server failure")
+			return err
 		}
-	}(log.WithField("service", "metrics_server"))
+		return nil
 
+	})
+	return eg.Wait()
 }
 
 func StartCallbackListener(
@@ -65,7 +65,6 @@ func StartCallbackListener(
 	wg *sync.WaitGroup,
 	callers []providers.Provider,
 	log *logrus.Logger) chan *providers.DataWrapper {
-	wg.Add(1)
 	// callback server
 	wg.Add(1)
 	callbacks := make(chan *providers.DataWrapper)
@@ -90,49 +89,4 @@ func StartCallbackListener(
 	}(server.Log.WithField("service", "callbackListener"))
 
 	return callbacks
-}
-
-func MustInitMetrics() (*prometheus.Exporter, *goprom.Registry) {
-	pe, r, err := initMetrics()
-	if err != nil {
-		panic(errors.Wrap(err, "Failed to initialize metrics service"))
-	}
-	return pe, r
-}
-
-func initMetrics() (*prometheus.Exporter, *goprom.Registry, error) {
-	r := goprom.NewRegistry()
-	r.MustRegister(goprom.NewProcessCollector(goprom.ProcessCollectorOpts{}))
-	r.MustRegister(goprom.NewGoCollector())
-
-	versionCollector := goprom.NewGaugeVec(goprom.GaugeOpts{
-		Namespace: MetricsNamespace,
-		Name:      "version",
-		Help:      "Application version.",
-	}, []string{"version"})
-
-	r.MustRegister(versionCollector)
-	versionCollector.WithLabelValues(version).Add(1)
-
-	captionTimer := goprom.NewHistogramVec(goprom.HistogramOpts{
-		Namespace: MetricsNamespace,
-		Name:      "asr_execution_time_seconds",
-		Help:      "provider caption time",
-		Buckets:   goprom.LinearBuckets(20, 5, 5),
-	}, []string{
-		"provider",
-	})
-
-	r.MustRegister(captionTimer)
-
-	// Stats exporter: Prometheus
-	pe, err := prometheus.NewExporter(prometheus.Options{
-		Namespace: MetricsNamespace,
-		Registry:  r,
-	})
-	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create the Prometheus stats exporter %w", err)
-	}
-
-	return pe, r, nil
 }

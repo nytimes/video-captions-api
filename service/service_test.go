@@ -1,14 +1,17 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
+	"sync"
 	"testing"
 
 	"reflect"
 
 	"github.com/NYTimes/gizmo/server"
+	captions "github.com/NYTimes/video-captions-api"
 	"github.com/NYTimes/video-captions-api/config"
 	"github.com/NYTimes/video-captions-api/database"
 	"github.com/NYTimes/video-captions-api/providers"
@@ -126,23 +129,27 @@ func TestAddProvider(t *testing.T) {
 	service, client := createCaptionsService("")
 
 	service.AddProvider(fakeProvider{})
-	provider := client.Providers["test-provider"]
-	assert.NotNil(provider)
-	assert.Equal(provider.GetName(), "test-provider")
+	p := client.Providers["test-provider"]
+	assert.NotNil(p)
+	assert.Equal(p.GetName(), "test-provider")
 }
 
 func TestNewCaptionsService(t *testing.T) {
 	logger := log.New()
 	projectID := "My amazing captions project"
-	providers := make(map[string]providers.Provider)
+	p := make(map[string]providers.Provider)
 	cfg := config.CaptionsServiceConfig{
 		Server:    &server.Config{},
 		Logger:    logger,
 		ProjectID: projectID,
 	}
 	db := database.NewMemoryDatabase()
-
-	service := NewCaptionsService(&cfg, db, prometheus.NewRegistry())
+	var callers []providers.Provider
+	for _, p := range p {
+		callers = append(callers, p)
+	}
+	cb := captions.StartCallbackListener(context.Background(), &sync.WaitGroup{}, callers, logger)
+	service := NewCaptionsService(&cfg, db, cb, prometheus.NewRegistry())
 
 	assert := assert.New(t)
 
@@ -157,7 +164,7 @@ func TestNewCaptionsService(t *testing.T) {
 	}
 
 	assert.NotNil(service.client.Providers)
-	assert.Equal(service.client.Providers, providers)
+	assert.Equal(service.client.Providers, p)
 
 	assert.Contains(service.Endpoints(), "/captions/{id}")
 	assert.Contains(service.Endpoints(), "/jobs/{id}")

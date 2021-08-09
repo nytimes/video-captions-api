@@ -23,6 +23,7 @@ require (
 	github.com/tdewolff/parse/v2 v2.4.3
 	go.opencensus.io v0.23.0 // indirect
 	golang.org/x/net v0.0.0-20210226172049-e18ecbb05110 // indirect
+	golang.org/x/sync v0.0.0-20201207232520-09787c993a3a
 	golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1 // indirect
 	golang.org/x/text v0.3.6 // indirect
 )

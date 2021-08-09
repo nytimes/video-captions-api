@@ -2,17 +2,25 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
 
+	"golang.org/x/sync/errgroup"
+
+	goprom "github.com/prometheus/client_golang/prometheus"
+
+	"contrib.go.opencensus.io/exporter/prometheus"
 	"github.com/NYTimes/gizmo/server"
+	videocaptionsapi "github.com/NYTimes/video-captions-api"
 	"github.com/NYTimes/video-captions-api/config"
 	"github.com/NYTimes/video-captions-api/database"
 	"github.com/NYTimes/video-captions-api/providers"
 	"github.com/NYTimes/video-captions-api/service"
 	"github.com/kelseyhightower/envconfig"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -63,17 +71,16 @@ func main() {
 
 	signal.Notify(interrupt, syscall.SIGINT, syscall.SIGTERM)
 	defer signal.Stop(interrupt)
-
-	var wg sync.WaitGroup
 	implementedProviders := makeProviders(&cfg, db)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
+	eg, ctx := errgroup.WithContext(ctx)
 
 	exporter, registry := MustInitMetrics()
-	StartMetricsServer(ctx, &wg, exporter, server.Log)
+	videocaptionsapi.StartMetricsServer(ctx, eg, exporter, server.Log)
 
-	callbacks := StartCallbackListener(ctx, &wg, implementedProviders, server.Log)
+	callbacks := videocaptionsapi.StartCallbackListener(ctx, &sync.WaitGroup{}, implementedProviders, server.Log)
 
 	// caption server
 	captionsService := service.NewCaptionsService(&cfg, db, callbacks, registry)
@@ -95,7 +102,7 @@ func main() {
 		server.Log.Fatal("Server encountered a fatal error: ", err)
 	}
 
-	wg.Wait()
+	eg.Wait()
 
 }
 
@@ -109,4 +116,49 @@ func makeProviders(cfg *config.CaptionsServiceConfig, db database.DB) []provider
 
 	return p
 
+}
+
+func MustInitMetrics() (*prometheus.Exporter, *goprom.Registry) {
+	pe, r, err := initMetrics()
+	if err != nil {
+		panic(errors.Wrap(err, "Failed to initialize metrics service"))
+	}
+	return pe, r
+}
+
+func initMetrics() (*prometheus.Exporter, *goprom.Registry, error) {
+	r := goprom.NewRegistry()
+	r.MustRegister(goprom.NewProcessCollector(goprom.ProcessCollectorOpts{}))
+	r.MustRegister(goprom.NewGoCollector())
+
+	versionCollector := goprom.NewGaugeVec(goprom.GaugeOpts{
+		Namespace: MetricsNamespace,
+		Name:      "version",
+		Help:      "Application version.",
+	}, []string{"version"})
+
+	r.MustRegister(versionCollector)
+	versionCollector.WithLabelValues(version).Add(1)
+
+	captionTimer := goprom.NewHistogramVec(goprom.HistogramOpts{
+		Namespace: MetricsNamespace,
+		Name:      "asr_execution_time_seconds",
+		Help:      "provider caption time",
+		Buckets:   goprom.LinearBuckets(20, 5, 5),
+	}, []string{
+		"provider",
+	})
+
+	r.MustRegister(captionTimer)
+
+	// Stats exporter: Prometheus
+	pe, err := prometheus.NewExporter(prometheus.Options{
+		Namespace: MetricsNamespace,
+		Registry:  r,
+	})
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to create the Prometheus stats exporter %w", err)
+	}
+
+	return pe, r, nil
 }
