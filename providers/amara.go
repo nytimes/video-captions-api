@@ -133,6 +133,6 @@ func (c *AmaraProvider) CancelJob(job *database.Job) (bool, error) {
 	return false, nil
 }
 
-func (c *AmaraProvider) HandleCallback(_ *http.Request) (*CallbackData, error) {
-	return &CallbackData{}, nil
+func (c *AmaraProvider) HandleCallback(_ *http.Request) (string, *CallbackData, error) {
+	return "", &CallbackData{}, nil
 }

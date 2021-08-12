@@ -286,7 +286,7 @@ func (c Client) notify(jobID string, providerID int, log *logrus.Entry) error {
 		return err
 	}
 
-	log.Debug("Making API call to: %v", c.CallbackURL)
+	log.WithField("addr", c.CallbackURL).Debug("Calling API")
 
 	resp, err := http.Post(c.CallbackURL, "application/json", bytes.NewBuffer(b))
 	if err != nil {
@@ -316,7 +316,7 @@ func (c Client) notify(jobID string, providerID int, log *logrus.Entry) error {
 
 	return nil
 }
-func (c Client) ProcessCallback(callbackData providers.CallbackData, jobID string) {
+func (c Client) ProcessCallback(callbackData *providers.CallbackData, jobID string) {
 
 	entry := c.Logger.WithFields(log.Fields{
 		"JobID":      jobID,

@@ -89,6 +89,6 @@ func (c *UploadProvider) validateCaptionFile(file *database.UploadedFile) error 
 
 	return nil
 }
-func (c *UploadProvider) HandleCallback(req *http.Request) (*CallbackData, error) {
+func (c *UploadProvider) HandleCallback(req *http.Request) (string, *CallbackData, error) {
 	panic("not implemented") // TODO: Implement
 }

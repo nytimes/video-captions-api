@@ -13,8 +13,7 @@ type Callback struct {
 
 type DataWrapper struct {
 	JobID string
-	Data  CallbackData
-	URL   string
+	Data  *CallbackData
 }
 
 type CallbackData struct {
@@ -39,6 +38,6 @@ type Provider interface {
 	Download(*database.Job, string) ([]byte, error)
 	GetProviderJob(*database.Job) (*database.ProviderJob, error)
 	GetName() string
-	HandleCallback(req *http.Request) (*CallbackData, error)
+	HandleCallback(req *http.Request) (jobID string, data *CallbackData, err error)
 	CancelJob(*database.Job) (bool, error)
 }

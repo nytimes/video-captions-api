@@ -162,7 +162,7 @@ func (c *ThreePlayProvider) CancelJob(job *database.Job) (bool, error) {
 	return providerJob.Cancellable, errors.New("job is not cancellable")
 }
 
-func (c *ThreePlayProvider) HandleCallback(req *http.Request) (*CallbackData, error) {
+func (c *ThreePlayProvider) HandleCallback(req *http.Request) (string, *CallbackData, error) {
 	requestLogger := c.logger.WithFields(log.Fields{
 		"Handler": "ThreePlayProcessCallback",
 	})
@@ -172,15 +172,16 @@ func (c *ThreePlayProvider) HandleCallback(req *http.Request) (*CallbackData, er
 	data, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		requestLogger.WithError(err).Error("Could not read request body: ")
-		return nil, err
+		return "", nil, err
 	}
 
 	callbackObject := Callback{}
 	err = json.Unmarshal(data, &callbackObject)
 	if err != nil {
 		requestLogger.WithError(err).Error("Could not unmarshal callback")
-		return nil, fmt.Errorf("Malformed parameters: %w", err)
+		return "", nil, fmt.Errorf("Malformed parameters: %w", err)
 	}
-
-	return &callbackObject.Data, nil
+	queryParams := req.URL.Query()
+	jobID := queryParams.Get("job_id")
+	return jobID, &callbackObject.Data, nil
 }

@@ -80,7 +80,7 @@ func main() {
 	exporter, registry := MustInitMetrics()
 	videocaptionsapi.StartMetricsServer(ctx, eg, exporter, server.Log)
 
-	callbackQueue, endpoints := providers.StartCallbackListener(ctx, &sync.WaitGroup{}, implementedProviders, server.Log)
+	callbackQueue, endpoints := providers.StartCallbackListener(ctx, &sync.WaitGroup{}, implementedProviders, server.Log.WithField("service", "CallbackListener"))
 
 	// caption server
 	captionsService := service.NewCaptionsService(&cfg, db, callbackQueue, endpoints, registry)
@@ -89,8 +89,6 @@ func main() {
 		captionsService.AddProvider(p)
 	}
 	server.Init("video-captions-api", cfg.Server)
-
-	//server.WithCloseHandler TODO need to implement gizmo server.Context.Handler to gracefully shut down
 
 	err = server.Register(captionsService)
 	if err != nil {

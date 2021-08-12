@@ -11,7 +11,6 @@ import (
 	"reflect"
 
 	"github.com/NYTimes/gizmo/server"
-	captions "github.com/NYTimes/video-captions-api"
 	"github.com/NYTimes/video-captions-api/config"
 	"github.com/NYTimes/video-captions-api/database"
 	"github.com/NYTimes/video-captions-api/providers"
@@ -26,7 +25,7 @@ type fakeProvider struct {
 	callbackData *providers.CallbackData
 }
 
-func (p fakeProvider) HandleCallback(req *http.Request) (*providers.CallbackData, error) {
+func (p fakeProvider) HandleCallback(req *http.Request) (string, *providers.CallbackData, error) {
 	panic("not implemented") // TODO: Implement
 }
 
@@ -78,8 +77,8 @@ func (p fakeProvider) CancelJob(job *database.Job) (bool, error) {
 
 type brokenProvider fakeProvider
 
-func (p brokenProvider) HandleCallback(req *http.Request) (*providers.CallbackData, error) {
-	return &providers.CallbackData{}, nil
+func (p brokenProvider) HandleCallback(req *http.Request) (string, *providers.CallbackData, error) {
+	return "", &providers.CallbackData{}, nil
 }
 
 func (p brokenProvider) GetName() string {
@@ -145,11 +144,13 @@ func TestNewCaptionsService(t *testing.T) {
 	}
 	db := database.NewMemoryDatabase()
 	var callers []providers.Provider
-	for _, p := range p {
-		callers = append(callers, p)
+	for _, caller := range p {
+		callers = append(callers, caller)
 	}
-	cb := captions.StartCallbackListener(context.Background(), &sync.WaitGroup{}, callers, logger)
-	service := NewCaptionsService(&cfg, db, cb, prometheus.NewRegistry())
+	cbQ, urls := providers.StartCallbackListener(context.Background(), &sync.WaitGroup{}, callers, logger.WithField("service", projectID))
+
+	assert.Zero(t, len(urls))
+	service := NewCaptionsService(&cfg, db, cbQ, urls, prometheus.NewRegistry())
 
 	assert := assert.New(t)
 
