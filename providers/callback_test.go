@@ -44,7 +44,7 @@ func TestCallbackListener(t *testing.T) {
 
 	log := logrus.New()
 	for _, tc := range tests {
-
+		log.Info("tc", tc)
 		//t.Parallel()
 		ctx, cancel := makeContext(tc.ttl)
 		var wg sync.WaitGroup
@@ -57,13 +57,15 @@ func TestCallbackListener(t *testing.T) {
 				"testname", tc.name,
 			),
 		)
-		addr := uris[tc.p[0].(*testProvider).name]
+		t.Log("generating urls for callbacks", uris)
+		addr := fmt.Sprintf("http://localhost:9090%s", uris[tc.p[0].(*testProvider).name])
 		go func() {
-			t.Log("calling the callback")
+			t.Log("calling the callback", addr)
 			res, err := http.Post(addr, "application/json", tc.payload)
 			require.NoError(t, err)
 			fmt.Printf("%+v\n", res)
 			cancel()
+			close(q)
 		}()
 		t.Log("ranging over CallbackData q")
 		for data := range q {

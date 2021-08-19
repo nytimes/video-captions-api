@@ -29,6 +29,10 @@ func StartCallbackListener(
 	for _, c := range callbackHandlers {
 
 		h, guid := handleRegister(ctx, q, c, log.WithField("provider", c))
+		log.WithFields(logrus.Fields{
+			"guid": guid,
+		}).Info("generating callback urls")
+		uris[c.GetName()] = fmt.Sprintf("%s", guid)
 		mux.HandleFunc(
 			fmt.Sprintf("%s", guid),
 			h,
@@ -45,6 +49,14 @@ func StartCallbackListener(
 			WriteTimeout: 2 * time.Second,
 			Handler:      mux,
 		}
+		go func() {
+			select {
+			case <-ctx.Done():
+				shutdownCtx, cancel := context.WithTimeout(context.Background(), time.Second*1)
+				defer cancel()
+				cbServer.Shutdown(shutdownCtx)
+			}
+		}()
 		var err error
 		if err = cbServer.ListenAndServe(); err != http.ErrServerClosed {
 			log.WithFields(logrus.Fields{
@@ -62,6 +74,7 @@ func handleRegister(ctx context.Context, q chan<- *DataWrapper, c CallbackHandle
 	path := fmt.Sprintf("/%s", guid)
 
 	h := func(w http.ResponseWriter, req *http.Request) {
+		log.Info("handle resgister callback")
 		id, data, err := c.HandleCallback(req)
 		if err != nil {
 			log.WithFields(logrus.Fields{

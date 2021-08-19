@@ -118,6 +118,7 @@ func TestStoreAndGetParallel(t *testing.T) {
 				for {
 					select {
 					case <-ctx.Done():
+						log.Info("ctx.Done")
 						total := atomic.LoadUint64(&runningTotal)
 						log.Debug(
 							"Context completed. Attempting to validate completion count",
@@ -130,6 +131,7 @@ func TestStoreAndGetParallel(t *testing.T) {
 						return
 
 					case j := <-toValidate:
+						log.Info("toValidate")
 						total := atomic.AddUint64(&runningTotal, 1)
 						log.Debug(
 							"pulling job",
@@ -161,6 +163,7 @@ func TestStoreAndGetParallel(t *testing.T) {
 				}
 			}(tc.name, tc.count, wLog)
 		}
+		log.Info("waiting")
 		wg.Wait()
 		cancel()
 	}
