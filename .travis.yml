@@ -4,6 +4,7 @@ addons:
   apt:
     packages:
       - docker-ce
+      - git
 env:
   global:
     - GO_FOR_RELEASE=1.x
@@ -17,7 +18,7 @@ install:
   - go mod download
 script:
   - make run-lint coverage
-  - go build -o video-captions-api
+  - VERSION=`git describe --always --tags` go build -o video-captions-api -ldflags="-X main.version=$(VERSION)
 after_success:
   - bash <(curl -s https://codecov.io/bash)
   - travis-scripts/docker.bash

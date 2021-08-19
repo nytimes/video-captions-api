@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/NYTimes/video-captions-api/database"
+	"github.com/NYTimes/video-captions-api/providers"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
@@ -15,7 +16,7 @@ import (
 func TestGetJob(t *testing.T) {
 	service, client := createCaptionsService("")
 	assert := assert.New(t)
-	service.AddProvider(fakeProvider{logger: log.New()})
+	service.AddProvider(&fakeProvider{logger: log.New()})
 	job := &database.Job{
 		ID:       "123",
 		MediaURL: "http://vp.nyt.com/video.mp4",
@@ -36,7 +37,7 @@ func TestDispatchJobNoProvider(t *testing.T) {
 func TestGetJobReady(t *testing.T) {
 	assert := assert.New(t)
 	service, client := createCaptionsService("")
-	service.AddProvider(fakeProvider{
+	service.AddProvider(&fakeProvider{
 		logger: log.New(),
 		params: map[string]bool{
 			"jobError":  false,
@@ -64,7 +65,7 @@ func TestGetJobs(t *testing.T) {
 
 	service, client := createCaptionsService("")
 
-	service.AddProvider(fakeProvider{logger: log.New()})
+	service.AddProvider(&fakeProvider{logger: log.New()})
 	today := time.Now()
 	yesterday := today.AddDate(0, 0, -1)
 	job1 := &database.Job{
@@ -96,7 +97,7 @@ func TestGetJobs(t *testing.T) {
 
 func TestProviderJobError(t *testing.T) {
 	service, client := createCaptionsService("")
-	service.AddProvider(fakeProvider{
+	service.AddProvider(&fakeProvider{
 		logger: log.New(),
 		params: map[string]bool{
 			"jobError":  true,
@@ -118,7 +119,7 @@ func TestProviderJobError(t *testing.T) {
 
 func TestProviderStatusError(t *testing.T) {
 	service, client := createCaptionsService("")
-	service.AddProvider(fakeProvider{
+	service.AddProvider(&fakeProvider{
 		logger: log.New(),
 		params: map[string]bool{
 			"jobError":  false,
@@ -140,7 +141,7 @@ func TestProviderStatusError(t *testing.T) {
 func TestCancelClientJob(t *testing.T) {
 	service, client := createCaptionsService("")
 	assert := assert.New(t)
-	service.AddProvider(fakeProvider{logger: log.New()})
+	service.AddProvider(&fakeProvider{logger: log.New()})
 	job := &database.Job{
 		ID:       "123",
 		MediaURL: "http://vp.nyt.com/video.mp4",
@@ -157,7 +158,7 @@ func TestCancelClientJob(t *testing.T) {
 func TestCancelClientJobDone(t *testing.T) {
 	service, client := createCaptionsService("")
 	assert := assert.New(t)
-	service.AddProvider(fakeProvider{logger: log.New()})
+	service.AddProvider(&fakeProvider{logger: log.New()})
 	job := &database.Job{
 		ID:       "123",
 		MediaURL: "http://vp.nyt.com/video.mp4",
@@ -175,7 +176,7 @@ func TestCancelClientJobDone(t *testing.T) {
 func TestCancelClientJob404(t *testing.T) {
 	service, client := createCaptionsService("")
 	assert := assert.New(t)
-	service.AddProvider(fakeProvider{logger: log.New()})
+	service.AddProvider(&fakeProvider{logger: log.New()})
 
 	canceled, err := client.CancelJob("404")
 	assert.NotNil(err)
@@ -186,7 +187,7 @@ func TestCancelClientJob404(t *testing.T) {
 func TestDownloadCaption(t *testing.T) {
 	service, client := createCaptionsService("")
 	assert := assert.New(t)
-	service.AddProvider(fakeProvider{logger: log.New()})
+	service.AddProvider(&fakeProvider{logger: log.New()})
 	job := &database.Job{
 		ID:       "123",
 		MediaURL: "http://vp.nyt.com/video.mp4",
@@ -201,7 +202,7 @@ func TestDownloadCaption(t *testing.T) {
 func TestDownloadNonexistentCaption(t *testing.T) {
 	service, client := createCaptionsService("")
 	assert := assert.New(t)
-	service.AddProvider(fakeProvider{logger: log.New()})
+	service.AddProvider(&fakeProvider{logger: log.New()})
 	job := &database.Job{
 		ID:       "123",
 		MediaURL: "http://vp.nyt.com/video.mp4",
@@ -231,7 +232,7 @@ func TestDownloadCaptionProviderError(t *testing.T) {
 func TestGenerateTranscriptSsa(t *testing.T) {
 	service, client := createCaptionsService("")
 	assert := assert.New(t)
-	service.AddProvider(fakeProvider{logger: log.New()})
+	service.AddProvider(&fakeProvider{logger: log.New()})
 	job := &database.Job{
 		ID:       "123",
 		MediaURL: "http://vp.nyt.com/video.mp4",
@@ -248,7 +249,7 @@ func TestGenerateTranscriptSsa(t *testing.T) {
 func TestGenerateTranscriptVtt(t *testing.T) {
 	service, client := createCaptionsService("")
 	assert := assert.New(t)
-	service.AddProvider(fakeProvider{logger: log.New()})
+	service.AddProvider(&fakeProvider{logger: log.New()})
 	job := &database.Job{
 		ID:       "123",
 		MediaURL: "http://vp.nyt.com/video.mp4",
@@ -265,7 +266,7 @@ func TestGenerateTranscriptVtt(t *testing.T) {
 func TestGenerateTranscriptSrt(t *testing.T) {
 	service, client := createCaptionsService("")
 	assert := assert.New(t)
-	service.AddProvider(fakeProvider{logger: log.New()})
+	service.AddProvider(&fakeProvider{logger: log.New()})
 	job := &database.Job{
 		ID:       "123",
 		MediaURL: "http://vp.nyt.com/video.mp4",
@@ -282,7 +283,7 @@ func TestGenerateTranscriptSrt(t *testing.T) {
 func TestGenerateTranscriptSbv(t *testing.T) {
 	service, client := createCaptionsService("")
 	assert := assert.New(t)
-	service.AddProvider(fakeProvider{logger: log.New()})
+	service.AddProvider(&fakeProvider{logger: log.New()})
 	job := &database.Job{
 		ID:       "123",
 		MediaURL: "http://vp.nyt.com/video.mp4",
@@ -299,7 +300,7 @@ func TestGenerateTranscriptSbv(t *testing.T) {
 func TestGenerateTranscriptWrongFormat(t *testing.T) {
 	service, client := createCaptionsService("")
 	assert := assert.New(t)
-	service.AddProvider(fakeProvider{logger: log.New()})
+	service.AddProvider(&fakeProvider{logger: log.New()})
 	job := &database.Job{
 		ID:       "123",
 		MediaURL: "http://vp.nyt.com/video.mp4",
@@ -377,8 +378,7 @@ func TestProcessCallbackClient(t *testing.T) {
 			}
 
 			service, client := createCaptionsService(callbackURL)
-			assert := assert.New(t)
-			service.AddProvider(fakeProvider{logger: log.New()})
+			service.AddProvider(&fakeProvider{logger: log.New()})
 			job := &database.Job{
 				ID:             "123",
 				MediaURL:       "http://vp.nyt.com/video.mp4",
@@ -386,7 +386,7 @@ func TestProcessCallbackClient(t *testing.T) {
 				ProviderParams: map[string]string{"ProviderID": "11214314"},
 			}
 			client.DB.StoreJob(job)
-			callbackData := CallbackData{
+			callbackData := &providers.CallbackData{
 				ID:          test.providerID,
 				MediaFileID: 3765758,
 				BatchID:     68841,
@@ -400,8 +400,8 @@ func TestProcessCallbackClient(t *testing.T) {
 				Cancellable: false,
 			}
 
-			err := client.ProcessCallback(callbackData, test.jobID)
-			assert.Equal(test.error, err)
+			client.ProcessCallback(callbackData, test.jobID)
+
 		})
 	}
 }

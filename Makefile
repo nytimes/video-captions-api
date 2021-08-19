@@ -1,5 +1,7 @@
 dev:
-	SERVER_HTTP_PORT=8000\
+	@go build -o captions cmd/main.go 
+
+	@SERVER_HTTP_PORT=8000\
 		SERVER_GIZMO_HEALTH_CHECK_PATH=/healthz\
 		THREE_PLAY_API_KEY=$(THREE_PLAY_API_KEY) \
 		THREE_PLAY_API_SECRET=$(THREE_PLAY_API_SECRET) \
@@ -10,14 +12,15 @@ dev:
 		BUCKET_NAME=$(CAPTIONS_BUCKET_NAME) \
 		CALLBACK_URL=$(CALLBACK_URL) \
 		CALLBACK_API_KEY=$(CALLBACK_API_KEY) \
-		go run main.go
+		./captions
 
 install-golangcilint:
-	GO111MODULE=off go get github.com/golangci/golangci-lint/cmd/golangci-lint
+	go get github.com/golangci/golangci-lint/cmd/golangci-lint
 
 run-lint:
-	golangci-lint run --enable-all -D errcheck -D lll -D funlen -D wsl --deadline 5m ./...
+	golangci-lint run -D lll -D funlen --deadline 5m ./...
 
+PHONY:
 lint: install-golangcilint run-lint
 
 coverage:
@@ -25,3 +28,5 @@ coverage:
 
 test:
 	go test -race ./...
+
+.PHONY: test

@@ -1,16 +1,21 @@
 package providers
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
+	"io/ioutil"
+	"net/http"
 	"net/url"
 	"strconv"
 
 	"github.com/NYTimes/video-captions-api/config"
 	"github.com/NYTimes/video-captions-api/database"
 	"github.com/kelseyhightower/envconfig"
+	log "github.com/sirupsen/logrus"
+
 	"github.com/nytimes/threeplay/types"
 	threeplay "github.com/nytimes/threeplay/v3api"
-	log "github.com/sirupsen/logrus"
 )
 
 const providerName string = "3play"
@@ -155,4 +160,28 @@ func (c *ThreePlayProvider) CancelJob(job *database.Job) (bool, error) {
 		return providerJob.Cancellable, nil
 	}
 	return providerJob.Cancellable, errors.New("job is not cancellable")
+}
+
+func (c *ThreePlayProvider) HandleCallback(req *http.Request) (string, *CallbackData, error) {
+	requestLogger := c.logger.WithFields(log.Fields{
+		"Handler": "ThreePlayProcessCallback",
+	})
+
+	defer req.Body.Close()
+
+	data, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		requestLogger.WithError(err).Error("Could not read request body: ")
+		return "", nil, err
+	}
+
+	callbackObject := Callback{}
+	err = json.Unmarshal(data, &callbackObject)
+	if err != nil {
+		requestLogger.WithError(err).Error("Could not unmarshal callback")
+		return "", nil, fmt.Errorf("Malformed parameters: %w", err)
+	}
+	queryParams := req.URL.Query()
+	jobID := queryParams.Get("job_id")
+	return jobID, &callbackObject.Data, nil
 }
