@@ -32,12 +32,12 @@ func NewCaptionsService(
 	metrics *prom.Registry,
 ) *CaptionsService {
 	storage, _ := NewGCSStorage(cfg.BucketName, cfg.Logger)
-	client := Client{
-		Providers: make(map[string]providers.Provider),
-		DB:        db,
-		Logger:    cfg.Logger,
-		Storage:   storage,
-	}
+	client := NewClient(
+		db,
+		cfg.Logger,
+		storage,
+		metrics,
+	)
 	service := &CaptionsService{
 		client,
 		cfg.Logger,

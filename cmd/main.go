@@ -24,11 +24,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-const (
-	// MetricsNamespace is the name of the application.
-	MetricsNamespace = "video_captions_api"
-)
-
 var (
 	version = "no version from LDFLAGS"
 )
@@ -79,9 +74,7 @@ func main() {
 
 	exporter, registry := MustInitMetrics()
 	videocaptionsapi.StartMetricsServer(ctx, eg, exporter, server.Log)
-
 	callbackQueue, endpoints := providers.StartCallbackListener(ctx, &sync.WaitGroup{}, implementedProviders, server.Log.WithField("service", "CallbackListener"))
-
 	// caption server
 	captionsService := service.NewCaptionsService(&cfg, db, callbackQueue, endpoints, registry)
 
@@ -130,28 +123,16 @@ func initMetrics() (*prometheus.Exporter, *goprom.Registry, error) {
 	r.MustRegister(goprom.NewGoCollector())
 
 	versionCollector := goprom.NewGaugeVec(goprom.GaugeOpts{
-		Namespace: MetricsNamespace,
+		Namespace: videocaptionsapi.MetricsNamespace,
 		Name:      "version",
 		Help:      "Application version.",
 	}, []string{"version"})
 
 	r.MustRegister(versionCollector)
 	versionCollector.WithLabelValues(version).Add(1)
-
-	captionTimer := goprom.NewHistogramVec(goprom.HistogramOpts{
-		Namespace: MetricsNamespace,
-		Name:      "asr_execution_time_seconds",
-		Help:      "provider caption time",
-		Buckets:   goprom.LinearBuckets(20, 5, 5),
-	}, []string{
-		"provider",
-	})
-
-	r.MustRegister(captionTimer)
-
 	// Stats exporter: Prometheus
 	pe, err := prometheus.NewExporter(prometheus.Options{
-		Namespace: MetricsNamespace,
+		Namespace: videocaptionsapi.MetricsNamespace,
 		Registry:  r,
 	})
 	if err != nil {

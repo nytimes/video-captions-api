@@ -11,6 +11,11 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
+const (
+	// MetricsNamespace is the name of the application.
+	MetricsNamespace = "video_captions_api"
+)
+
 func StartMetricsServer(
 	ctx context.Context,
 	eg *errgroup.Group,

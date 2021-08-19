@@ -10,12 +10,25 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
+	videocaptionsapi "github.com/NYTimes/video-captions-api"
 	"github.com/NYTimes/video-captions-api/database"
 	"github.com/NYTimes/video-captions-api/providers"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 )
+
+var captionTimer = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+	Namespace: videocaptionsapi.MetricsNamespace,
+	Name:      "asr_execution_time_seconds",
+	Help:      "provider caption time",
+	Buckets:   prometheus.LinearBuckets(10, 10, 10),
+}, []string{
+	"provider",
+	"job",
+})
 
 // Client CaptionsService client
 type Client struct {
@@ -25,6 +38,19 @@ type Client struct {
 	Storage        Storage
 	CallbackURL    string
 	CallbackAPIKey string
+	Metrics        *prometheus.Registry
+}
+
+func NewClient(db database.DB, logger *logrus.Logger, storage Storage, metrics *prometheus.Registry) Client {
+	metrics.MustRegister(captionTimer)
+	return Client{
+		Providers: make(map[string]providers.Provider),
+		DB:        db,
+		Logger:    logger,
+		Storage:   storage,
+		Metrics:   metrics,
+	}
+
 }
 
 // GetJobs gets all jobs associated with a ParentID
@@ -104,6 +130,7 @@ func (c Client) GetJob(jobID string) (*database.Job, error) {
 
 // DispatchJob dispatches a Job given an existing Provider
 func (c Client) DispatchJob(job *database.Job) error {
+
 	provider := c.Providers[job.Provider]
 	jobLogger := c.Logger.WithFields(log.Fields{"JobID": job.ID, "Provider": job.Provider})
 	if provider == nil {
@@ -166,6 +193,12 @@ func (c Client) DownloadCaption(jobID string, captionType string) ([]byte, error
 		c.Logger.Error("Could not find Job in database")
 		return nil, err
 	}
+
+	captionTimer.With(
+		prometheus.Labels{
+			"provider": job.Provider,
+			"job":      job.ID,
+		}).Observe(float64(time.Now().Sub(job.CreatedAt)) / float64(time.Millisecond))
 
 	providerID := job.GetProviderID()
 	fields := log.Fields{"JobID": jobID, "Provider": job.Provider, "ProviderID": providerID}
