@@ -22,7 +22,7 @@ func StartMetricsServer(
 	exporter *prometheus.Exporter,
 	log *logrus.Logger) error {
 
-	addr := ":9000"
+	addr := ":9090"
 	log.WithField("address", addr).Info("starting metric server")
 
 	mux := http.NewServeMux()
@@ -38,10 +38,13 @@ func StartMetricsServer(
 	shutdownCtx, cancel := context.WithCancel(ctx)
 	eg.Go(func() error {
 		defer cancel()
-		var err error
-		if err = srv.Shutdown(shutdownCtx); err != nil {
-			log.Fatalf("server Shutdown Failed:%+s", err)
-			return err
+		select {
+		case <-shutdownCtx.Done():
+			var err error
+			if err = srv.Shutdown(shutdownCtx); err != nil {
+				log.Fatalf("server Shutdown Failed:%+s", err)
+				return err
+			}
 		}
 		return nil
 
@@ -57,6 +60,7 @@ func StartMetricsServer(
 			}).Fatal("Metrics server failure")
 			return err
 		}
+		println("returned")
 		return nil
 
 	})
