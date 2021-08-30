@@ -63,14 +63,20 @@ func main() {
 	}
 
 	interrupt := make(chan os.Signal, 1)
-
-	signal.Notify(interrupt, syscall.SIGINT, syscall.SIGTERM)
-	defer signal.Stop(interrupt)
-	implementedProviders := makeProviders(&cfg, db)
-
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	eg, ctx := errgroup.WithContext(ctx)
+
+	signal.Notify(interrupt, syscall.SIGINT, syscall.SIGTERM)
+	defer signal.Stop(interrupt)
+	go func() {
+		select {
+		case <-interrupt:
+			cancel()
+
+		}
+	}()
+	implementedProviders := makeProviders(&cfg, db)
 
 	exporter, registry := MustInitMetrics()
 	videocaptionsapi.StartMetricsServer(ctx, eg, exporter, server.Log)
