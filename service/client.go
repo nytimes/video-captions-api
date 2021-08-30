@@ -198,6 +198,7 @@ func (c Client) DownloadCaption(jobID string, captionType string) ([]byte, error
 		prometheus.Labels{
 			"provider": job.Provider,
 			"job":      job.ID,
+			"stage":    "download",
 		}).Observe(float64(time.Now().Sub(job.CreatedAt)) / float64(time.Millisecond))
 
 	providerID := job.GetProviderID()
