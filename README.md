@@ -52,3 +52,15 @@ A pre-built image is available on Docker Hub: https://hub.docker.com/r/nytimes/v
 ## Documentation
 
 For more info check the [docs](https://github.com/nytimes/video-captions-api/wiki/Endpoints)
+
+# Trint Captions Provider
+
+## In Progress
+
+The refactor for the Trint work has been completed. We dynamically spin up a callback endpoint for all providers at runtime. Then all callbacks that are received are sent through the appropriate callback parser defined in the provider and sent through the callback channel defined in the service, created in `NewCaptionsService`.
+
+`providers/trint` is incomplete.
+
+## Metrics
+
+The metrics gatherer is defined in `sidekicks.go` and started in `cmd/main.go`. It uses Prometheus to scrape metrics and reports them to Datadog.
