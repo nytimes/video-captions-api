@@ -2,6 +2,7 @@ package videocaptionsapi
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -18,12 +19,13 @@ const (
 
 func StartMetricsServer(
 	ctx context.Context,
+	port int,
 	eg *errgroup.Group,
 	exporter *prometheus.Exporter,
 	log *logrus.Logger) error {
 
-	addr := ":9090"
-	log.WithField("address", addr).Info("starting metric server")
+	addr := fmt.Sprintf(":%d", port)
+	log.WithField("port", port).Info("starting metric server")
 
 	mux := http.NewServeMux()
 	mux.Handle("/metrics", exporter)
@@ -41,7 +43,7 @@ func StartMetricsServer(
 		select {
 		case <-shutdownCtx.Done():
 			var err error
-			if err = srv.Shutdown(shutdownCtx); err != nil {
+			if err = srv.Shutdown(shutdownCtx); err != nil && err != context.Canceled {
 				log.Fatalf("server Shutdown Failed:%+s", err)
 				return err
 			}

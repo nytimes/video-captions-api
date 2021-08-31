@@ -79,27 +79,33 @@ func main() {
 	implementedProviders := makeProviders(&cfg, db)
 
 	exporter, registry := MustInitMetrics()
-	videocaptionsapi.StartMetricsServer(ctx, eg, exporter, server.Log)
-	callbackQueue, endpoints := providers.StartCallbackListener(ctx, &sync.WaitGroup{}, implementedProviders, server.Log.WithField("service", "CallbackListener"))
+	go videocaptionsapi.StartMetricsServer(ctx, 9090, eg, exporter, server.Log)
+	callbackQueue, endpoints := providers.StartCallbackListener(ctx, 9091, &sync.WaitGroup{}, implementedProviders, server.Log.WithField("service", "CallbackListener"))
 	// caption server
 	captionsService := service.NewCaptionsService(&cfg, db, callbackQueue, endpoints, registry)
 
 	for _, p := range implementedProviders {
 		captionsService.AddProvider(p)
 	}
-	server.Init("video-captions-api", cfg.Server)
 
-	err = server.Register(captionsService)
-	if err != nil {
-		server.Log.Fatal("Unable to register service: ", err)
+	eg.Go(func() error {
+		server.Init("video-captions-api", cfg.Server)
+
+		err = server.Register(captionsService)
+		if err != nil {
+			return err
+		}
+
+		err = server.Run()
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	if err := eg.Wait(); err != nil {
+		server.Log.WithField("err", err).Error("Unexpected error from server")
 	}
-
-	err = server.Run()
-	if err != nil {
-		server.Log.Fatal("Server encountered a fatal error: ", err)
-	}
-
-	eg.Wait()
 
 }
 

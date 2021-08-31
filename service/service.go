@@ -45,6 +45,7 @@ func NewCaptionsService(
 		metrics,
 	}
 	go func(log *logrus.Entry) {
+		log.Info("Starting callback worker")
 		for wrapper := range callbacks {
 			data, id := wrapper.Data, wrapper.JobID
 			client.ProcessCallback(data, id)

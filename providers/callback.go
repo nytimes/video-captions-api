@@ -18,6 +18,7 @@ type CallbackHandler interface {
 
 func StartCallbackListener(
 	ctx context.Context,
+	port int,
 	wg *sync.WaitGroup,
 	callbackHandlers []Provider,
 	log *logrus.Entry) (chan *DataWrapper, map[string]string) {
@@ -43,8 +44,10 @@ func StartCallbackListener(
 	go func(log *logrus.Entry) {
 		defer wg.Done()
 
+		log.WithField("port", port).Info("Starting callback listener")
+
 		cbServer := &http.Server{
-			Addr:         ":9090",
+			Addr:         fmt.Sprintf(":%d", port),
 			ReadTimeout:  2 * time.Second,
 			WriteTimeout: 2 * time.Second,
 			Handler:      mux,
