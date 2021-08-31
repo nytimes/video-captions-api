@@ -1,8 +1,11 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"net/http"
+	"sync"
 	"testing"
 
 	"reflect"
@@ -11,13 +14,19 @@ import (
 	"github.com/NYTimes/video-captions-api/config"
 	"github.com/NYTimes/video-captions-api/database"
 	"github.com/NYTimes/video-captions-api/providers"
+	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
 
 type fakeProvider struct {
-	logger *log.Logger
-	params map[string]bool
+	logger       *log.Logger
+	params       map[string]bool
+	callbackData *providers.CallbackData
+}
+
+func (p fakeProvider) HandleCallback(req *http.Request) (string, *providers.CallbackData, error) {
+	panic("not implemented") // TODO: Implement
 }
 
 func (p fakeProvider) DispatchJob(job *database.Job) error {
@@ -68,6 +77,10 @@ func (p fakeProvider) CancelJob(job *database.Job) (bool, error) {
 
 type brokenProvider fakeProvider
 
+func (p brokenProvider) HandleCallback(req *http.Request) (string, *providers.CallbackData, error) {
+	return "", &providers.CallbackData{}, nil
+}
+
 func (p brokenProvider) GetName() string {
 	return "broken-provider"
 }
@@ -115,23 +128,29 @@ func TestAddProvider(t *testing.T) {
 	service, client := createCaptionsService("")
 
 	service.AddProvider(fakeProvider{})
-	provider := client.Providers["test-provider"]
-	assert.NotNil(provider)
-	assert.Equal(provider.GetName(), "test-provider")
+	p := client.Providers["test-provider"]
+	assert.NotNil(p)
+	assert.Equal(p.GetName(), "test-provider")
 }
 
 func TestNewCaptionsService(t *testing.T) {
 	logger := log.New()
 	projectID := "My amazing captions project"
-	providers := make(map[string]providers.Provider)
+	p := make(map[string]providers.Provider)
 	cfg := config.CaptionsServiceConfig{
 		Server:    &server.Config{},
 		Logger:    logger,
 		ProjectID: projectID,
 	}
 	db := database.NewMemoryDatabase()
+	var callers []providers.Provider
+	for _, caller := range p {
+		callers = append(callers, caller)
+	}
+	cbQ, urls := providers.StartCallbackListener(context.Background(), &sync.WaitGroup{}, callers, logger.WithField("service", projectID))
 
-	service := NewCaptionsService(&cfg, db)
+	assert.Zero(t, len(urls))
+	service := NewCaptionsService(&cfg, db, cbQ, urls, prometheus.NewRegistry())
 
 	assert := assert.New(t)
 
@@ -146,7 +165,7 @@ func TestNewCaptionsService(t *testing.T) {
 	}
 
 	assert.NotNil(service.client.Providers)
-	assert.Equal(service.client.Providers, providers)
+	assert.Equal(service.client.Providers, p)
 
 	assert.Contains(service.Endpoints(), "/captions/{id}")
 	assert.Contains(service.Endpoints(), "/jobs/{id}")
@@ -154,5 +173,4 @@ func TestNewCaptionsService(t *testing.T) {
 	assert.Contains(service.Endpoints(), "/jobs/{id}/cancel")
 	assert.Contains(service.Endpoints(), "/jobs/{id}/download/{captionFormat}")
 	assert.Contains(service.Endpoints(), "/jobs/{id}/transcript/{captionFormat}")
-	assert.Contains(service.Endpoints(), "/callback")
 }

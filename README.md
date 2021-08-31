@@ -23,6 +23,14 @@ THREE_PLAY_API_SECRET
 
 Note that `THREE_PLAY_API_KEY` should take the form of `captions:<captions_key>,transcript:<transcript_key>`.
 
+The following env vars are required for production environments, but have fallbacks for development.
+In the even that `PROJECT_ID` is absent, we start an in memory datastore and log a warning. 
+
+```
+PROJECT_ID='nyt-video-dev'
+BUCKET_NAME='bakeoff-trint-3play'
+```
+
 Run:
 
 ```
@@ -44,3 +52,15 @@ A pre-built image is available on Docker Hub: https://hub.docker.com/r/nytimes/v
 ## Documentation
 
 For more info check the [docs](https://github.com/nytimes/video-captions-api/wiki/Endpoints)
+
+# Trint Captions Provider
+
+## In Progress
+
+The refactor for the Trint work has been completed. We dynamically spin up a callback endpoint for all providers at runtime. Then all callbacks that are received are sent through the appropriate callback parser defined in the provider and sent through the callback channel defined in the service, created in `NewCaptionsService`.
+
+`providers/trint` is incomplete.
+
+## Metrics
+
+The metrics gatherer is defined in `sidekicks.go` and started in `cmd/main.go`. It uses Prometheus to scrape metrics and reports them to Datadog.

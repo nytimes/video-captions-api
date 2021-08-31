@@ -5,15 +5,30 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
+	videocaptionsapi "github.com/NYTimes/video-captions-api"
 	"github.com/NYTimes/video-captions-api/database"
 	"github.com/NYTimes/video-captions-api/providers"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 )
+
+var captionTimer = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+	Namespace: videocaptionsapi.MetricsNamespace,
+	Name:      "asr_execution_time_seconds",
+	Help:      "provider caption time",
+	Buckets:   prometheus.LinearBuckets(10, 10, 10),
+}, []string{
+	"provider",
+	"job",
+})
 
 // Client CaptionsService client
 type Client struct {
@@ -23,6 +38,19 @@ type Client struct {
 	Storage        Storage
 	CallbackURL    string
 	CallbackAPIKey string
+	Metrics        *prometheus.Registry
+}
+
+func NewClient(db database.DB, logger *logrus.Logger, storage Storage, metrics *prometheus.Registry) Client {
+	metrics.MustRegister(captionTimer)
+	return Client{
+		Providers: make(map[string]providers.Provider),
+		DB:        db,
+		Logger:    logger,
+		Storage:   storage,
+		Metrics:   metrics,
+	}
+
 }
 
 // GetJobs gets all jobs associated with a ParentID
@@ -102,6 +130,7 @@ func (c Client) GetJob(jobID string) (*database.Job, error) {
 
 // DispatchJob dispatches a Job given an existing Provider
 func (c Client) DispatchJob(job *database.Job) error {
+
 	provider := c.Providers[job.Provider]
 	jobLogger := c.Logger.WithFields(log.Fields{"JobID": job.ID, "Provider": job.Provider})
 	if provider == nil {
@@ -164,6 +193,13 @@ func (c Client) DownloadCaption(jobID string, captionType string) ([]byte, error
 		c.Logger.Error("Could not find Job in database")
 		return nil, err
 	}
+
+	captionTimer.With(
+		prometheus.Labels{
+			"provider": job.Provider,
+			"job":      job.ID,
+			"stage":    "download",
+		}).Observe(float64(time.Now().Sub(job.CreatedAt)) / float64(time.Millisecond))
 
 	providerID := job.GetProviderID()
 	fields := log.Fields{"JobID": jobID, "Provider": job.Provider, "ProviderID": providerID}
@@ -260,54 +296,66 @@ func (c Client) GenerateTranscript(captionFile []byte, captionFormat string) (st
 	return "", fmt.Errorf("unable to generate a transcript for caption format: %v", captionFormat)
 }
 
-func (c Client) ProcessCallback(callbackData CallbackData, jobID string) error {
-	jobLogger := c.Logger.WithFields(log.Fields{
-		"JobID":      jobID,
-		"ProviderID": callbackData.ID,
-		"Status":     callbackData.Status,
-	})
-	jobLogger.Info("Processing a callback for captions")
-	if callbackData.ID == 0 {
-		jobLogger.Error("Invalid Provider ID")
-		return errors.New("invalid Provider ID")
-	}
+func (c Client) notify(jobID string, providerID int, log *logrus.Entry) error {
+
+	log.Debug("Processing a callback for captions")
 	if jobID == "" {
-		databaseJob, err := c.DB.GetJobByProviderID(strconv.Itoa(callbackData.ID))
+		databaseJob, err := c.DB.GetJobByProviderID(strconv.Itoa(providerID))
 		if err != nil {
-			jobLogger.Errorf("Could not retrieve job by provider ID: %v", err)
+			// We don't need to add fields for jobID or providerID. They are already in the *logrus.Entry. Tell your friends. (The errors below)
+			log.WithField("error", err).Error("Failed to get job by provider ID")
 			return err
 		}
 		jobID = databaseJob.ID
 	}
 	job, err := c.GetJob(jobID)
 	if err != nil {
-		jobLogger.Errorf("Could not get job data: %v", err)
-		return err
-	}
-	if c.CallbackURL != "" {
-		jobLogger.Infof("Making API call to: %v", c.CallbackURL)
-		err = c.makeAPICall(job)
-		if err != nil {
-			jobLogger.Errorf("Encountered an error while making a callback call: %v", err)
-			return err
-		}
-	}
-	return nil
-}
-
-func (c Client) makeAPICall(job *database.Job) error {
-	requestBody, err := json.Marshal(job)
-	if err != nil {
+		log.WithField("error", err).Error("Failed to get job by ID")
 		return err
 	}
 
-	resp, err := http.Post(c.CallbackURL, "application/json", bytes.NewBuffer(requestBody))
+	b, err := json.Marshal(job)
 	if err != nil {
+		log.WithField("error", err).Error("Failed to marshal user response")
 		return err
 	}
+
+	log.WithField("addr", c.CallbackURL).Debug("Calling API")
+
+	resp, err := http.Post(c.CallbackURL, "application/json", bytes.NewBuffer(b))
+	if err != nil {
+		log.WithField("error", err).Error("Failed to POST job completion")
+		return err
+	}
+
 	defer resp.Body.Close()
 	if !(resp.StatusCode >= 200 && resp.StatusCode < 300) {
-		return fmt.Errorf("%v", resp.Status)
+		entry := log.WithFields(logrus.Fields{
+			"status": resp.Status,
+		})
+
+		msg := "Unexpected response code from user callback"
+
+		_, err := io.ReadAll(resp.Body)
+		if err != nil {
+			err := fmt.Errorf("%s:%w", msg, err)
+			entry.WithField("error", err).Error("failed to read response body")
+			return err
+
+		}
+
+		entry.Error(msg)
+		return errors.New(msg)
 	}
+
 	return nil
+}
+func (c Client) ProcessCallback(callbackData *providers.CallbackData, jobID string) {
+
+	entry := c.Logger.WithFields(log.Fields{
+		"JobID":      jobID,
+		"ProviderID": callbackData.ID,
+	})
+
+	c.notify(jobID, callbackData.ID, entry)
 }
