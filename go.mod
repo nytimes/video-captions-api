@@ -15,3 +15,5 @@ require (
 )
 
 go 1.13
+
+replace github.com/nytimes/amara => /Users/211351/code/amara
