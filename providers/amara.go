@@ -29,8 +29,10 @@ type AmaraConfig struct {
 
 // NewAmaraProvider creates an AmaraProvider
 func NewAmaraProvider(cfg *AmaraConfig, svcCfg *config.CaptionsServiceConfig) Provider {
+	client := amara.NewClient(cfg.Token, cfg.Team)
+	client.EnableRateLimitProtection()
 	return &AmaraProvider{
-		amara.NewClient(cfg.Token, cfg.Team),
+		client,
 		svcCfg.Logger,
 		cfg.Username,
 		cfg.Team,
