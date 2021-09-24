@@ -29,7 +29,7 @@ deploy:
     script: travis-scripts/deploy.bash stg
     on:
       repo: nytimes/video-captions-api
-      branch: master
+      branch: main
       go: 1.x
   - provider: script
     skip_cleanup: true

@@ -15,7 +15,7 @@ if [ "${TRAVIS_GO_VERSION}" != "${GO_FOR_RELEASE}" ]; then
 	exit 0
 fi
 
-if [ "${TRAVIS_BRANCH}" != "master" ] && [ -z "${TRAVIS_TAG}" ]; then
+if [ "${TRAVIS_BRANCH}" != "main" ] && [ -z "${TRAVIS_TAG}" ]; then
 	echo >&2 "Skipping image build on branch ${TRAVIS_BRANCH}"
 	exit 0
 fi
