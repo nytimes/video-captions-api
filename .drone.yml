@@ -48,7 +48,7 @@ steps:
       - push
       - tag
     branch:
-      - migrate-build-to-drone
+      - main
 - name: docker
   image: plugins/docker
   settings:
@@ -65,7 +65,7 @@ steps:
       - push
       - tag
     branch:
-      - migrate-build-to-drone
+      - main
 - name: deploy-stg
   image: plugins/downstream
   settings:
@@ -83,7 +83,7 @@ steps:
     event:
       - push
     branch:
-      - migrate-build-to-drone
+      - main
 - name: deploy-prd
   image: plugins/downstream
   settings:
