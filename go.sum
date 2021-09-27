@@ -204,6 +204,8 @@ github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d h1:VhgPp6v9qf9Agr/
 github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d/go.mod h1:YUTz3bUH2ZwIWBy3CJBeOBEugqcmXREj14T+iG/4k4U=
 github.com/nytimes/amara v0.3.0 h1:Wgx60hgSyChOji90s3MF0rWmN9CDz3b44dXv88iihGQ=
 github.com/nytimes/amara v0.3.0/go.mod h1:pfACvrYOIo7fA0uLLE2v6BK2tufSaOx8d9XH2a6Ztqk=
+github.com/nytimes/amara v0.4.0 h1:wRy/uhifWc1rq7kP15i60QuQEYuLiTSUFMFGxEHFSHw=
+github.com/nytimes/amara v0.4.0/go.mod h1:pfACvrYOIo7fA0uLLE2v6BK2tufSaOx8d9XH2a6Ztqk=
 github.com/nytimes/threeplay v0.3.2 h1:vJNX/g6i+U012rKOYVWICKCY1JLBLkmTwcgAXIouhSw=
 github.com/nytimes/threeplay v0.3.2/go.mod h1:7RYQwk6M28F77xLPmzb0DAe7fBmdLD3MAFvXrF7Q2us=
 github.com/opentracing/opentracing-go v1.1.0/go.mod h1:UkNAQd3GIcIGf0SeVgPpRdFStlNbqXla1AfSYxPUl2o=

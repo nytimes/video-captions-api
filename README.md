@@ -1,6 +1,6 @@
 # video-captions-api
 
-[![Build Status](https://travis-ci.org/nytimes/video-captions-api.svg?branch=main)](https://travis-ci.org/nytimes/video-captions-api)
+[![Build Status](https://cloud.drone.io/api/badges/nytimes/video-captions-api/status.svg?ref=refs/heads/main)](https://cloud.drone.io/nytimes/video-captions-api)
 [![codecov](https://codecov.io/gh/nytimes/video-captions-api/branch/main/graph/badge.svg)](https://codecov.io/gh/nytimes/video-captions-api)
 [![Go Report Card](https://goreportcard.com/badge/github.com/nytimes/video-captions-api)](https://goreportcard.com/report/github.com/nytimes/video-captions-api)
 
