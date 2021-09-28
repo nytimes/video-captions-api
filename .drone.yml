@@ -53,7 +53,7 @@ steps:
   image: plugins/docker
   settings:
     repo: nytimes/video-captions-api
-    auto_tag: false
+    auto_tag: true
     username:
       from_secret: docker_username
     password:
