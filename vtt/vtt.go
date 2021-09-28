@@ -155,7 +155,6 @@ func validateHeader(block []string) error {
 				message:   fmt.Sprintf("invalid header: malformed metadata: %s", line),
 			}
 		}
-
 	}
 
 	return nil

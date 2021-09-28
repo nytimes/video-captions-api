@@ -1,0 +1,105 @@
+kind: pipeline
+type: docker
+name: default
+
+steps:
+- name: mod-download
+  image: golang:1.15
+  volumes:
+    - name: deps
+      path: /go
+  commands:
+    - go mod download
+  when:
+    event:
+      - push
+      - pull_request
+- name: lint
+  image: golangci/golangci-lint:v1.21
+  volumes:
+    - name: deps
+      path: /go
+  commands:
+    - make run-lint
+  when:
+    event:
+      - push
+      - pull_request
+- name: test
+  image: golang:1.15
+  volumes:
+    - name: deps
+      path: /go
+  commands:
+    - make test
+  when:
+    event:
+      - push
+      - pull_request
+- name: build
+  image: golang:1.15
+  volumes:
+    - name: deps
+      path: /go
+  commands:
+    - go build -o video-captions-api
+  when:
+    event:
+      - push
+      - tag
+    branch:
+      - main
+- name: docker
+  image: plugins/docker
+  settings:
+    repo: nytimes/video-captions-api
+    auto_tag: false
+    username:
+      from_secret: docker_username
+    password:
+      from_secret: docker_password
+    tags:
+      - ${DRONE_COMMIT_SHA:0:8}
+  when:
+    event:
+      - push
+      - tag
+    branch:
+      - main
+- name: deploy-stg
+  image: plugins/downstream
+  settings:
+    server:
+      from_secret: nyt_drone_server
+    token:
+      from_secret: nyt_drone_token
+    deploy: stg
+    last_successful: true
+    repositories:
+      - nytimes/video-captions-api-deployment@main
+    params:
+      - IMAGE=nytimes/video-captions-api:${DRONE_COMMIT_SHA:0:8}
+  when:
+    event:
+      - push
+    branch:
+      - main
+- name: deploy-prd
+  image: plugins/downstream
+  settings:
+    server:
+      from_secret: nyt_drone_server
+    token:
+      from_secret: nyt_drone_token
+    deploy: prd
+    last_successful: true
+    repositories:
+      - nytimes/video-captions-api-deployment@main
+    params:
+      - IMAGE=nytimes/video-captions-api:${DRONE_TAG}
+  when:
+    event:
+      - tag
+volumes:
+- name: deps
+  temp: {}
