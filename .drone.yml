@@ -53,13 +53,14 @@ steps:
   image: plugins/docker
   settings:
     repo: nytimes/video-captions-api
-    auto_tag: true
+    auto_tag: false
     username:
       from_secret: docker_username
     password:
       from_secret: docker_password
     tags:
       - ${DRONE_COMMIT_SHA:0:8}
+      - ${DRONE_TAG}
   when:
     event:
       - push
