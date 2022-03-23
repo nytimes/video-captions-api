@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"path/filepath"
 
-	captionsConfig "github.com/NYTimes/video-captions-api/config"
-	"github.com/NYTimes/video-captions-api/database"
-	"github.com/NYTimes/video-captions-api/vtt"
+	captionsConfig "github.com/nytimes/video-captions-api/config"
+	"github.com/nytimes/video-captions-api/database"
+	"github.com/nytimes/video-captions-api/vtt"
 	log "github.com/sirupsen/logrus"
 )
 

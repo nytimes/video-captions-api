@@ -8,9 +8,9 @@ import (
 	"reflect"
 
 	"github.com/NYTimes/gizmo/server"
-	"github.com/NYTimes/video-captions-api/config"
-	"github.com/NYTimes/video-captions-api/database"
-	"github.com/NYTimes/video-captions-api/providers"
+	"github.com/nytimes/video-captions-api/config"
+	"github.com/nytimes/video-captions-api/database"
+	"github.com/nytimes/video-captions-api/providers"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )

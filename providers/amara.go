@@ -5,8 +5,8 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/NYTimes/video-captions-api/config"
-	"github.com/NYTimes/video-captions-api/database"
+	"github.com/nytimes/video-captions-api/config"
+	"github.com/nytimes/video-captions-api/database"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/nytimes/amara"
 	log "github.com/sirupsen/logrus"

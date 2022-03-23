@@ -1,4 +1,4 @@
-module github.com/NYTimes/video-captions-api
+module github.com/nytimes/video-captions-api
 
 require (
 	cloud.google.com/go/datastore v1.4.0

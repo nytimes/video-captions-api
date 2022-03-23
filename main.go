@@ -2,10 +2,10 @@ package main
 
 import (
 	"github.com/NYTimes/gizmo/server"
-	"github.com/NYTimes/video-captions-api/config"
-	"github.com/NYTimes/video-captions-api/database"
-	"github.com/NYTimes/video-captions-api/providers"
-	"github.com/NYTimes/video-captions-api/service"
+	"github.com/nytimes/video-captions-api/config"
+	"github.com/nytimes/video-captions-api/database"
+	"github.com/nytimes/video-captions-api/providers"
+	"github.com/nytimes/video-captions-api/service"
 	"github.com/kelseyhightower/envconfig"
 )
 

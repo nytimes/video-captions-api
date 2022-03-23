@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/NYTimes/gizmo/server"
-	"github.com/NYTimes/video-captions-api/database"
+	"github.com/nytimes/video-captions-api/database"
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 )

@@ -10,8 +10,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/NYTimes/video-captions-api/database"
-	"github.com/NYTimes/video-captions-api/providers"
+	"github.com/nytimes/video-captions-api/database"
+	"github.com/nytimes/video-captions-api/providers"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -59,7 +59,7 @@ func (c Client) GetJob(jobID string) (*database.Job, error) {
 	jobLogger.Info("Fetching job from Provider")
 	providerJob, err := provider.GetProviderJob(job)
 	if err != nil {
-		jobLogger.Error("error getting job from provider", err)
+		jobLogger.Error("error getting job from provider: ", err)
 		return nil, err
 	}
 
@@ -172,7 +172,7 @@ func (c Client) DownloadCaption(jobID string, captionType string) ([]byte, error
 	jobLogger.Info("Downloading captions from provider")
 	captions, err := provider.Download(job, captionType)
 	if err != nil {
-		jobLogger.Error("error downloading captions from provider", err)
+		jobLogger.Error("error downloading captions from provider: ", err)
 		return nil, err
 	}
 	return captions, nil
