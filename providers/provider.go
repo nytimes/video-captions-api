@@ -1,6 +1,6 @@
 package providers
 
-import "github.com/NYTimes/video-captions-api/database"
+import "github.com/nytimes/video-captions-api/database"
 
 // Provider is the interface that transcription/captions providers must implement
 type Provider interface {

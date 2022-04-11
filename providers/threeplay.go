@@ -5,8 +5,8 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/NYTimes/video-captions-api/config"
-	"github.com/NYTimes/video-captions-api/database"
+	"github.com/nytimes/video-captions-api/config"
+	"github.com/nytimes/video-captions-api/database"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/nytimes/threeplay/types"
 	threeplay "github.com/nytimes/threeplay/v3api"
@@ -126,13 +126,13 @@ func (c *ThreePlayProvider) DispatchJob(job *database.Job) error {
 	fileID, err := c.UploadFileFromURL(query, callParams)
 
 	if err != nil {
-		jobLogger.Error("Failed to upload file to 3Play", err)
+		jobLogger.Error("Failed to upload file to 3Play: ", err)
 		return err
 	}
 
 	transcriptResponse, err := c.OrderTranscript(strconv.Itoa(fileID), callbackURL, turnaroundLevel, callParams)
 	if err != nil {
-		jobLogger.Error("Failed to order caption", err)
+		jobLogger.Error("Failed to order caption: ", err)
 		return err
 	}
 

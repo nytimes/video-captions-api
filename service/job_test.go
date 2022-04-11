@@ -10,7 +10,7 @@ import (
 	"fmt"
 
 	"github.com/NYTimes/gizmo/server"
-	"github.com/NYTimes/video-captions-api/database"
+	"github.com/nytimes/video-captions-api/database"
 	"github.com/stretchr/testify/assert"
 
 	"io/ioutil"
